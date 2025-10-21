@@ -309,16 +309,16 @@ export default function Sidebar() {
               </UnstyledLink>
                {isAdmin && (
               <UnstyledLink
-                href='/admin/input-beasiswa'
+                href='/admin/manajemen-beasiswa'
                 className={clsxm(
                   'py-2 px-3 flex items-center gap-2 rounded-md',
-                  pathName === '/admin/input-beasiswa' && 'bg-primary-blue'
+                  pathName === '/admin/manajemen-beasiswa' && 'bg-primary-blue'
                 )}
               >
                 <HiDocumentText
                   className={clsxm(
                     'w-6 h-6',
-                    pathName === '/admin/input-beasiswa'
+                    pathName === '/admin/manajemen-beasiswa'
                       ? 'text-white'
                       : 'text-primary-blue'
                   )}
@@ -327,12 +327,12 @@ export default function Sidebar() {
                   variant='bt'
                   weight='medium'
                   className={clsxm(
-                    pathName === '/admin/input-beasiswa'
+                    pathName === '/admin/manajemen-beasiswa'
                       ? 'text-white'
                       : 'text-primary-blue'
                   )}
                 >
-                  Input Beasiswa
+                  Manajemen Beasiswa
                 </Typography>
               </UnstyledLink>
                 )}
