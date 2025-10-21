@@ -284,9 +284,9 @@ export default function InputBeasiswaPage() {
           />
         )}
 
-        <label className="flex items-center gap-2">
-          <input type="checkbox" {...register("status_fakultas_khusus")} />
-          Fakultas khusus?
+        <label>
+          <input type="checkbox" {...register("status_fakultas_khusus")} /> Fakultas
+          khusus?
         </label>
 
         {watch("status_fakultas_khusus") && (
@@ -294,32 +294,21 @@ export default function InputBeasiswaPage() {
             id="fakultas_khusus"
             label="Nama Fakultas"
             type="text"
-            {...register("fakultas_khusus")} // <--- pakai key berbeda
+            {...register("status_fakultas_khusus")}
           />
         )}
 
-        <label className="flex items-center gap-2">
-          <input type="checkbox" {...register("status_jurusan_khusus")} />
-          Jurusan khusus?
+        <label>
+          <input type="checkbox" {...register("status_jurusan_khusus")} /> Jurusan
+          khusus?
         </label>
 
         {watch("status_jurusan_khusus") && (
-          <Controller
-            name="jurusan_khusus"
-            control={control}
-            render={({ field }) => (
-              <Select
-                isMulti
-                options={[
-                  { value: "TI", label: "Teknik Informatika" },
-                  { value: "SI", label: "Sistem Informasi" },
-                  { value: "EK", label: "Ekonomi" },
-                ]}
-                placeholder="Pilih Jurusan"
-                value={field.value?.map((val: string) => ({ value: val, label: val })) || []}
-                onChange={(selected: any) => field.onChange(selected.map((opt: any) => opt.value))}
-              />
-            )}
+          <Input
+            id="jurusan_khusus"
+            label="Nama Jurusan"
+            type="text"
+            {...register("status_jurusan_khusus")}
           />
         )}
 
@@ -353,7 +342,7 @@ export default function InputBeasiswaPage() {
         </section>
 
         <div className="flex flex-col justify-center gap-4 mt-6 md:flex-row">
-          <Button type="button" variant="unstyled" onClick={() => router.back()}>Kembali</Button>
+          <Button type="button" variant="warning" onClick={() => router.back()}>Kembali</Button>
           <Button type="submit" disabled={loading}>
             {loading ? 'Menyimpan...' : 'Simpan'}
           </Button>
