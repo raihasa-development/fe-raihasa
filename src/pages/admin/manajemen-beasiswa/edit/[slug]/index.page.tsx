@@ -54,18 +54,19 @@ export default function EditBeasiswaPage() {
   const methods = useForm<BeasiswaForm>();
   const { handleSubmit, reset, register } = methods;
   const router = useRouter();
-  const { id } = useParams();
+  const params = useParams(); 
+  const slug = params.slug;
   const token = useAuthStore((s) => s.token || s.user?.token);
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    if (id) fetchData();
-  }, [id]);
-
+    if (slug) fetchData();
+  }, [slug]);
   const fetchData = async () => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/scholarship/${id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/scholarship/${slug}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error('Gagal memuat data');
@@ -87,7 +88,7 @@ export default function EditBeasiswaPage() {
   const onSubmit = async (formData: BeasiswaForm) => {
     try {
       setSaving(true);
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/scholarship/${id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/scholarship/${slug}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
