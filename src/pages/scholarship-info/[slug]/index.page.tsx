@@ -1,5 +1,5 @@
 //@ts-nocheck
-export const runtime = 'experimental-edge';
+// export const runtime = 'experimental-edge';
 
 import { Disclosure, Transition } from '@headlessui/react';
 import { useQuery } from '@tanstack/react-query';
@@ -35,13 +35,18 @@ const { data, isLoading, isError } = useQuery<ApiReturn<BeasiswaDetail> | null>(
   enabled: !!slug,
 });
 
-
-
   if (isLoading) return <Loading />;
   if (isError) return <div>Error loading scholarship info.</div>;
+  const scholarship = data?.data?.data?.scholarship;
+  console.log(scholarship);
+const requirement = data?.data?.data?.requirement ?? {
+  penyelenggara: '',
+  min_ipk: null,
+  persyaratan: [],
+  berkas: [],
+};
+  console.log(requirement);
 
-const scholarship = data?.data.data as BeasiswaDetail['scholarship'];
-const requirement = data?.data.data as BeasiswaDetail['requirement'];
 
   const formattedStartDate = scholarship?.open_registration
     ? new Date(scholarship.open_registration).toLocaleDateString('id-ID', {
@@ -268,130 +273,130 @@ const requirement = data?.data.data as BeasiswaDetail['requirement'];
 
               {/* Requirements */}
             <Disclosure as='div'>
-  {({ open }) => (
-    <>
-      <Disclosure.Button className='flex justify-between text-[28px] w-full items-center !font-semibold'>
-        <Typography variant='h6' className='text-xl font-semibold'>
-          Requirements
-        </Typography>
-        <HiChevronUp
-          className={`${open ? 'rotate-180 transform transition ease-in-out duration-200' : ''} text-[#111827] text-[32px]`}
-        />
-      </Disclosure.Button>
-      <Transition
-        enter='transition duration-100 ease-out'
-        enterFrom='transform scale-95 opacity-0'
-        enterTo='transform scale-100 opacity-100'
-        leave='transition duration-75 ease-out'
-        leaveFrom='transform scale-100 opacity-100'
-        leaveTo='transform scale-95 opacity-0'
-      >
-        <Disclosure.Panel className='px-6 lg:p-8'>
-          {requirement.berkas?.length > 0 && (
-            <div className='grid py-8 item lg:grid-cols-4'>
-              <div className='col-span-1'>
-                <Typography variant='p' weight='semibold'>Berkas</Typography>
-              </div>
-              <div className='col-span-3'>
-                <ul className='list-disc marker:text-[#FB991A] marker:text-2xl px-6 lg:px-0'>
-                  {requirement.berkas.map((item, index) => (
-                    <li key={index}><Typography>{item}</Typography></li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          )}
+            {({ open }) => (
+            <>
+              <Disclosure.Button className='flex justify-between text-[28px] w-full items-center !font-semibold'>
+                <Typography variant='h6' className='text-xl font-semibold'>
+                  Requirements
+                </Typography>
+                <HiChevronUp
+                  className={`${open ? 'rotate-180 transform transition ease-in-out duration-200' : ''} text-[#111827] text-[32px]`}
+                />
+              </Disclosure.Button>
+              <Transition
+                enter='transition duration-100 ease-out'
+                enterFrom='transform scale-95 opacity-0'
+                enterTo='transform scale-100 opacity-100'
+                leave='transition duration-75 ease-out'
+                leaveFrom='transform scale-100 opacity-100'
+                leaveTo='transform scale-95 opacity-0'
+              >
+                <Disclosure.Panel className='px-6 lg:p-8'>
+                  {requirement.berkas?.length > 0 && (
+                    <div className='grid py-8 item lg:grid-cols-4'>
+                      <div className='col-span-1'>
+                        <Typography variant='p' weight='semibold'>Berkas</Typography>
+                      </div>
+                      <div className='col-span-3'>
+                        <ul className='list-disc marker:text-[#FB991A] marker:text-2xl px-6 lg:px-0'>
+                          {requirement.berkas.map((item, index) => (
+                            <li key={index}><Typography>{item}</Typography></li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  )}
 
-          {requirement.gpa && (
-            <div className='grid py-8 item lg:grid-cols-4'>
-              <div className='col-span-1'>
-                <Typography variant='p' weight='semibold'>GPA</Typography>
-              </div>
-              <div className='col-span-3'>
-                <Typography variant='p'>{requirement.gpa}</Typography>
-              </div>
-            </div>
-          )}
+                  {requirement.gpa && (
+                    <div className='grid py-8 item lg:grid-cols-4'>
+                      <div className='col-span-1'>
+                        <Typography variant='p' weight='semibold'>GPA</Typography>
+                      </div>
+                      <div className='col-span-3'>
+                        <Typography variant='p'>{requirement.gpa}</Typography>
+                      </div>
+                    </div>
+                  )}
 
-          {requirement.instansi?.length > 0 && (
-            <div className='grid py-8 item lg:grid-cols-4'>
-              <div className='col-span-1'>
-                <Typography variant='p' weight='semibold'>Instansi</Typography>
-              </div>
-              <div className='col-span-3'>
-                <ul className='list-disc marker:text-[#FB991A] marker:text-2xl px-6 lg:px-0'>
-                  {requirement.instansi.map((item, index) => (
-                    <li key={index}><Typography>{item}</Typography></li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          )}
+                  {requirement.instansi?.length > 0 && (
+                    <div className='grid py-8 item lg:grid-cols-4'>
+                      <div className='col-span-1'>
+                        <Typography variant='p' weight='semibold'>Instansi</Typography>
+                      </div>
+                      <div className='col-span-3'>
+                        <ul className='list-disc marker:text-[#FB991A] marker:text-2xl px-6 lg:px-0'>
+                          {requirement.instansi.map((item, index) => (
+                            <li key={index}><Typography>{item}</Typography></li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  )}
 
-          {requirement.jurusan?.length > 0 && (
-            <div className='grid py-8 item lg:grid-cols-4'>
-              <div className='col-span-1'>
-                <Typography variant='p' weight='semibold'>Jurusan</Typography>
-              </div>
-              <div className='col-span-3'>
-                <ul className='list-disc marker:text-[#FB991A] marker:text-2xl px-6 lg:px-0'>
-                  {requirement.jurusan.map((item, index) => (
-                    <li key={index}><Typography>{item}</Typography></li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          )}
+                  {requirement.jurusan?.length > 0 && (
+                    <div className='grid py-8 item lg:grid-cols-4'>
+                      <div className='col-span-1'>
+                        <Typography variant='p' weight='semibold'>Jurusan</Typography>
+                      </div>
+                      <div className='col-span-3'>
+                        <ul className='list-disc marker:text-[#FB991A] marker:text-2xl px-6 lg:px-0'>
+                          {requirement.jurusan.map((item, index) => (
+                            <li key={index}><Typography>{item}</Typography></li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  )}
 
-          {requirement.semester?.length > 0 && (
-            <div className='grid py-8 item lg:grid-cols-4'>
-              <div className='col-span-1'>
-                <Typography variant='p' weight='semibold'>Semester</Typography>
-              </div>
-              <div className='col-span-3'>
-                <ul className='list-disc marker:text-[#FB991A] marker:text-2xl px-6 lg:px-0'>
-                  {requirement.semester.map((item, index) => (
-                    <li key={index}><Typography>{item}</Typography></li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          )}
+                  {requirement.semester?.length > 0 && (
+                    <div className='grid py-8 item lg:grid-cols-4'>
+                      <div className='col-span-1'>
+                        <Typography variant='p' weight='semibold'>Semester</Typography>
+                      </div>
+                      <div className='col-span-3'>
+                        <ul className='list-disc marker:text-[#FB991A] marker:text-2xl px-6 lg:px-0'>
+                          {requirement.semester.map((item, index) => (
+                            <li key={index}><Typography>{item}</Typography></li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  )}
 
-          {requirement.persyaratan?.length > 0 && (
-            <div className='grid py-8 item lg:grid-cols-4'>
-              <div className='col-span-1'>
-                <Typography variant='p' weight='semibold'>Persyaratan</Typography>
-              </div>
-              <div className='col-span-3'>
-                <ul className='list-disc marker:text-[#FB991A] marker:text-2xl px-6 lg:px-0'>
-                  {requirement.persyaratan.map((item, index) => (
-                    <li key={index}><Typography>{item}</Typography></li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          )}
+                  {requirement.persyaratan?.length > 0 && (
+                    <div className='grid py-8 item lg:grid-cols-4'>
+                      <div className='col-span-1'>
+                        <Typography variant='p' weight='semibold'>Persyaratan</Typography>
+                      </div>
+                      <div className='col-span-3'>
+                        <ul className='list-disc marker:text-[#FB991A] marker:text-2xl px-6 lg:px-0'>
+                          {requirement.persyaratan.map((item, index) => (
+                            <li key={index}><Typography>{item}</Typography></li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  )}
 
-          {requirement.lainnya?.length > 0 && (
-            <div className='grid py-8 item lg:grid-cols-4'>
-              <div className='col-span-1'>
-                <Typography variant='p' weight='semibold'>Lainnya</Typography>
-              </div>
-              <div className='col-span-3'>
-                <ul className='list-disc marker:text-[#FB991A] marker:text-2xl px-6 lg:px-0'>
-                  {requirement.lainnya.map((item, index) => (
-                    <li key={index}><Typography>{item}</Typography></li>
-                  ))}
-                </ul>
-              </div>
-            </div>
+                  {requirement.lainnya?.length > 0 && (
+                    <div className='grid py-8 item lg:grid-cols-4'>
+                      <div className='col-span-1'>
+                        <Typography variant='p' weight='semibold'>Lainnya</Typography>
+                      </div>
+                      <div className='col-span-3'>
+                        <ul className='list-disc marker:text-[#FB991A] marker:text-2xl px-6 lg:px-0'>
+                          {requirement.lainnya.map((item, index) => (
+                            <li key={index}><Typography>{item}</Typography></li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  )}
+                </Disclosure.Panel>
+              </Transition>
+            </>
           )}
-        </Disclosure.Panel>
-      </Transition>
-    </>
-  )}
-</Disclosure>
+        </Disclosure>
 
               <hr />
 

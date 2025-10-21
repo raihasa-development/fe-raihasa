@@ -1,3 +1,4 @@
+
 import FingerprintJS from '@fingerprintjs/fingerprintjs';
 import React, { useState, useEffect, useCallback } from 'react';
 import { X } from 'lucide-react';
@@ -23,24 +24,19 @@ import {
 const PromoPopup: React.FC = () => {
   const [deviceId, setDeviceId] = useState<string | null>(null);
   const [showPopup, setShowPopup] = useState(false);
+  const [showExpiredPopup, setShowExpiredPopup] = useState(false);
+  const [showPricingPopup, setShowPricingPopup] = useState(false);
+  const [isTrialExpired, setIsTrialExpired] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const router = useRouter();
   const user = useAuthStore.useUser() as User | null;
 
-  // Cek status popup pernah muncul di sessionStorage
-  useEffect(() => {
-    const alreadyShown = sessionStorage.getItem('promoPopupShown');
-    if (alreadyShown) return; 
-  }, []);
-
-  // Fingerprint
   useEffect(() => {
     const loadFingerprint = async () => {
       const fp = await FingerprintJS.load();
       const result = await fp.get();
       setDeviceId(result.visitorId);
-      console.log('Device ID:', result.visitorId);
     };
     loadFingerprint();
   }, []);
@@ -53,53 +49,70 @@ const PromoPopup: React.FC = () => {
       return !res.data.status;
     } catch (err: any) {
       if (err.response?.status === 404) return true;
-      console.error('Gagal cek status trial', err);
       return false;
     }
   }, []);
 
   useEffect(() => {
-    let timer: ReturnType<typeof setTimeout>;
-    const alreadyShown = sessionStorage.getItem('promoPopupShown');
-    if (alreadyShown) return; 
+  const runCheck = async () => {
+    const token = getToken();
+    if (!token || !user) return; // kalau belum login, skip
 
-    const showPopupWithBlur = () => {
-      setShowPopup(true);
-      document.body.style.overflow = 'hidden';
-      const mainContent = document.querySelector('main');
-      if (mainContent) {
-        (mainContent as HTMLElement).style.filter = 'blur(2px) brightness(0.4)';
-        (mainContent as HTMLElement).style.transition = 'filter 0.3s ease-in-out';
-      }
+    const expired = await checkTrialStatus(user.id, user.token);
 
-      sessionStorage.setItem('promoPopupShown', 'true');
-    };
+    if (expired) {
+      setIsTrialExpired(true);
+      setShowExpiredPopup(true);
+    }
+  };
 
+  const timer = setTimeout(runCheck, 1000);
+  return () => clearTimeout(timer);
+}, [user]);
+
+
+  useEffect(() => {
     const runCheck = async () => {
       const token = getToken();
-      if (!token) {
-        timer = setTimeout(showPopupWithBlur, 1500);
+      const alreadyShown = sessionStorage.getItem('promoPopupShown');
+      if (alreadyShown) return;
+
+      if (!token || !user) {
+        setTimeout(() => {
+          setShowPopup(true);
+          document.body.style.overflow = 'hidden';
+          const mainContent = document.querySelector('main');
+          if (mainContent) {
+            (mainContent as HTMLElement).style.filter = 'blur(2px) brightness(0.4)';
+            (mainContent as HTMLElement).style.transition = 'filter 0.3s ease-in-out';
+          }
+          sessionStorage.setItem('promoPopupShown', 'true');
+        }, 1500);
         return;
       }
 
-      if (user?.id && user.token) {
-        const hasNoTrial = await checkTrialStatus(user.id, user.token);
-        if (hasNoTrial) timer = setTimeout(showPopupWithBlur, 1500);
+    const result = await checkTrialStatus(user.id, user.token);
+    console.log('[PromoPopup] Trial expired status:', result);
+  
+      if (result) {
+        setIsTrialExpired(true);
+        setShowExpiredPopup(true);
       }
+      
     };
-
     runCheck();
 
     return () => {
-      if (timer) clearTimeout(timer);
       document.body.style.overflow = 'unset';
       const mainContent = document.querySelector('main');
       if (mainContent) (mainContent as HTMLElement).style.filter = 'none';
     };
   }, [user, checkTrialStatus]);
 
-  const handleClose = () => {
+  const handleCloseAll = () => {
     setShowPopup(false);
+    setShowExpiredPopup(false);
+    setShowPricingPopup(false);
     document.body.style.overflow = 'unset';
     const mainContent = document.querySelector('main');
     if (mainContent) (mainContent as HTMLElement).style.filter = 'none';
@@ -111,70 +124,49 @@ const PromoPopup: React.FC = () => {
       router.replace('/auth/register');
       return;
     }
-
     setLoading(true);
-
     try {
       await api.get('/auth/me', {
         headers: { Authorization: `Bearer ${user.token}` },
       });
-
       const res = await api.get('/products/booster?program=LMS', {
         headers: { Authorization: `Bearer ${user.token}` },
       });
-
       const productId = res.data?.data[0]?.id;
-      console.log('Product ID:', productId);
-
-      const trialBody = {
-        product_id: productId,
-        device_id: deviceId,
-      };
-
+      const trialBody = { product_id: productId, device_id: deviceId };
       const trialRes = await api.post('/lms/trial', trialBody, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
-
       const message = trialRes.data?.message || 'Trial berhasil dimulai!';
       showToast(message, SUCCESS_TOAST);
-
-      handleClose();
+      handleCloseAll();
       router.push('/dashboard');
     } catch (err: any) {
-      console.error('Error response:', err.response?.data);
-
       let message = 'Terjadi kesalahan, coba lagi.';
-
       if (err.response) {
         const status = err.response.status;
         const serverMessage = err.response.data?.message;
-
-        if (status === 401) {
-          message = 'Token tidak valid, silakan login ulang.';
-        } else if (status === 409) {
-          message = serverMessage || 'Trial sudah pernah dibuat untuk device ini.';
-        } else if (status === 400) {
-          message = serverMessage || 'Request tidak valid.';
-        } else if (status >= 500) {
-          showToast('Berhasil Trial', SUCCESS_TOAST);
-        } else {
-          message = serverMessage || message;
-        }
-      } else if (err.message) {
-        message = err.message;
-      }
-
+        if (status === 401) message = 'Token tidak valid, silakan login ulang.';
+        else if (status === 409) message = serverMessage || 'Trial sudah pernah dibuat.';
+        else if (status === 400) message = serverMessage || 'Request tidak valid.';
+        else if (status >= 500) showToast('Berhasil Trial', SUCCESS_TOAST);
+        else message = serverMessage || message;
+      } else if (err.message) message = err.message;
       showToast(message, DANGER_TOAST);
     } finally {
       setLoading(false);
     }
   };
 
-  if (!showPopup) return null;
+  const handleGoPremium = () => {
+    setShowPopup(false);
+    setShowExpiredPopup(false);
+    setShowPricingPopup(true);
+  };
+
 
   return (
     <>
-      {/* animasi popup tetap sama */}
       <style jsx global>{`
         @keyframes popupFadeIn {
           from {
@@ -196,8 +188,7 @@ const PromoPopup: React.FC = () => {
           }
         }
       `}</style>
-
-      {/* ... isi popup sama seperti sebelumnya */}
+      {showPopup && (
       <div
         className="fixed inset-0 z-[9999] flex items-center justify-center p-2 sm:p-4 overflow-y-auto"
         style={{
@@ -214,7 +205,7 @@ const PromoPopup: React.FC = () => {
           }}
         >
           <button
-            onClick={handleClose}
+            onClick={handleCloseAll}
             className="absolute z-10 flex items-center justify-center p-2 transition-all duration-200 bg-white rounded-full top-3 right-3 bg-opacity-90 hover:bg-opacity-100 hover:scale-110"
           >
             <X size={20} className="text-gray-600" />
@@ -296,6 +287,132 @@ const PromoPopup: React.FC = () => {
           </div>
         </div>
       </div>
+      )}
+       {showExpiredPopup && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 p-4">
+          <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 text-center animate-[popupSlideIn_0.3s_ease-out_forwards]">
+            <button
+              onClick={handleCloseAll}
+              className="absolute p-2 transition rounded-full top-3 right-3 bg-white/80 hover:scale-110"
+            >
+              <X className="text-gray-700" size={20} />
+            </button>
+
+            <Image
+              src="/images/landing/haira-hero-mobile.png"
+              alt="icon"
+              width={64}
+              height={64}
+              className="mx-auto mb-4 rounded-full bg-gradient-to-r from-[#1B7691] to-[#FB991A] p-2"
+            />
+
+            <h2 className="text-xl font-bold text-gray-800">
+              Cie ada yang nyaman pake fitur premium nih 😅
+            </h2>
+            <p className="mt-2 text-sm text-gray-600">
+              Yuk mending langsung upgrade ke{" "}
+              <span className="font-semibold text-[#1B7691]">Membership</span> biar
+              persiapan beasiswamu makin maksimal.
+            </p>
+
+            <div className="flex flex-col gap-3 mt-6">
+              <button
+                onClick={handleGoPremium}
+                className="w-full py-3 font-semibold text-white rounded-lg bg-gradient-to-r from-[#1B7691] to-[#FB991A] hover:scale-[1.02] transition"
+              >
+                Gas Upgrade
+              </button>
+
+              <button
+                onClick={handleCloseAll}
+                className="text-sm text-gray-500 underline hover:text-gray-700"
+              >
+                Nanti saja
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+       {showPricingPopup && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4">
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl p-6 sm:p-8 animate-[popupSlideIn_0.3s_ease-out_forwards]">
+            <button
+              onClick={handleCloseAll}
+              className="absolute p-2 transition rounded-full top-3 right-3 bg-white/80 hover:scale-110"
+            >
+              <X className="text-gray-700" size={20} />
+            </button>
+
+            <h2 className="text-2xl font-bold text-center text-[#1B7691] mb-2">
+              Pilih Paket Premium ✨
+            </h2>
+            <p className="mb-6 text-sm text-center text-gray-600">
+              Akses semua fitur eksklusif & bimbingan mentor berpengalaman.
+            </p>
+
+            {/* Paket Pricing */}
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
+              {[
+                {
+                  name: "Basic",
+                  price: "Rp29.000",
+                  features: ["Akses video tutorial", "E-book gratis", "Forum komunitas"],
+                },
+                {
+                  name: "Pro",
+                  price: "Rp79.000",
+                  features: [
+                    "Semua Basic",
+                    "Kelas mentor eksklusif",
+                    "Simulasi berkas beasiswa",
+                  ],
+                  highlight: true,
+                },
+                {
+                  name: "Ultimate",
+                  price: "Rp149.000",
+                  features: [
+                    "Semua Pro",
+                    "1-on-1 konsultasi mentor",
+                    "Prioritas event & beasiswa",
+                  ],
+                },
+              ].map((pkg, i) => (
+                <div
+                  key={i}
+                  className={`rounded-2xl p-5 shadow-lg border ${
+                    pkg.highlight
+                      ? "border-[#FB991A] scale-[1.02] bg-gradient-to-br from-[#FFF9F2] to-[#FFFDF9]"
+                      : "border-gray-200"
+                  } transition`}
+                >
+                  <h3 className="text-lg font-semibold text-gray-800">{pkg.name}</h3>
+                  <p className="text-2xl font-bold text-[#1B7691] mt-2">{pkg.price}</p>
+                  <ul className="mt-3 space-y-2 text-sm text-gray-600">
+                    {pkg.features.map((f, idx) => (
+                      <li key={idx}>• {f}</li>
+                    ))}
+                  </ul>
+                  <button
+                    onClick={() => alert(`Langganan paket ${pkg.name}`)}
+                    className={`mt-5 w-full py-2.5 rounded-lg font-semibold text-white ${
+                      pkg.highlight
+                        ? "bg-gradient-to-r from-[#1B7691] to-[#FB991A]"
+                        : "bg-[#1B7691] hover:opacity-90"
+                    }`}
+                  >
+                    Langganan
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            <p className="mt-5 text-xs text-center text-gray-500">
+              Semua harga sudah termasuk PPN • Batalkan kapan saja
+            </p>
+          </div>
+        </div>
+      )}
     </>
   );
 };

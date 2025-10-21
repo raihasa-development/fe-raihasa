@@ -6,7 +6,7 @@ import 'aos/dist/aos.css';
 import { Disclosure, Transition } from '@headlessui/react';
 import { useQuery,keepPreviousData, } from '@tanstack/react-query';
 import Aos from 'aos';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { CiFilter } from 'react-icons/ci';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import { HiChevronUp } from 'react-icons/hi';
@@ -33,12 +33,12 @@ import { ApiReturn } from '@/types/api';
 import { AllBeasiswa, BeasiswaDetail } from '@/types/entities/detailbeasiswa';
 import api from '@/lib/api';
 import { useRouter } from 'next/router';
+import withAuth from '@/components/hoc/withAuth';
 
-export default function InfoBeasiswa() {
-  React.useEffect(() => {
+function InfoBeasiswa() {
+  useEffect(() => {
     Aos.init({ once: true });
   }, []);
-
 
   const router = useRouter();
   const { id } = router.query;
@@ -71,20 +71,19 @@ export default function InfoBeasiswa() {
   });
 
   const filteredData = useMemo(() => {
-  if (!data?.data) return [];
-  return data.data.filter((beasiswa) => {
-    const name = beasiswa.nama ?? '';
-    return (
-      (filters.search === '' ||
-        name.toLowerCase().includes(filters.search.toLowerCase())) &&
-      (filters.jenis === '' || beasiswa.jenis === filters.jenis) &&
-      (filters.skala === '' || beasiswa.skala === filters.skala)
-    );
-  });
-}, [data, filters]);
+    if (!data?.data) return [];
+    return data.data.filter((b) => {
+      const name = b.nama ?? '';
+      return (
+        (filters.search === '' ||
+          name.toLowerCase().includes(filters.search.toLowerCase())) &&
+        (filters.jenis === '' || b.jenis === filters.jenis) &&
+        (filters.skala === '' || b.skala === filters.skala)
+      );
+    });
+  }, [data, filters]);
 
-
-   const toTime = (s?: string | Date | null) => {
+  const toTime = (s?: string | Date | null) => {
     if (!s) return Number.POSITIVE_INFINITY;
     const dateStr = s instanceof Date ? s.toISOString() : s;
     const t = Date.parse(dateStr);
@@ -110,15 +109,9 @@ export default function InfoBeasiswa() {
 
   // pagination helper
   const DOTS = 'DOTS';
-  function getPaginationRange(
-    total: number,
-    current: number,
-    siblingCount = 1,
-    boundaryCount = 1
-  ) {
+  function getPaginationRange(total: number, current: number, siblingCount = 1, boundaryCount = 1) {
     const totalPageNumbers = boundaryCount * 2 + siblingCount * 2 + 3;
-    if (total <= totalPageNumbers)
-      return Array.from({ length: total }, (_, i) => i + 1);
+    if (total <= totalPageNumbers) return Array.from({ length: total }, (_, i) => i + 1);
 
     const leftSibling = Math.max(current - siblingCount, boundaryCount + 2);
     const rightSibling = Math.min(current + siblingCount, total - boundaryCount - 1);
@@ -127,31 +120,18 @@ export default function InfoBeasiswa() {
     const showRightDots = rightSibling < total - boundaryCount - 1;
 
     const pages: (number | string)[] = [];
-
     for (let i = 1; i <= boundaryCount; i++) pages.push(i);
-
     if (showLeftDots) pages.push(DOTS);
-    else {
-      for (let i = boundaryCount + 1; i < leftSibling; i++) pages.push(i);
-    }
-
+    else for (let i = boundaryCount + 1; i < leftSibling; i++) pages.push(i);
     for (let i = leftSibling; i <= rightSibling; i++) pages.push(i);
-
     if (showRightDots) pages.push(DOTS);
-    else {
-      for (let i = rightSibling + 1; i <= total - boundaryCount; i++) pages.push(i);
-    }
-
+    else for (let i = rightSibling + 1; i <= total - boundaryCount; i++) pages.push(i);
     for (let i = total - boundaryCount + 1; i <= total; i++) pages.push(i);
-
     return pages;
   }
 
-    const handleFilterChange = (key: keyof typeof filters, value: string) => {
-    setFilters((prev) => ({
-      ...prev,
-      [key]: value,
-    }));
+  const handleFilterChange = (key: keyof typeof filters, value: string) => {
+    setFilters((prev) => ({ ...prev, [key]: value }));
     setCurrentPage(1);
   };
 
@@ -159,6 +139,7 @@ export default function InfoBeasiswa() {
     setSort(value);
     setCurrentPage(1);
   };
+
   if (isLoading) return <Loading />;
 
 
@@ -548,3 +529,6 @@ export default function InfoBeasiswa() {
     </Layout>
   );
 }
+
+export default withAuth(InfoBeasiswa, 'user');
+

@@ -23,15 +23,15 @@ export default function Sidebar() {
   const isAdmin = user?.role === 'ADMIN';
 
   return (
-    <div className='bg-white px-6 py-8 relative z-50'>
+    <div className='relative z-50 px-6 py-8 bg-white'>
       <NextImage
         src='/images/logo.png'
         alt='logo'
         width={254}
         height={177}
-        className='w-20 self-center mx-auto'
+        className='self-center w-20 mx-auto'
       />
-      <div className='mt-6 flex flex-row items-center gap-6'>
+      <div className='flex flex-row items-center gap-6 mt-6'>
         <div className='w-10 h-10 rounded-full bg-slate-400' />
         <div>
           <Typography
@@ -44,7 +44,7 @@ export default function Sidebar() {
           <Typography
             variant='c2'
             weight='medium'
-            className='text-primary-blue max-w-52 truncate'
+            className='truncate text-primary-blue max-w-52'
           >
             {user?.email}
           </Typography>
@@ -83,7 +83,7 @@ export default function Sidebar() {
         <div className='h-[1px] my-3 w-full bg-[#111111]/15' />
         <div>
           <div
-            className='flex gap-4 items-center hover:cursor-pointer'
+            className='flex items-center gap-4 hover:cursor-pointer'
             onClick={() => setIsBoosterOpen(!isBoosterOpen)}
           >
             <FaChevronDown
@@ -101,7 +101,7 @@ export default function Sidebar() {
             </Typography>
           </div>
           {isBoosterOpen && (
-            <div className='mt-2 ml-4 flex flex-col gap-2'>
+            <div className='flex flex-col gap-2 mt-2 ml-4'>
               <UnstyledLink
                 href={isAdmin ? `/admin/cv-boost` : `/dashboard/cv-boost`}
                 className={clsxm(
@@ -205,7 +205,7 @@ export default function Sidebar() {
         <div className='h-[1px] my-3 w-full bg-[#111111]/15' />
         <div>
           <div
-            className='flex gap-4 items-center hover:cursor-pointer'
+            className='flex items-center gap-4 hover:cursor-pointer'
             onClick={() => setIsLmsOpen(!isLmsOpen)}
           >
             <FaChevronDown
@@ -223,7 +223,7 @@ export default function Sidebar() {
             </Typography>
           </div>
           {isLmsOpen && (
-            <div className='mt-2 ml-4 flex flex-col gap-2'>
+            <div className='flex flex-col gap-2 mt-2 ml-4'>
               <UnstyledLink
                 href={isAdmin ? `/admin/lms` : `/dashboard/lms`}
                 className={clsxm(
@@ -259,7 +259,7 @@ export default function Sidebar() {
          <div className='h-[1px] my-3 w-full bg-[#111111]/15' />
         <div>
           <div
-            className='flex gap-4 items-center hover:cursor-pointer'
+            className='flex items-center gap-4 hover:cursor-pointer'
             onClick={() => setIsBeasiswaOpen(!isBeasiswaOpen)}
           >
             <FaChevronDown
@@ -277,7 +277,7 @@ export default function Sidebar() {
             </Typography>
           </div>
           {isBeasiswaOpen && (
-            <div className='mt-2 ml-4 flex flex-col gap-2'>
+            <div className='flex flex-col gap-2 mt-2 ml-4'>
               <UnstyledLink
                 href={isAdmin ? `/rekomendasi-beasiswa` : `/rekomendasi-beasiswa`}
                 className={clsxm(
@@ -307,6 +307,35 @@ export default function Sidebar() {
                   Rekomendasi Beasiswa
                 </Typography>
               </UnstyledLink>
+               {isAdmin && (
+              <UnstyledLink
+                href='/admin/input-beasiswa'
+                className={clsxm(
+                  'py-2 px-3 flex items-center gap-2 rounded-md',
+                  pathName === '/admin/input-beasiswa' && 'bg-primary-blue'
+                )}
+              >
+                <HiDocumentText
+                  className={clsxm(
+                    'w-6 h-6',
+                    pathName === '/admin/input-beasiswa'
+                      ? 'text-white'
+                      : 'text-primary-blue'
+                  )}
+                />
+                <Typography
+                  variant='bt'
+                  weight='medium'
+                  className={clsxm(
+                    pathName === '/admin/input-beasiswa'
+                      ? 'text-white'
+                      : 'text-primary-blue'
+                  )}
+                >
+                  Input Beasiswa
+                </Typography>
+              </UnstyledLink>
+                )}
             </div>
           )}
         </div>

@@ -180,7 +180,7 @@ export default function Navbar() {
                         >
                           <div className='w-fit flex items-center gap-1.5 p-2 hover:rounded-md'>
                             <Typography color='inline' variant='bt' as='p'>
-                              Bimbingan Beasiswa
+                              BISA Membership
                             </Typography>
                           </div>
                         </ButtonLink>
@@ -589,7 +589,7 @@ export default function Navbar() {
                     <Typography
                       color='inline'
                       variant='bt'
-                      className='py-4 pl-4'
+                      className='px-4 py-4'
                     >
                       Info Beasiswa
                     </Typography>
@@ -665,7 +665,7 @@ export default function Navbar() {
                     <Typography
                       color='inline'
                       variant='bt'
-                      className='py-4 pl-4'
+                      className='px-4 py-4'
                     >
                       Info Beasiswa
                     </Typography>

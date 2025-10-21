@@ -88,6 +88,10 @@ export default function FormRekomendasiPage() {
   // useEffect untuk localstorage serta callback dari login/register pages
   useEffect(() => {
     if (typeof window !== 'undefined') {
+      localStorage.removeItem('step_data');
+      localStorage.removeItem('scholarship_recommendation_data');
+      setActiveStep(0);
+
       if (!isAuthenticated) {
         sessionStorage.setItem('redirectAfterLogin', router.asPath);
       } else {
