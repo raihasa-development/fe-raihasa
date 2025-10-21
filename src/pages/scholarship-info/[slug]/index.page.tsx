@@ -1,5 +1,4 @@
 //@ts-nocheck
-// export const runtime = 'experimental-edge';
 
 import { Disclosure, Transition } from '@headlessui/react';
 import { useQuery } from '@tanstack/react-query';
@@ -17,35 +16,35 @@ import { BeasiswaDetail } from '@/types/entities/detailbeasiswa';
 
 export default function InfoBeasiswa() {
   const router = useRouter();
-  const { slug } = router.query;
+  const slug = router.query.slug as string | undefined;
 
-
-const { data, isLoading, isError } = useQuery<ApiReturn<BeasiswaDetail> | null>({
-  queryKey: ['/scholarship', slug],
-  queryFn: async () => {
-    if (!slug) return null;
-
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BACKEND_API_URL}/scholarship/${slug}`
-    );
-    if (!res.ok) throw new Error('Failed to fetch scholarship');
-
-    return (await res.json()) as ApiReturn<BeasiswaDetail>;
-  },
-  enabled: !!slug,
-});
+  const { data, isLoading, isError } = useQuery<ApiReturn<BeasiswaDetail> | null>({
+    queryKey: ['/scholarship', slug],
+    queryFn: async () => {
+      if (!slug) return null;
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_API_URL}/scholarship/${slug}`
+      );
+      if (!res.ok) throw new Error('Failed to fetch scholarship');
+      return (await res.json()) as ApiReturn<BeasiswaDetail>;
+    },
+    enabled: !!slug, 
+  });
 
   if (isLoading) return <Loading />;
-  if (isError) return <div>Error loading scholarship info.</div>;
+  if (isError || !data) return <div>Error loading scholarship info.</div>;
+
   const scholarship = data?.data?.data?.scholarship;
-  console.log(scholarship);
-const requirement = data?.data?.data?.requirement ?? {
-  penyelenggara: '',
-  min_ipk: null,
-  persyaratan: [],
-  berkas: [],
-};
-  console.log(requirement);
+  const requirement = {
+    berkas: [],
+    gpa: null,
+    instansi: [],
+    jurusan: [],
+    semester: [],
+    persyaratan: [],
+    lainnya: [],
+    ...data?.data?.data?.requirement,
+  };
 
 
   const formattedStartDate = scholarship?.open_registration
