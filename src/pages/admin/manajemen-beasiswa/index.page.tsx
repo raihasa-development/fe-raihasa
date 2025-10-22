@@ -74,6 +74,7 @@ export default function BeasiswaListPage() {
 
     if (!res.ok) throw new Error(`Gagal memuat data (${res.status})`);
     const json = await res.json();
+    console.log('Fetched scholarship data:', json);
     const list = Array.isArray(json)
       ? json
       : Array.isArray(json.data)

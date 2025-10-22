@@ -13,6 +13,8 @@ import Button from '@/components/buttons/Button';
 import Typography from '@/components/Typography';
 import useAuthStore from '@/store/useAuthStore';
 import SelectInput from '@/components/form/SelectInput';
+import { form, input } from '@heroui/react';
+import { label } from 'yet-another-react-lightbox';
 
 const jenisOptions = [
   { value: 'FULL', label: 'Full Scholarship' },
