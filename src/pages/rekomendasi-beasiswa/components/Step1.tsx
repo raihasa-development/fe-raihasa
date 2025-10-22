@@ -24,16 +24,14 @@ export default function Step1({ onNext, onBack }: StepProps) {
     useGetAllProvinsi();
 
   // Convert provinsi name to code
-  const getProvinsiCode = (value: string) => {
-    // If it's already a code (numeric), return as is
-    if (/^\d+$/.test(value)) return value;
+ const getProvinsiCode = (value: string) => {
+  if (/^\d+$/.test(value)) return value;
 
-    // If it's a name, find the corresponding code
-    const province = provinsiData?.find(
-      (p) => p.name.toUpperCase() === value.toUpperCase()
-    );
-    return province?.id || value;
-  };
+  const province = provinsiData?.find(
+    (p) => String(p.name).toUpperCase() === String(value).toUpperCase()
+  );
+  return province?.id || value;
+};
 
   const provinsiCode = getProvinsiCode(provinsi);
 
@@ -49,35 +47,39 @@ export default function Step1({ onNext, onBack }: StepProps) {
   };
 
   // Convert provinsi dan kota/kabupaten name from localStorage to ID for the form
-  useEffect(() => {
-    if (provinsiData && provinsiData.length > 0) {
-      const currentProvinsiValue = getValues('provinsi');
-      // If the value is a name (not a numeric ID), find the corresponding ID
-      if (currentProvinsiValue && !/^\d+$/.test(currentProvinsiValue)) {
-        const province = provinsiData.find(
-          (p) => p.name.toUpperCase() === currentProvinsiValue.toUpperCase()
-        );
-        if (province) {
-          setValue('provinsi', province.id, { shouldDirty: false });
-        }
+useEffect(() => {
+  if (provinsiData && provinsiData.length > 0) {
+    const currentProvinsiValue = getValues('provinsi');
+    // Jika value adalah nama (bukan ID numerik)
+    if (currentProvinsiValue && !/^\d+$/.test(String(currentProvinsiValue))) {
+      const province = provinsiData.find(
+        (p) =>
+          String(p.name).toUpperCase() ===
+          String(currentProvinsiValue).toUpperCase()
+      );
+      if (province) {
+        setValue('provinsi', province.id, { shouldDirty: false });
       }
     }
-  }, [provinsiData, getValues, setValue]);
+  }
+}, [provinsiData, getValues, setValue]);
 
-  useEffect(() => {
-    if (kotaKabupatenData && kotaKabupatenData.length > 0) {
-      const currentKotaValue = getValues('kota_kabupaten');
-      // If the value is a name (not a numeric ID), find the corresponding ID
-      if (currentKotaValue && !/^\d+$/.test(currentKotaValue)) {
-        const kota = kotaKabupatenData.find(
-          (k) => k.name.toUpperCase() === currentKotaValue.toUpperCase()
-        );
-        if (kota) {
-          setValue('kota_kabupaten', kota.id, { shouldDirty: false });
-        }
+useEffect(() => {
+  if (kotaKabupatenData && kotaKabupatenData.length > 0) {
+    const currentKotaValue = getValues('kota_kabupaten');
+    // Jika value adalah nama (bukan ID numerik)
+    if (currentKotaValue && !/^\d+$/.test(String(currentKotaValue))) {
+      const kota = kotaKabupatenData.find(
+        (k) =>
+          String(k.name).toUpperCase() ===
+          String(currentKotaValue).toUpperCase()
+      );
+      if (kota) {
+        setValue('kota_kabupaten', kota.id, { shouldDirty: false });
       }
     }
-  }, [kotaKabupatenData, getValues, setValue]);
+  }
+}, [kotaKabupatenData, getValues, setValue]);
 
   const handleNext = () => {
     const transformedData = {
@@ -96,7 +98,7 @@ export default function Step1({ onNext, onBack }: StepProps) {
   return (
     <div className='flex flex-col items-center justify-center w-full'>
       <div className='flex flex-col gap-16 items-center justify-center max-w-[898px] text-center'>
-        <div className='flex flex-col gap-3 justify-center items-center'>
+        <div className='flex flex-col items-center justify-center gap-3'>
           <TitleStep title='Isi data dirimu di sini biar kita bisa cari beasiswa terbaik untukmu!' />
           <Input
             id='name'
@@ -160,7 +162,7 @@ export default function Step1({ onNext, onBack }: StepProps) {
           </div>
         </div>
 
-        <div className='flex flex-col-reverse md:flex-row gap-4 items-center justify-center w-full '>
+        <div className='flex flex-col-reverse items-center justify-center w-full gap-4 md:flex-row '>
           <Button
             className='w-full rounded-[12px] md:w-[200px] max-h-[44px] text-[16px] py-[12px] px-6 font-semibold text-primary-blue hover:text-primary-blue active:text-primary-blue hover:border-primary-blue hover:bg-primary-blue/10 active:border-primary-blue active:bg-primary-blue/20 border-2 border-[#D4D4D8]'
             variant='unstyled'
