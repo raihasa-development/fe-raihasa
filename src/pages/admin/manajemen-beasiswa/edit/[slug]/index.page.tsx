@@ -10,6 +10,7 @@ import Typography from '@/components/Typography';
 import SelectInput from '@/components/form/SelectInput';
 import useAuthStore from '@/store/useAuthStore';
 import { showToast, SUCCESS_TOAST, DANGER_TOAST } from '@/components/Toast';
+import withAuth from '@/components/hoc/withAuth';
 
 const jenisOptions = [
   { value: 'FULL', label: 'Full Scholarship' },
@@ -29,7 +30,8 @@ const jenjangOptions = [
   { value: 'S3', label: 'Doktor (S3)' },
 ];
 
-export default function EditBeasiswaPage() {
+export default withAuth(EditBeasiswaPage, 'admin');
+function EditBeasiswaPage() {
   type FormValues = {
     nama: string;
     jenis: string;
@@ -134,6 +136,9 @@ export default function EditBeasiswaPage() {
 
         if (!res.ok) throw new Error('Gagal memuat data beasiswa');
         const resJson = await res.json();
+        console.log('🧱 resJson:', resJson);
+        console.log('🧱 resJson.data:', resJson.data);
+        console.log('🧱 resJson.data[0]:', resJson.data?.[0]);
         const data =
           Array.isArray(resJson.data) ? resJson.data[0] : resJson.data || resJson;
 

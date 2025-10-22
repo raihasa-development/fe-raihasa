@@ -14,7 +14,7 @@ import Typography from '@/components/Typography';
 import useMutationToast from '@/hooks/useMutationToast';
 import Layout from '@/layouts/Layout';
 import api from '@/lib/api';
-import { setToken } from '@/lib/cookies';
+import { removeToken, setToken } from '@/lib/cookies';
 import useAuthStore from '@/store/useAuthStore';
 import withAuth from '@/components/hoc/withAuth';
 import { ApiError } from '@/types/api';
@@ -37,9 +37,11 @@ function LoginPage() {
 
   const mutation = useMutation<void, AxiosError<ApiError>, LoginForm>({
     mutationFn: async (data: LoginForm) => {
+      removeToken();
+
       const { data: res } = await api.post('/auth/login', data);
 
-      if (!res.data) throw new Error('Sesi login tidak valid');
+      if (!res?.data) throw new Error('Sesi login tidak valid');
 
       const { token, ...user } = res.data;
 
@@ -47,7 +49,6 @@ function LoginPage() {
       login({ ...user, token });
       showToast('Berhasil login', SUCCESS_TOAST);
 
-      // Redirect logic after login
       const redirectAfterLogin = sessionStorage.getItem('redirectAfterLogin');
       const queryRedirect = router.query.redirect as string | undefined;
 
@@ -62,13 +63,13 @@ function LoginPage() {
     },
   });
 
-
   const { mutate: loginMutation, isPending } =
     useMutationToast<void, LoginForm>(mutation);
 
   const onSubmit = (data: LoginForm) => {
     loginMutation(data);
   };
+
   return (
     <Layout withFooter={true} withNavbar={true}>
       <SEO title='Login' description='Login Page' />

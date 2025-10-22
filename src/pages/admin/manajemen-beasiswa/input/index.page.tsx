@@ -15,6 +15,7 @@ import useAuthStore from '@/store/useAuthStore';
 import SelectInput from '@/components/form/SelectInput';
 import { form, input } from '@heroui/react';
 import { label } from 'yet-another-react-lightbox';
+import withAuth from '@/components/hoc/withAuth';
 
 const jenisOptions = [
   { value: 'FULL', label: 'Full Scholarship' },
@@ -34,7 +35,8 @@ const jenjangOptions = [
   { value: 'S3', label: 'Doktor (S3)' },
 ];
 
-export default function InputBeasiswaPage() {
+export default withAuth(InputBeasiswaPage, 'admin');
+function InputBeasiswaPage() {
   const methods = useForm({
     defaultValues: {
         nama: "",

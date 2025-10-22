@@ -42,7 +42,7 @@ const useAuthStoreBase = create<AuthStoreType>()(
           produce<AuthStoreType>((state) => {
             state.isAuthenticated = false;
             state.user = null;
-            state.token = null;a
+            state.token = null;
           })
         );
       },

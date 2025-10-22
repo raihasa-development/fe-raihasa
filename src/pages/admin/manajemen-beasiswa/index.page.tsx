@@ -10,6 +10,7 @@ import {
 import Typography from '@/components/Typography';
 import Button from '@/components/buttons/Button';
 import Input from '@/components/form/Input'; // 🔹 gunakan komponen input kamu kalau ada
+import withAuth from '@/components/hoc/withAuth';
 
 interface BeasiswaInfo {
   nama: string;
@@ -53,7 +54,8 @@ interface ScholarshipItem {
   requirement: RequirementInfo;
 }
 
-export default function BeasiswaListPage() {
+export default withAuth(BeasiswaPage, 'admin');
+function BeasiswaPage() {
   const [data, setData] = useState<ScholarshipItem[]>([]);
   const [filteredData, setFilteredData] = useState<ScholarshipItem[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
