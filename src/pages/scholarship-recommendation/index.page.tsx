@@ -123,20 +123,20 @@ export default function ScholarshipRecommendationPage() {
                     </Typography>
 
                     <div className="flex gap-3">
-                      <ButtonLink
+                    <ButtonLink
                         href={scholarship.link}
                         variant="primary"
                         size="sm"
-                        className="flex-1"
-                      >
-                        <Typography className="flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-[#1B7691] rounded-xl hover:bg-[#FB991A] transition-colors">
-                          Lihat Detail <FaArrowRightLong />
+                        className="flex-1 bg-[#1B7691] hover:bg-[#FB991A] text-white rounded-xl transition-colors px-4 py-2"
+                    >
+                        <Typography className="flex items-center justify-center gap-2 text-sm font-semibold">
+                            Lihat Detail <FaArrowRightLong />
                         </Typography>
-                      </ButtonLink>
+                    </ButtonLink>
                       
-                      <button className="px-4 py-2 border-2 border-[#1B7691] text-[#1B7691] rounded-xl hover:bg-[#1B7691] hover:text-white transition-colors">
+                      {/* <button className="px-4 py-2 border-2 border-[#1B7691] text-[#1B7691] rounded-xl hover:bg-[#1B7691] hover:text-white transition-colors">
                         <FiExternalLink className="w-5 h-5" />
-                      </button>
+                      </button> */}
                     </div>
                   </div>
                 ))}
