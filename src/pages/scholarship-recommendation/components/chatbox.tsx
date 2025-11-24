@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { FiSend, FiUser, FiZap } from 'react-icons/fi';
 import NextImage from '@/components/NextImage';
 import Typography from '@/components/Typography';
@@ -27,10 +27,6 @@ export default function Chatbox({ onRecommendation }: ChatboxProps) {
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
 
   const mockRecommendations: ScholarshipRecommendation[] = [
     {

@@ -31,10 +31,10 @@ export default function ScholarshipRecommendationPage() {
               {/* <Typography className="text-[#1B7691] text-xl md:text-2xl mb-4">
                 <i>Powered by Artificial Intelligence</i>
               </Typography> */}
-              <Typography className="font-bold text-4xl md:text-6xl text-[#FB991A] mb-4">
+              <Typography className="font-bold text-4xl md:text-6xl text-primary-orange mb-4">
                 Rekomendasi Beasiswa Berbasis AI
               </Typography>
-              <Typography className="text-lg md:text-xl text-[#1B7691] max-w-3xl mx-auto">
+              <Typography className="text-lg md:text-xl text-primary-blue max-w-3xl mx-auto">
                 Ceritakan profil akademik Anda kepada Haira AI dan dapatkan rekomendasi beasiswa yang paling sesuai!
               </Typography>
             </div>
@@ -56,7 +56,7 @@ export default function ScholarshipRecommendationPage() {
                   className="w-full max-w-[400px] h-auto"
                 />
                 <div className="text-center mt-4">
-                  <Typography className="text-2xl font-bold text-[#1B7691] mb-2">
+                  <Typography className="text-2xl font-bold text-primary-blue mb-2">
                     Kenalan dengan Haira!
                   </Typography>
                   <Typography className="text-gray-600">
@@ -72,7 +72,7 @@ export default function ScholarshipRecommendationPage() {
         {recommendations.length > 0 && (
           <section className="py-12 bg-white/50">
             <div className="container mx-auto px-4">
-              <Typography className="text-3xl font-bold text-[#1B7691] text-center mb-8">
+              <Typography className="text-3xl font-bold text-primary-blue text-center mb-8">
                 Rekomendasi Beasiswa untuk Anda
               </Typography>
               
@@ -83,10 +83,10 @@ export default function ScholarshipRecommendationPage() {
                     className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-shadow"
                   >
                     <div className="flex justify-between items-start mb-4">
-                      <Typography className="text-xl font-bold text-[#1B7691] leading-tight">
+                      <Typography className="text-xl font-bold text-primary-blue leading-tight">
                         {scholarship.title}
                       </Typography>
-                      <div className="bg-[#FB991A]/10 text-[#FB991A] px-3 py-1 rounded-full text-sm font-medium">
+                      <div className="bg-primary-orange/10 text-primary-orange px-3 py-1 rounded-full text-sm font-medium">
                         Rekomendasi
                       </div>
                     </div>
@@ -97,21 +97,21 @@ export default function ScholarshipRecommendationPage() {
 
                     <div className="space-y-3 mb-6">
                       <div className="flex items-center gap-3">
-                        <FiCalendar className="text-[#1B7691] w-5 h-5" />
+                        <FiCalendar className="text-primary-blue w-5 h-5" />
                         <Typography className="text-sm">
                           <span className="font-medium">Deadline:</span> {scholarship.deadline}
                         </Typography>
                       </div>
                       
                       <div className="flex items-center gap-3">
-                        <FiDollarSign className="text-[#1B7691] w-5 h-5" />
+                        <FiDollarSign className="text-primary-blue w-5 h-5" />
                         <Typography className="text-sm">
                           <span className="font-medium">Nilai:</span> {scholarship.amount}
                         </Typography>
                       </div>
 
                       <div className="flex items-start gap-3">
-                        <FiCheckCircle className="text-[#1B7691] w-5 h-5 mt-0.5" />
+                        <FiCheckCircle className="text-primary-blue w-5 h-5 mt-0.5" />
                         <Typography className="text-sm">
                           <span className="font-medium">Syarat:</span> {scholarship.eligibility}
                         </Typography>
@@ -123,20 +123,20 @@ export default function ScholarshipRecommendationPage() {
                     </Typography>
 
                     <div className="flex gap-3">
-                      <ButtonLink
+                    <ButtonLink
                         href={scholarship.link}
                         variant="primary"
                         size="sm"
-                        className="flex-1"
-                      >
-                        <Typography className="flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-[#1B7691] rounded-xl hover:bg-[#FB991A] transition-colors">
-                          Lihat Detail <FaArrowRightLong />
+                        className="flex-1 bg-primary-blue hover:bg-primary-orange text-white rounded-xl transition-colors px-4 py-2"
+                    >
+                        <Typography className="flex items-center justify-center gap-2 text-sm font-semibold">
+                            Lihat Detail <FaArrowRightLong />
                         </Typography>
-                      </ButtonLink>
+                    </ButtonLink>
                       
-                      <button className="px-4 py-2 border-2 border-[#1B7691] text-[#1B7691] rounded-xl hover:bg-[#1B7691] hover:text-white transition-colors">
+                      {/* <button className="px-4 py-2 border-2 border-[#1B7691] text-[#1B7691] rounded-xl hover:bg-[#1B7691] hover:text-white transition-colors">
                         <FiExternalLink className="w-5 h-5" />
-                      </button>
+                      </button> */}
                     </div>
                   </div>
                 ))}
@@ -149,17 +149,17 @@ export default function ScholarshipRecommendationPage() {
         <section className="py-12">
           <div className="container mx-auto px-4">
             <div className="bg-white rounded-2xl shadow-lg p-8 max-w-4xl mx-auto">
-              <Typography className="text-2xl font-bold text-[#1B7691] text-center mb-6">
+              <Typography className="text-2xl font-bold text-primary-blue text-center mb-6">
                 Tips untuk Mendapatkan Rekomendasi Terbaik
               </Typography>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="flex gap-4">
-                  <div className="w-8 h-8 bg-[#FB991A] text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
+                  <div className="w-8 h-8 bg-primary-orange text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
                     1
                   </div>
                   <div>
-                    <Typography className="font-semibold text-[#1B7691] mb-2">
+                    <Typography className="font-semibold text-primary-blue mb-2">
                       Berikan Informasi Lengkap
                     </Typography>
                     <Typography className="text-gray-600 text-sm">
@@ -169,11 +169,11 @@ export default function ScholarshipRecommendationPage() {
                 </div>
 
                 <div className="flex gap-4">
-                  <div className="w-8 h-8 bg-[#FB991A] text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
+                  <div className="w-8 h-8 bg-primary-orange text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
                     2
                   </div>
                   <div>
-                    <Typography className="font-semibold text-[#1B7691] mb-2">
+                    <Typography className="font-semibold text-primary-blue mb-2">
                       Ceritakan Minat Anda
                     </Typography>
                     <Typography className="text-gray-600 text-sm">
@@ -183,11 +183,11 @@ export default function ScholarshipRecommendationPage() {
                 </div>
 
                 <div className="flex gap-4">
-                  <div className="w-8 h-8 bg-[#FB991A] text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
+                  <div className="w-8 h-8 bg-primary-orange text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
                     3
                   </div>
                   <div>
-                    <Typography className="font-semibold text-[#1B7691] mb-2">
+                    <Typography className="font-semibold text-primary-blue mb-2">
                       Sebutkan Prestasi
                     </Typography>
                     <Typography className="text-gray-600 text-sm">
@@ -197,11 +197,11 @@ export default function ScholarshipRecommendationPage() {
                 </div>
 
                 <div className="flex gap-4">
-                  <div className="w-8 h-8 bg-[#FB991A] text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
+                  <div className="w-8 h-8 bg-primary-orange text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
                     4
                   </div>
                   <div>
-                    <Typography className="font-semibold text-[#1B7691] mb-2">
+                    <Typography className="font-semibold text-primary-blue mb-2">
                       Tentukan Preferensi
                     </Typography>
                     <Typography className="text-gray-600 text-sm">
