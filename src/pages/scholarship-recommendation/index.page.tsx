@@ -40,7 +40,7 @@ export default function ScholarshipRecommendationPage() {
             </div>
 
             {/* Chat Interface */}
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 max-w-7xl mx-auto">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-12 max-w-7xl mx-auto">
               {/* Chatbox */}
               <div className="order-2 xl:order-1">
                 <Chatbox onRecommendation={handleRecommendation} />
@@ -50,17 +50,17 @@ export default function ScholarshipRecommendationPage() {
               <div className="order-1 xl:order-2 flex flex-col items-center justify-center">
                 <NextImage
                   src="/images/landing/haira-hero-desktop.png"
-                  width={400}
-                  height={400}
+                  width={350}
+                  height={350}
                   alt="Haira AI Assistant"
-                  className="w-full max-w-[400px] h-auto"
+                  className="w-full max-w-[350px] h-auto"
                 />
-                <div className="text-center mt-4">
-                  <Typography className="text-2xl font-bold text-primary-blue mb-2">
+                <div className="text-center mt-6">
+                  <Typography className="text-xl font-semibold text-primary-blue mb-2">
                     Kenalan dengan Haira!
                   </Typography>
-                  <Typography className="text-gray-600">
-                    Asisten AI yang siap membantu menemukan beasiswa impian Anda
+                  <Typography className="text-gray-500 text-sm leading-relaxed">
+                    Asisten AI yang siap membantu menemukan<br />beasiswa impian Anda
                   </Typography>
                 </div>
               </div>
@@ -146,65 +146,65 @@ export default function ScholarshipRecommendationPage() {
         )}
 
         {/* Tips Section */}
-        <section className="py-12">
+        <section className="py-16">
           <div className="container mx-auto px-4">
-            <div className="bg-white rounded-2xl shadow-lg p-8 max-w-4xl mx-auto">
-              <Typography className="text-2xl font-bold text-primary-blue text-center mb-6">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-10 max-w-4xl mx-auto">
+              <Typography className="text-xl font-semibold text-primary-blue text-center mb-8">
                 Tips untuk Mendapatkan Rekomendasi Terbaik
               </Typography>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="flex gap-4">
-                  <div className="w-8 h-8 bg-primary-orange text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
+                  <div className="w-6 h-6 bg-primary-blue text-white rounded-full flex items-center justify-center text-xs font-medium flex-shrink-0 mt-1">
                     1
                   </div>
                   <div>
-                    <Typography className="font-semibold text-primary-blue mb-2">
+                    <Typography className="font-medium text-gray-900 mb-2 text-sm">
                       Berikan Informasi Lengkap
                     </Typography>
-                    <Typography className="text-gray-600 text-sm">
+                    <Typography className="text-gray-500 text-sm leading-relaxed">
                       Sebutkan universitas, jurusan, semester, dan IPK untuk rekomendasi yang lebih akurat.
                     </Typography>
                   </div>
                 </div>
 
                 <div className="flex gap-4">
-                  <div className="w-8 h-8 bg-primary-orange text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
+                  <div className="w-6 h-6 bg-primary-blue text-white rounded-full flex items-center justify-center text-xs font-medium flex-shrink-0 mt-1">
                     2
                   </div>
                   <div>
-                    <Typography className="font-semibold text-primary-blue mb-2">
+                    <Typography className="font-medium text-gray-900 mb-2 text-sm">
                       Ceritakan Minat Anda
                     </Typography>
-                    <Typography className="text-gray-600 text-sm">
+                    <Typography className="text-gray-500 text-sm leading-relaxed">
                       Bagikan bidang studi atau karir yang Anda minati untuk mendapat beasiswa yang sesuai.
                     </Typography>
                   </div>
                 </div>
 
                 <div className="flex gap-4">
-                  <div className="w-8 h-8 bg-primary-orange text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
+                  <div className="w-6 h-6 bg-primary-blue text-white rounded-full flex items-center justify-center text-xs font-medium flex-shrink-0 mt-1">
                     3
                   </div>
                   <div>
-                    <Typography className="font-semibold text-primary-blue mb-2">
+                    <Typography className="font-medium text-gray-900 mb-2 text-sm">
                       Sebutkan Prestasi
                     </Typography>
-                    <Typography className="text-gray-600 text-sm">
+                    <Typography className="text-gray-500 text-sm leading-relaxed">
                       Ceritakan prestasi akademik atau non-akademik untuk beasiswa yang lebih kompetitif.
                     </Typography>
                   </div>
                 </div>
 
                 <div className="flex gap-4">
-                  <div className="w-8 h-8 bg-primary-orange text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
+                  <div className="w-6 h-6 bg-primary-blue text-white rounded-full flex items-center justify-center text-xs font-medium flex-shrink-0 mt-1">
                     4
                   </div>
                   <div>
-                    <Typography className="font-semibold text-primary-blue mb-2">
+                    <Typography className="font-medium text-gray-900 mb-2 text-sm">
                       Tentukan Preferensi
                     </Typography>
-                    <Typography className="text-gray-600 text-sm">
+                    <Typography className="text-gray-500 text-sm leading-relaxed">
                       Sebutkan jika Anda ingin beasiswa dalam negeri, luar negeri, atau keduanya.
                     </Typography>
                   </div>
