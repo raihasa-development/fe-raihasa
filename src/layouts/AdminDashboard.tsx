@@ -16,9 +16,14 @@ export default function AdminDashboard({
   ...rest
 }: AdminDashboardProps) {
   return (
-    <Layout withFooter={false} withNavbar={true}>
+    <Layout withFooter={false} withNavbar={false}>
       <section className='min-h-screen h-full w-full relative flex items-center justify-center px-5 md:px-16 py-32'>
-        <div className='flex items-start justify-center gap-7 w-full'>
+        <div
+          className={clsxm(
+            'flex items-start justify-center gap-7 w-full',
+            withSidebar && 'xl:ml-72' // Add left margin equal to sidebar width
+          )}
+        >
           {withSidebar && <Sidebar />}
           <div
             className={clsxm('bg-white relative z-50 w-full', className)}
