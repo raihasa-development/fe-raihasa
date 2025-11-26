@@ -1,8 +1,9 @@
 import { useRouter } from 'next/router';
-import { useState } from 'react';
-import { FaChevronDown, FaUserGroup } from 'react-icons/fa6';
-import { HiBookOpen, HiDocumentSearch, HiDocumentText } from 'react-icons/hi';
-import { TiHome } from 'react-icons/ti';
+import { useState, useEffect } from 'react';
+import { FaChevronDown, FaUsers, FaGraduationCap, FaBookReader } from 'react-icons/fa';
+import { HiBookOpen, HiDocumentSearch, HiDocumentText, HiLogout, HiHome } from 'react-icons/hi';
+import { IoSparkles, IoBulbOutline } from 'react-icons/io5';
+import { MdDashboard, MdManageAccounts } from 'react-icons/md';
 
 import UnstyledLink from '@/components/links/UnstyledLink';
 import NextImage from '@/components/NextImage';
@@ -12,333 +13,301 @@ import useAuthStore from '@/store/useAuthStore';
 
 export default function Sidebar() {
   const user = useAuthStore().user;
+  const logout = useAuthStore().logout;
   const router = useRouter();
 
-  const [isBoosterOpen, setIsBoosterOpen] = useState(true);
+  const [isBoosterOpen, setIsBoosterOpen] = useState(false);
   const [isLmsOpen, setIsLmsOpen] = useState(false);
   const [isBeasiswaOpen, setIsBeasiswaOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState<string>('');
 
   const pathName = router.pathname;
-
   const isAdmin = user?.role === 'ADMIN';
 
+  // Auto-expand sections based on current path
+  useEffect(() => {
+    if (pathName.includes('cv-boost') || pathName.includes('essay-boost') || pathName.includes('interview-boost')) {
+      setIsBoosterOpen(true);
+      setActiveSection('booster');
+    } else if (pathName.includes('lms')) {
+      setIsLmsOpen(true);
+      setActiveSection('lms');
+    } else if (pathName.includes('beasiswa')) {
+      setIsBeasiswaOpen(true);
+      setActiveSection('beasiswa');
+    }
+  }, [pathName]);
+
+  const handleLogout = () => {
+    logout();
+    router.push('/auth/login');
+  };
+
+  const menuSections = [
+    {
+      id: 'booster',
+      title: 'Booster',
+      icon: IoSparkles,
+      isOpen: isBoosterOpen,
+      setIsOpen: setIsBoosterOpen,
+      items: [
+        {
+          title: 'CV Boost',
+          href: isAdmin ? '/admin/cv-boost' : '/dashboard/cv-boost',
+          icon: HiDocumentSearch,
+          paths: ['/dashboard/cv-boost', '/admin/cv-boost']
+        },
+        {
+          title: 'Essay Boost',
+          href: isAdmin ? '/admin/essay-boost' : '/dashboard/essay-boost',
+          icon: HiDocumentText,
+          paths: ['/dashboard/essay-boost', '/admin/essay-boost']
+        },
+        {
+          title: 'Interview Boost',
+          href: isAdmin ? '/admin/interview-boost' : '/dashboard/interview-boost',
+          icon: FaUsers,
+          paths: ['/dashboard/interview-boost', '/admin/interview-boost']
+        }
+      ]
+    },
+    {
+      id: 'lms',
+      title: 'Learning',
+      icon: FaBookReader,
+      isOpen: isLmsOpen,
+      setIsOpen: setIsLmsOpen,
+      items: [
+        {
+          title: 'Learning Management',
+          href: isAdmin ? '/admin/lms' : '/dashboard/lms',
+          icon: HiBookOpen,
+          paths: ['/dashboard/lms', '/admin/lms']
+        }
+      ]
+    },
+    {
+      id: 'beasiswa',
+      title: 'Beasiswa',
+      icon: FaGraduationCap,
+      isOpen: isBeasiswaOpen,
+      setIsOpen: setIsBeasiswaOpen,
+      items: [
+        {
+          title: 'Rekomendasi AI',
+          href: '/rekomendasi-beasiswa',
+          icon: IoBulbOutline,
+          paths: ['/rekomendasi-beasiswa']
+        },
+        ...(isAdmin ? [{
+          title: 'Kelola Beasiswa',
+          href: '/admin/manajemen-beasiswa',
+          icon: MdManageAccounts,
+          paths: ['/admin/manajemen-beasiswa']
+        }] : [])
+      ]
+    }
+  ];
+
   return (
-    <div className='relative z-50 px-6 py-8 bg-white'>
-      <NextImage
-        src='/images/logo.png'
-        alt='logo'
-        width={254}
-        height={177}
-        className='self-center w-20 mx-auto'
-      />
-      <div className='flex flex-row items-center gap-6 mt-6'>
-        <div className='w-10 h-10 rounded-full bg-slate-400' />
-        <div>
-          <Typography
-            variant='bt'
-            weight='medium'
-            className='text-primary-blue'
-          >
-            {user?.name}
+    <div className='hidden xl:block fixed left-0 top-0 h-screen w-72 bg-white border-r border-gray-200 shadow-sm flex flex-col z-40 overflow-hidden'>
+      {/* Header */}
+      <div className='flex-shrink-0 px-6 py-6 border-b border-gray-100'>
+        <div className='text-center mb-6'>
+          <NextImage
+            src='/images/logo.png'
+            alt='logo'
+            width={254}
+            height={177}
+            className='w-12 mx-auto mb-3'
+          />
+          <Typography className='text-primary-blue font-bold text-lg'>
+            Raihasa
           </Typography>
-          <Typography
-            variant='c2'
-            weight='medium'
-            className='truncate text-primary-blue max-w-52'
-          >
-            {user?.email}
+          <Typography className='text-gray-400 text-xs tracking-wider'>
+            Dashboard
           </Typography>
+        </div>
+        
+        {/* User Profile */}
+        <div className='flex items-center gap-3 p-4 bg-gradient-to-br from-blue-50 via-white to-orange-50 rounded-xl border border-gray-100'>
+          <div className='relative flex-shrink-0'>
+            <div className='w-11 h-11 rounded-full bg-gradient-to-br from-primary-blue to-primary-orange flex items-center justify-center shadow-sm'>
+              <Typography className='text-white font-bold text-base'>
+                {user?.name?.charAt(0).toUpperCase()}
+              </Typography>
+            </div>
+            <div className='absolute -bottom-1 -right-1 w-4 h-4 bg-green-400 border-2 border-white rounded-full'></div>
+          </div>
+          <div className='flex-1 min-w-0 overflow-hidden'>
+            <Typography variant='bt' weight='semibold' className='text-gray-900 truncate text-sm block'>
+              {user?.name}
+            </Typography>
+            <Typography variant='c2' className='text-gray-500 truncate text-xs block'>
+              {user?.role === 'ADMIN' ? 'Administrator' : 'Member'}
+            </Typography>
+          </div>
         </div>
       </div>
 
-      <div className='mt-6'>
-        <UnstyledLink
-          href={isAdmin ? `/admin` : `/dashboard`}
-          className={clsxm(
-            'py-2 px-3 flex items-center gap-2 rounded-md',
-            (pathName === '/dashboard' || pathName === '/admin') &&
-              'bg-primary-blue'
-          )}
+      {/* Navigation */}
+      <div className='flex-1 overflow-y-auto overflow-x-hidden px-4 py-6 min-h-0 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent hover:scrollbar-thumb-gray-400'>
+        {/* Home */}
+        <div className='mb-6'>
+          <UnstyledLink
+            href={isAdmin ? `/admin` : `/dashboard`}
+            className={clsxm(
+              'group flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 hover:bg-gray-50 hover:shadow-sm',
+              (pathName === '/dashboard' || pathName === '/admin') && 'bg-gradient-to-r from-primary-blue to-primary-orange shadow-md'
+            )}
+          >
+            <div className={clsxm(
+              'p-2 rounded-lg transition-all duration-300 flex-shrink-0',
+              pathName === '/dashboard' || pathName === '/admin'
+                ? 'bg-white/20'
+                : 'bg-gray-100 group-hover:bg-primary-blue/10'
+            )}>
+              <HiHome
+                className={clsxm(
+                  'w-5 h-5 transition-colors duration-300',
+                  pathName === '/dashboard' || pathName === '/admin'
+                    ? 'text-white'
+                    : 'text-gray-600 group-hover:text-primary-blue'
+                )}
+              />
+            </div>
+            <Typography
+              variant='bt'
+              weight='medium'
+              className={clsxm(
+                'transition-colors duration-300 truncate',
+                pathName === '/dashboard' || pathName === '/admin'
+                  ? 'text-white'
+                  : 'text-gray-700 group-hover:text-gray-900'
+              )}
+            >
+              Dashboard
+            </Typography>
+          </UnstyledLink>
+        </div>
+
+        {/* Menu Sections */}
+        <div className='space-y-2'>
+          {menuSections.map((section) => (
+            <div key={section.id} className='mb-4'>
+              {/* Section Header */}
+              <button
+                onClick={() => {
+                  section.setIsOpen(!section.isOpen);
+                  setActiveSection(section.isOpen ? '' : section.id);
+                }}
+                className={clsxm(
+                  'w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 hover:bg-gray-50 hover:shadow-sm group',
+                  activeSection === section.id && 'bg-blue-50 shadow-sm border border-blue-100'
+                )}
+              >
+                <div className={clsxm(
+                  'p-2 rounded-lg transition-all duration-300 flex-shrink-0',
+                  activeSection === section.id 
+                    ? 'bg-primary-blue/10' 
+                    : 'bg-gray-100 group-hover:bg-primary-blue/10'
+                )}>
+                  <section.icon className={clsxm(
+                    'w-5 h-5 transition-colors duration-300',
+                    activeSection === section.id ? 'text-primary-blue' : 'text-gray-600 group-hover:text-primary-blue'
+                  )} />
+                </div>
+                <Typography
+                  variant='bt'
+                  weight='medium'
+                  className={clsxm(
+                    'flex-1 text-left transition-colors duration-300 truncate',
+                    activeSection === section.id ? 'text-primary-blue' : 'text-gray-700 group-hover:text-gray-900'
+                  )}
+                >
+                  {section.title}
+                </Typography>
+                <FaChevronDown
+                  className={clsxm(
+                    'w-4 h-4 transition-all duration-300 flex-shrink-0',
+                    section.isOpen ? 'rotate-180 text-primary-blue' : 'text-gray-400 group-hover:text-gray-600'
+                  )}
+                />
+              </button>
+
+              {/* Section Items */}
+              <div className={clsxm(
+                'overflow-hidden transition-all duration-300 ease-in-out',
+                section.isOpen ? 'max-h-96 opacity-100 mt-2' : 'max-h-0 opacity-0'
+              )}>
+                <div className='ml-4 space-y-1 pb-2'>
+                  {section.items.map((item) => {
+                    const isActive = item.paths.includes(pathName);
+                    return (
+                      <UnstyledLink
+                        key={item.title}
+                        href={item.href}
+                        className={clsxm(
+                          'group flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-300 relative overflow-hidden',
+                          isActive 
+                            ? 'bg-gradient-to-r from-primary-blue to-primary-orange text-white shadow-md transform scale-[1.02]' 
+                            : 'hover:bg-gray-50 text-gray-600 hover:text-gray-900 hover:shadow-sm'
+                        )}
+                      >
+                        {/* Background pattern for active state */}
+                        {isActive && (
+                          <div className='absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-50' />
+                        )}
+                        
+                        {/* Active indicator */}
+                        {isActive && (
+                          <div className='absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-white rounded-r-full shadow-sm' />
+                        )}
+                        
+                        <div className={clsxm(
+                          'p-1.5 rounded-lg transition-all duration-300 relative z-10 flex-shrink-0',
+                          isActive 
+                            ? 'bg-white/20' 
+                            : 'bg-gray-100 group-hover:bg-primary-blue/10'
+                        )}>
+                          <item.icon className={clsxm(
+                            'w-4 h-4 transition-colors duration-300',
+                            isActive ? 'text-white' : 'text-gray-500 group-hover:text-primary-blue'
+                          )} />
+                        </div>
+                        <Typography
+                          variant='c1'
+                          weight='medium'
+                          className={clsxm(
+                            'transition-colors duration-300 relative z-10 truncate',
+                            isActive ? 'text-white' : 'group-hover:text-gray-900'
+                          )}
+                        >
+                          {item.title}
+                        </Typography>
+                      </UnstyledLink>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className='flex-shrink-0 p-4 border-t border-gray-100 bg-gray-50/50'>
+        <button
+          onClick={handleLogout}
+          className='w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl transition-all duration-300 group hover:shadow-sm'
         >
-          <TiHome
-            className={clsxm(
-              'w-6 h-6',
-              pathName === '/dashboard' || pathName === '/admin'
-                ? 'text-white'
-                : 'text-primary-blue'
-            )}
-          />
-          <Typography
-            variant='bt'
-            weight='medium'
-            className={clsxm(
-              pathName === '/dashboard' || pathName === '/admin'
-                ? 'text-white'
-                : 'text-primary-blue'
-            )}
-          >
-            Home
+          <div className='p-2 bg-red-100 rounded-lg group-hover:bg-red-200 transition-colors duration-300 flex-shrink-0'>
+            <HiLogout className='w-5 h-5 group-hover:scale-110 transition-transform duration-300' />
+          </div>
+          <Typography variant='bt' weight='medium' className='group-hover:text-red-700 transition-colors duration-300 truncate'>
+            Logout
           </Typography>
-        </UnstyledLink>
-        <div className='h-[1px] my-3 w-full bg-[#111111]/15' />
-        <div>
-          <div
-            className='flex items-center gap-4 hover:cursor-pointer'
-            onClick={() => setIsBoosterOpen(!isBoosterOpen)}
-          >
-            <FaChevronDown
-              className={clsxm(
-                'w-4 h-4 text-primary-blue transition-all',
-                isBoosterOpen && '-rotate-180'
-              )}
-            />
-            <Typography
-              variant='bt'
-              weight='medium'
-              className='text-primary-blue'
-            >
-              Booster
-            </Typography>
-          </div>
-          {isBoosterOpen && (
-            <div className='flex flex-col gap-2 mt-2 ml-4'>
-              <UnstyledLink
-                href={isAdmin ? `/admin/cv-boost` : `/dashboard/cv-boost`}
-                className={clsxm(
-                  'py-2 px-3 flex items-center gap-2 rounded-md',
-                  (pathName === '/dashboard/cv-boost' ||
-                    pathName === '/admin/cv-boost') &&
-                    'bg-primary-blue'
-                )}
-              >
-                <HiDocumentSearch
-                  className={clsxm(
-                    'w-6 h-6',
-                    pathName === '/dashboard/cv-boost' ||
-                      pathName === '/admin/cv-boost'
-                      ? 'text-white'
-                      : 'text-primary-blue'
-                  )}
-                />
-                <Typography
-                  variant='bt'
-                  weight='medium'
-                  className={clsxm(
-                    pathName === '/dashboard/cv-boost' ||
-                      pathName === '/admin/cv-boost'
-                      ? 'text-white'
-                      : 'text-primary-blue'
-                  )}
-                >
-                  Order CV
-                </Typography>
-              </UnstyledLink>
-              <UnstyledLink
-                href={isAdmin ? `/admin/essay-boost` : `/dashboard/essay-boost`}
-                className={clsxm(
-                  'py-2 px-3 flex items-center gap-2 rounded-md',
-                  (pathName === '/dashboard/essay-boost' ||
-                    pathName === '/admin/essay-boost') &&
-                    'bg-primary-blue'
-                )}
-              >
-                <HiDocumentText
-                  className={clsxm(
-                    'w-6 h-6',
-                    pathName === '/dashboard/essay-boost' ||
-                      pathName === '/admin/essay-boost'
-                      ? 'text-white'
-                      : 'text-primary-blue'
-                  )}
-                />
-                <Typography
-                  variant='bt'
-                  weight='medium'
-                  className={clsxm(
-                    pathName === '/dashboard/essay-boost' ||
-                      pathName === '/admin/essay-boost'
-                      ? 'text-white'
-                      : 'text-primary-blue'
-                  )}
-                >
-                  Order Essay
-                </Typography>
-              </UnstyledLink>
-              <UnstyledLink
-                href={
-                  isAdmin
-                    ? `/admin/interview-boost`
-                    : `/dashboard/interview-boost`
-                }
-                className={clsxm(
-                  'py-2 px-3 flex items-center gap-2 rounded-md',
-                  (pathName === '/dashboard/interview-boost' ||
-                    pathName === '/admin/interview-boost') &&
-                    'bg-primary-blue'
-                )}
-              >
-                <FaUserGroup
-                  className={clsxm(
-                    'w-6 h-6',
-                    pathName === '/dashboard/interview-boost' ||
-                      pathName === '/admin/interview-boost'
-                      ? 'text-white'
-                      : 'text-primary-blue'
-                  )}
-                />
-                <Typography
-                  variant='bt'
-                  weight='medium'
-                  className={clsxm(
-                    pathName === '/dashboard/interview-boost' ||
-                      pathName === '/admin/interview-boost'
-                      ? 'text-white'
-                      : 'text-primary-blue'
-                  )}
-                >
-                  Order Interview
-                </Typography>
-              </UnstyledLink>
-            </div>
-          )}
-        </div>
-        <div className='h-[1px] my-3 w-full bg-[#111111]/15' />
-        <div>
-          <div
-            className='flex items-center gap-4 hover:cursor-pointer'
-            onClick={() => setIsLmsOpen(!isLmsOpen)}
-          >
-            <FaChevronDown
-              className={clsxm(
-                'w-4 h-4 text-primary-blue transition-all',
-                isLmsOpen && '-rotate-180'
-              )}
-            />
-            <Typography
-              variant='bt'
-              weight='medium'
-              className='text-primary-blue'
-            >
-              LMS
-            </Typography>
-          </div>
-          {isLmsOpen && (
-            <div className='flex flex-col gap-2 mt-2 ml-4'>
-              <UnstyledLink
-                href={isAdmin ? `/admin/lms` : `/dashboard/lms`}
-                className={clsxm(
-                  'py-2 px-3 flex items-center gap-2 rounded-md',
-                  (pathName === '/dashboard/lms' ||
-                    pathName === '/admin/lms') &&
-                    'bg-primary-blue'
-                )}
-              >
-                <HiBookOpen
-                  className={clsxm(
-                    'w-6 h-6',
-                    pathName === '/dashboard/lms' || pathName === '/admin/lms'
-                      ? 'text-white'
-                      : 'text-primary-blue'
-                  )}
-                />
-                <Typography
-                  variant='bt'
-                  weight='medium'
-                  className={clsxm(
-                    pathName === '/dashboard/lms' || pathName === '/admin/lms'
-                      ? 'text-white'
-                      : 'text-primary-blue'
-                  )}
-                >
-                  Order LMS
-                </Typography>
-              </UnstyledLink>
-            </div>
-          )}
-        </div>
-         <div className='h-[1px] my-3 w-full bg-[#111111]/15' />
-        <div>
-          <div
-            className='flex items-center gap-4 hover:cursor-pointer'
-            onClick={() => setIsBeasiswaOpen(!isBeasiswaOpen)}
-          >
-            <FaChevronDown
-              className={clsxm(
-                'w-4 h-4 text-primary-blue transition-all',
-                isBeasiswaOpen && '-rotate-180'
-              )}
-            />
-            <Typography
-              variant='bt'
-              weight='medium'
-              className='text-primary-blue'
-            >
-              Beasiswa
-            </Typography>
-          </div>
-          {isBeasiswaOpen && (
-            <div className='flex flex-col gap-2 mt-2 ml-4'>
-              <UnstyledLink
-                href={isAdmin ? `/rekomendasi-beasiswa` : `/rekomendasi-beasiswa`}
-                className={clsxm(
-                  'py-2 px-3 flex items-center gap-2 rounded-md',
-                  (pathName === '/rekomendasi-beasiswa' ||
-                    pathName === '/rekomendasi-beasiswa') &&
-                    'bg-primary-blue'
-                )}
-              >
-                <HiBookOpen
-                  className={clsxm(
-                    'w-6 h-6',
-                    pathName === '/rekomendasi-beasiswa' || pathName === '/rekomendasi-beasiswa'
-                      ? 'text-white'
-                      : 'text-primary-blue'
-                  )}
-                />
-                <Typography
-                  variant='bt'
-                  weight='medium'
-                  className={clsxm(
-                    pathName === '/rekomendasi-beasiswa' || pathName === '/rekomendasi-beasiswa'
-                      ? 'text-white'
-                      : 'text-primary-blue'
-                  )}
-                >
-                  Rekomendasi Beasiswa
-                </Typography>
-              </UnstyledLink>
-               {isAdmin && (
-              <UnstyledLink
-                href='/admin/manajemen-beasiswa'
-                className={clsxm(
-                  'py-2 px-3 flex items-center gap-2 rounded-md',
-                  pathName === '/admin/manajemen-beasiswa' && 'bg-primary-blue'
-                )}
-              >
-                <HiDocumentText
-                  className={clsxm(
-                    'w-6 h-6',
-                    pathName === '/admin/manajemen-beasiswa'
-                      ? 'text-white'
-                      : 'text-primary-blue'
-                  )}
-                />
-                <Typography
-                  variant='bt'
-                  weight='medium'
-                  className={clsxm(
-                    pathName === '/admin/manajemen-beasiswa'
-                      ? 'text-white'
-                      : 'text-primary-blue'
-                  )}
-                >
-                  Manajemen Beasiswa
-                </Typography>
-              </UnstyledLink>
-                )}
-            </div>
-          )}
-        </div>
+        </button>
       </div>
     </div>
   );
