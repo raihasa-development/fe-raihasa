@@ -1,13 +1,23 @@
 'use client';
 
 import { useRouter } from 'next/router';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FiArrowLeft, FiCalendar, FiDollarSign, FiHeart, FiMapPin, FiSend } from 'react-icons/fi';
 
 import ButtonLink from '@/components/links/ButtonLink';
 import SEO from '@/components/SEO';
 import Typography from '@/components/Typography';
 import Layout from '@/layouts/Layout';
+import { ScholarshipRecommendation } from '../types/type';
+
+interface ScholarshipDetail extends ScholarshipRecommendation {
+  description?: string;
+  requirements?: string[];
+  benefits?: string[];
+  documents?: string[];
+  applicationUrl?: string;
+  eligibility?: string;
+}
 
 export default function ScholarshipDetailPage() {
   const router = useRouter();
@@ -22,45 +32,124 @@ export default function ScholarshipDetailPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  // Mock data - in real app, fetch based on recommendation_id
-  const scholarshipDetail = {
-    id: recommendation_id,
-    title: 'Beasiswa LPDP S1',
-    provider: 'Lembaga Pengelola Dana Pendidikan',
-    deadline: '2024-12-31', // ISO format for easier comparison
-    deadlineDisplay: '31 Desember 2024',
-    amount: 'Full Scholarship + Tunjangan Hidup',
-    location: 'Seluruh Indonesia',
-    description: 'Beasiswa penuh untuk mahasiswa berprestasi yang ingin melanjutkan studi dan berkontribusi untuk Indonesia.',
-    eligibility: 'Mahasiswa S1 semester 4-8',
-    requirements: [
-      'IPK minimal 3.0',
-      'Mahasiswa aktif semester 4-8',
-      'Tidak sedang menerima beasiswa lain',
-      'Bersedia menandatangani kontrak ikatan dinas',
-      'Sehat jasmani dan rohani'
-    ],
-    benefits: [
-      'Biaya kuliah penuh',
-      'Tunjangan hidup bulanan',
-      'Biaya penelitian',
-      'Asuransi kesehatan',
-      'Dukungan kegiatan akademik'
-    ],
-    documents: [
-      'Transkrip nilai terbaru',
-      'Surat keterangan aktif kuliah',
-      'Essay motivasi (max 1000 kata)',
-      'CV dan portofolio',
-      'Surat rekomendasi dosen'
-    ],
-    applicationUrl: 'https://lpdp.kemenkeu.go.id'
-  };
+  const [scholarshipDetail, setScholarshipDetail] = useState<ScholarshipDetail | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch scholarship detail from backend
+  useEffect(() => {
+    const fetchScholarshipDetail = async () => {
+      if (!recommendation_id) return;
+
+      try {
+        setIsLoading(true);
+        const apiUrl = process.env.NEXT_PUBLIC_BACKEND_API_URL;
+        const fullUrl = `${apiUrl}/scholarship/${recommendation_id}`;
+        
+        console.log('Fetching scholarship detail from:', fullUrl);
+        
+        const response = await fetch(fullUrl);
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('Error response:', errorText);
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const responseData = await response.json();
+        console.log('Scholarship detail response:', responseData);
+        
+        // Handle backend response structure
+        let data: ScholarshipRecommendation;
+        if (responseData.code === 200 && responseData.status && responseData.data) {
+          data = responseData.data;
+        } else if (responseData.id) {
+          // Direct data response
+          data = responseData;
+        } else {
+          throw new Error('Invalid response format');
+        }
+        
+        // Transform and set the data
+        setScholarshipDetail({
+          ...data,
+          description: `Beasiswa ${data.jenis} dari ${data.penyelenggara}. Program beasiswa ini dirancang untuk mendukung mahasiswa berprestasi dalam menyelesaikan pendidikan.`,
+          requirements: [
+            'Mahasiswa aktif',
+            `Sesuai dengan jenis: ${data.jenis}`,
+            'Tidak sedang menerima beasiswa lain',
+            'Memenuhi persyaratan akademik',
+            'Berkomitmen menyelesaikan studi'
+          ],
+          benefits: [
+            'Bantuan biaya pendidikan',
+            'Dukungan akademik',
+            'Networking dengan sesama penerima',
+            'Mentoring program',
+            'Sertifikat penerima beasiswa'
+          ],
+          documents: [
+            'Transkrip nilai terbaru',
+            'Surat keterangan aktif kuliah',
+            'Essay motivasi',
+            'CV dan portofolio',
+            'Surat rekomendasi'
+          ],
+          applicationUrl: '#',
+          eligibility: `Periode pendaftaran: ${new Date(data.open_registration).toLocaleDateString('id-ID')} - ${new Date(data.close_registration).toLocaleDateString('id-ID')}`
+        });
+      } catch (error) {
+        console.error('Error fetching scholarship detail:', error);
+        const errorMessage = error instanceof Error ? error.message : 'Gagal memuat detail beasiswa';
+        setError(errorMessage);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchScholarshipDetail();
+  }, [recommendation_id]);
+
+  if (isLoading) {
+    return (
+      <Layout withNavbar={true} withFooter={true}>
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-16 h-16 border-4 border-primary-blue border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <Typography>Memuat detail beasiswa...</Typography>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
+  if (error || !scholarshipDetail) {
+    return (
+      <Layout withNavbar={true} withFooter={true}>
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <Typography className="text-red-500 text-lg mb-4">{error || 'Beasiswa tidak ditemukan'}</Typography>
+            <button
+              onClick={() => router.back()}
+              className="text-primary-blue hover:underline"
+            >
+              Kembali ke halaman sebelumnya
+            </button>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
 
   // Check if deadline has passed
-  const isDeadlinePassed = new Date() > new Date(scholarshipDetail.deadline);
+  const isDeadlinePassed = new Date() > new Date(scholarshipDetail.close_registration);
   const deadlineColor = isDeadlinePassed ? 'text-red-500' : 'text-green-500';
   const deadlineStatus = isDeadlinePassed ? 'TUTUP' : 'BUKA';
+  const deadlineDisplay = new Date(scholarshipDetail.close_registration).toLocaleDateString('id-ID', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  });
 
   const handleLike = () => {
     setIsLiked(!isLiked);
@@ -80,7 +169,7 @@ export default function ScholarshipDetailPage() {
 
   return (
     <Layout withNavbar={true} withFooter={true}>
-      <SEO title={`${scholarshipDetail.title} - Detail Beasiswa`} />
+      <SEO title={`${scholarshipDetail.nama} - Detail Beasiswa`} />
       <main className="min-h-screen bg-gradient-to-br from-blue-50 to-orange-50">
         {/* Header */}
         <section className="bg-gradient-to-r from-primary-blue to-primary-orange pt-24 pb-12">
@@ -95,17 +184,17 @@ export default function ScholarshipDetailPage() {
 
             <div className="max-w-4xl mx-auto">
               <Typography className="text-4xl md:text-5xl font-bold text-white mb-4">
-                {scholarshipDetail.title}
+                {scholarshipDetail.nama}
               </Typography>
               <Typography className="text-xl text-white/90 mb-6">
-                {scholarshipDetail.provider}
+                {scholarshipDetail.penyelenggara}
               </Typography>
               
               <div className="flex flex-wrap gap-6 text-white mb-6">
                 <div className="flex items-center gap-2">
                   <FiCalendar className="w-5 h-5" />
                   <Typography className="text-white">
-                    Deadline: {scholarshipDetail.deadlineDisplay}
+                    Deadline: {deadlineDisplay}
                   </Typography>
                   <span className={`px-3 py-1 rounded-full text-xs font-bold ${
                     isDeadlinePassed ? 'bg-red-500' : 'bg-green-500'
@@ -117,16 +206,18 @@ export default function ScholarshipDetailPage() {
                 <div className="flex items-center gap-2">
                   <FiDollarSign className="w-5 h-5" />
                   <Typography className="text-white">
-                    {scholarshipDetail.amount}
+                    {scholarshipDetail.jenis}
                   </Typography>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <FiMapPin className="w-5 h-5" />
-                  <Typography className="text-white">
-                    {scholarshipDetail.location}
-                  </Typography>
-                </div>
+                {scholarshipDetail.match_score && (
+                  <div className="flex items-center gap-2">
+                    <FiMapPin className="w-5 h-5" />
+                    <Typography className="text-white">
+                      Match Score: {Math.round(scholarshipDetail.match_score * 100)}%
+                    </Typography>
+                  </div>
+                )}
               </div>
 
               {/* Like Button */}
@@ -156,7 +247,7 @@ export default function ScholarshipDetailPage() {
                   <Typography className="text-2xl font-bold text-primary-blue mb-4">
                     Deskripsi Beasiswa
                   </Typography>
-                  <Typography className="text-gray-700 leading-relaxed  ">
+                  <Typography className="text-gray-700 leading-relaxed">
                     {scholarshipDetail.description}
                   </Typography>
                 </div>
@@ -164,31 +255,31 @@ export default function ScholarshipDetailPage() {
                 {/* Requirements & Benefits - Side by side */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div className="bg-white rounded-2xl shadow-lg p-8">
-                    <Typography className="text-2xl font-bold text-primary-blue mb-4  ">
+                    <Typography className="text-2xl font-bold text-primary-blue mb-4">
                       Syarat & Ketentuan
                     </Typography>
-                    <Typography className="text-gray-600 mb-4  ">
+                    <Typography className="text-gray-600 mb-4">
                       Eligibilitas: {scholarshipDetail.eligibility}
                     </Typography>
                     <ul className="space-y-3">
-                      {scholarshipDetail.requirements.map((req, index) => (
+                      {scholarshipDetail.requirements?.map((req, index) => (
                         <li key={index} className="flex gap-3">
                           <div className="w-2 h-2 bg-primary-orange rounded-full mt-2 flex-shrink-0"></div>
-                          <Typography className="text-gray-700  ">{req}</Typography>
+                          <Typography className="text-gray-700">{req}</Typography>
                         </li>
                       ))}
                     </ul>
                   </div>
 
                   <div className="bg-white rounded-2xl shadow-lg p-8">
-                    <Typography className="text-2xl font-bold text-primary-blue mb-4  ">
+                    <Typography className="text-2xl font-bold text-primary-blue mb-4">
                       Manfaat Beasiswa
                     </Typography>
                     <ul className="space-y-3">
-                      {scholarshipDetail.benefits.map((benefit, index) => (
+                      {scholarshipDetail.benefits?.map((benefit, index) => (
                         <li key={index} className="flex gap-3">
                           <div className="w-2 h-2 bg-primary-blue rounded-full mt-2 flex-shrink-0"></div>
-                          <Typography className="text-gray-700  ">{benefit}</Typography>
+                          <Typography className="text-gray-700">{benefit}</Typography>
                         </li>
                       ))}
                     </ul>
@@ -197,14 +288,14 @@ export default function ScholarshipDetailPage() {
 
                 {/* Documents */}
                 <div className="bg-white rounded-2xl shadow-lg p-8">
-                  <Typography className="text-2xl font-bold text-primary-blue mb-4  ">
+                  <Typography className="text-2xl font-bold text-primary-blue mb-4">
                     Dokumen yang Diperlukan
                   </Typography>
                   <ul className="space-y-3">
-                    {scholarshipDetail.documents.map((doc, index) => (
+                    {scholarshipDetail.documents?.map((doc, index) => (
                       <li key={index} className="flex gap-3">
                         <div className="w-2 h-2 bg-primary-orange rounded-full mt-2 flex-shrink-0"></div>
-                        <Typography className="text-gray-700  ">{doc}</Typography>
+                        <Typography className="text-gray-700">{doc}</Typography>
                       </li>
                     ))}
                   </ul>
@@ -280,13 +371,13 @@ export default function ScholarshipDetailPage() {
                           Pendaftaran Ditutup
                         </Typography>
                         <Typography className="text-gray-500 text-sm">
-                          Deadline telah berakhir pada {scholarshipDetail.deadlineDisplay}
+                          Deadline telah berakhir pada {deadlineDisplay}
                         </Typography>
                       </div>
                     </div>
                   ) : (
                     <ButtonLink
-                      href={scholarshipDetail.applicationUrl}
+                      href={scholarshipDetail.applicationUrl || '#'}
                       variant="primary"
                       size="lg"
                       className="w-full"
@@ -312,7 +403,7 @@ export default function ScholarshipDetailPage() {
                       {isDeadlinePassed ? 'PENDAFTARAN DITUTUP' : 'PENDAFTARAN DIBUKA'}
                     </Typography>
                     <Typography className="text-sm text-gray-600 text-center mt-2">
-                      Deadline: {scholarshipDetail.deadlineDisplay}
+                      Deadline: {deadlineDisplay}
                     </Typography>
                   </div>
                 </div>

@@ -3,10 +3,11 @@
 import React, { useState, useRef } from 'react';
 import { FiSend, FiUser } from 'react-icons/fi';
 import Typography from '@/components/Typography';
-import { ChatMessage, ScholarshipRecommendation } from '../types/type';
+import { ChatMessage, ScholarshipRecommendationDisplay, RekomendasiBeasiswaRequest, AIRecommendationResponse } from '../types/type';
+import { useRouter } from 'next/router';
 
 interface ChatboxProps {
-  onRecommendation?: (recommendations: ScholarshipRecommendation[]) => void;
+  onRecommendation?: (recommendations: ScholarshipRecommendationDisplay[]) => void;
 }
 
 interface QuestionFlow {
@@ -28,6 +29,7 @@ interface UserData {
 }
 
 export default function Chatbox({ onRecommendation }: ChatboxProps) {
+  const router = useRouter();
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: '1',
@@ -142,38 +144,97 @@ export default function Chatbox({ onRecommendation }: ChatboxProps) {
     setInputValue(template);
   };
 
-  const generateRecommendations = () => {
+  const generateRecommendations = async () => {
     setIsLoading(true);
     
-    const mockRecommendations: ScholarshipRecommendation[] = [
-      {
-        id: '1',
-        title: 'Beasiswa LPDP S1',
-        provider: 'Lembaga Pengelola Dana Pendidikan',
-        deadline: '31 Desember 2024',
-        amount: 'Full Scholarship + Tunjangan Hidup',
-        requirements: ['IPK minimal 3.0', 'Mahasiswa aktif', 'Tidak sedang menerima beasiswa lain'],
-        description: 'Beasiswa penuh untuk mahasiswa berprestasi yang ingin melanjutkan studi.',
-        eligibility: 'Mahasiswa S1 semester 4-8',
-        link: '/scholarship-recommendation/1'
-      },
-      {
-        id: '2',
-        title: 'Beasiswa Psikologi Indonesia',
-        provider: 'Himpunan Psikologi Indonesia',
-        deadline: '15 Januari 2025',
-        amount: 'Rp 5.000.000/semester',
-        requirements: ['Jurusan Psikologi', 'IPK minimal 3.25', 'Essay motivasi'],
-        description: 'Beasiswa khusus untuk mahasiswa psikologi berprestasi.',
-        eligibility: 'Mahasiswa Psikologi semester 3-7',
-        link: '/scholarship-recommendation/2'
+    try {
+      // Construct request payload
+      const requestData: RekomendasiBeasiswaRequest = {
+        age: userData.age ? parseInt(userData.age) : undefined,
+        gender: userData.gender === 'Laki-laki' ? 'LAKI_LAKI' : userData.gender === 'Perempuan' ? 'PEREMPUAN' : undefined,
+        provinsi: userData.region && ['Jakarta', 'Jawa Barat', 'Jawa Tengah', 'Jawa Timur'].includes(userData.region) ? userData.region : undefined,
+        kota_kabupaten: userData.region && !['Jakarta', 'Jawa Barat', 'Jawa Tengah', 'Jawa Timur'].includes(userData.region) ? userData.region : undefined,
+        education_level: userData.degree === 'SMA/SMK' ? 'sma' : userData.degree?.toLowerCase(),
+        ipk: userData.gpa ? parseFloat(userData.gpa) : undefined,
+        status_beasiswa_aktif: false,
+        status_keluarga_tidak_mampu: false,
+        status_disabilitas: false,
+        semester: undefined,
+        user_prompt: `${userData.custom || ''} Saya mencari beasiswa ${userData.scholarshipType || 'yang sesuai dengan profil saya'}. Jenjang pendidikan: ${userData.degree || 'tidak disebutkan'}.`.trim(),
+        limit: 10
+      };
+
+      const apiUrl = process.env.NEXT_PUBLIC_BACKEND_API_URL;
+      const fullUrl = `${apiUrl}/scholarship/recommend-guest`;
+      
+      // Debug logging
+      console.log('API URL:', fullUrl);
+      console.log('Request Data:', requestData);
+
+      const response = await fetch(fullUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+      });
+
+      console.log('Response status:', response.status);
+      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error response body:', errorText);
+        throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`);
       }
-    ];
-    
-    setIsLoading(false);
-    addMessage('Saya menemukan beberapa beasiswa yang sesuai dengan profil Anda! Lihat rekomendasi di sebelah kanan.', 'bot');
-    if (onRecommendation) {
-      onRecommendation(mockRecommendations);
+
+      const responseData = await response.json();
+      console.log('Full response:', responseData);
+      
+      // Handle backend API response structure
+      if (responseData.code !== 200 || !responseData.status || !responseData.data) {
+        throw new Error(`API Error: ${responseData.message || 'Invalid response format'}`);
+      }
+
+      const data = responseData.data;
+      
+      // Transform backend data to frontend format
+      const transformedRecommendations: ScholarshipRecommendationDisplay[] = data.recommendations.map((rec: any) => ({
+        id: rec.id,
+        title: rec.nama,
+        provider: rec.penyelenggara,
+        deadline: new Date(rec.close_registration).toLocaleDateString('id-ID', {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric'
+        }),
+        amount: rec.jenis === 'PARTIAL' ? 'Partial Scholarship' : rec.jenis === 'FULL' ? 'Full Scholarship' : rec.jenis,
+        requirements: [`Jenis: ${rec.jenis}`, `Match Score: ${rec.match_score}%`],
+        description: `Beasiswa ${rec.jenis} dari ${rec.penyelenggara}`,
+        eligibility: `Pendaftaran: ${new Date(rec.open_registration).toLocaleDateString('id-ID')} - ${new Date(rec.close_registration).toLocaleDateString('id-ID')}`,
+        link: `/scholarship-recommendation/${rec.id}`,
+        match_score: rec.match_score / 100 // Convert to decimal for consistency
+      }));
+
+      // Save to localStorage and redirect to results page
+      localStorage.setItem('scholarship_recommendations', JSON.stringify(transformedRecommendations));
+      localStorage.setItem('scholarship_search_summary', data.search_summary);
+      
+      addMessage(`${data.search_summary} Mengarahkan Anda ke halaman hasil...`, 'bot');
+      
+      // Small delay for better UX
+      setTimeout(() => {
+        router.push('/scholarship-recommendation/scholarship-result');
+      }, 2000);
+      
+    } catch (error) {
+      console.error('Error fetching recommendations:', error);
+      
+      // Show error message with more helpful info
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      addMessage(`Terjadi kesalahan saat mencari rekomendasi: ${errorMessage}. Pastikan backend berjalan di ${process.env.NEXT_PUBLIC_BACKEND_API_URL || 'http://localhost:4000'}`, 'bot');
+    } finally {
+      setIsLoading(false);
     }
   };
 
