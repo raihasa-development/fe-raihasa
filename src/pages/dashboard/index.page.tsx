@@ -13,178 +13,139 @@ function DashboardUserPage() {
       withSidebar
       className='min-h-screen bg-gradient-to-br from-blue-50 to-orange-50'
     >
-      <div className='container mx-auto px-4 max-w-7xl'>
+      <div className='container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl'>
         {/* Hero Section */}
-        <section className='relative pt-8 pb-12'>
-          <div className='text-center mb-12'>
-            <Typography className='font-bold text-3xl md:text-5xl text-primary-orange mb-4'>
+        <section className='relative pt-6 sm:pt-8 pb-8 sm:pb-12'>
+          <div className='text-center mb-8 sm:mb-12'>
+            <Typography className='font-bold text-2xl sm:text-3xl lg:text-5xl text-primary-orange mb-3 sm:mb-4 leading-tight'>
               Selamat Datang di Dashboard
             </Typography>
-            <Typography className='text-lg md:text-xl text-primary-blue max-w-3xl mx-auto'>
+            <Typography className='text-base sm:text-lg lg:text-xl text-primary-blue max-w-3xl mx-auto px-4'>
               Kelola perjalanan beasiswa Anda dengan berbagai layanan yang tersedia
             </Typography>
           </div>
 
-          {/* Character Illustration */}
-          <div className='flex justify-center mb-12'>
-            <NextImage
-              src='/images/dashboard/haira.png'
-              width={300}
-              height={300}
-              alt='Haira Assistant'
-              className='w-full max-w-[300px] h-auto'
-            />
-          </div>
+      
         </section>
 
         {/* Services Section */}
-        <section className='py-12 bg-white/50 rounded-2xl mb-12'>
-          <div className='px-4 lg:px-8'>
-            <div className='mb-8'>
-              <Typography className='text-2xl md:text-3xl font-bold text-primary-blue text-center mb-4'>
+        <section className='py-8 sm:py-12 bg-white/50 rounded-xl sm:rounded-2xl mb-8 sm:mb-12'>
+          <div className='px-4 sm:px-6 lg:px-8'>
+            <div className='mb-6 sm:mb-8'>
+              <Typography className='text-xl sm:text-2xl lg:text-3xl font-bold text-primary-blue text-center mb-3 sm:mb-4'>
                 Layanan Tersedia
               </Typography>
-              <Typography className='text-gray-600 text-center max-w-2xl mx-auto'>
+              <Typography className='text-sm sm:text-base text-gray-600 text-center max-w-2xl mx-auto px-4'>
                 Pilih layanan yang sesuai dengan kebutuhan Anda untuk meningkatkan peluang mendapatkan beasiswa
               </Typography>
             </div>
 
             {/* Services Grid */}
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl mx-auto'>
-              {/* CV Boost Card */}
-              <div className='bg-white rounded-2xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-shadow'>
-                <div className='flex justify-between items-start mb-4'>
-                  <Typography className='text-xl font-bold text-primary-blue leading-tight'>
-                    CV Boost
+            <div className='grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 max-w-6xl mx-auto'>
+              {/* Scholra Card */}
+              <div className='bg-white rounded-xl sm:rounded-2xl shadow-lg border border-gray-200 p-4 sm:p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1'>
+                <div className='flex justify-between items-start mb-3 sm:mb-4'>
+                  <Typography className='text-lg sm:text-xl font-bold text-primary-blue leading-tight'>
+                    Scholra
                   </Typography>
-                  <div className='bg-primary-orange/10 text-primary-orange px-3 py-1 rounded-full text-sm font-medium'>
-                    Populer
+                  <div className='bg-primary-orange/10 text-primary-orange px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium'>
+                    AI
                   </div>
                 </div>
 
-                <div className='flex items-center justify-center mb-6'>
+                <div className='flex items-center justify-center mb-4 sm:mb-6 h-16 sm:h-20'>
                   <NextImage
                     src='/images/dashboard/cv-boost.png'
                     width={120}
                     height={80}
-                    alt='CV Boost'
-                    className='w-24 h-auto object-contain'
+                    alt='Scholra AI'
+                    className='w-16 sm:w-24 h-auto object-contain'
                   />
                 </div>
 
-                <Typography className='text-gray-700 text-sm mb-6 leading-relaxed'>
-                  Tingkatkan kualitas CV Anda dengan bantuan mentor profesional untuk meningkatkan peluang diterima beasiswa.
+                <Typography className='text-gray-700 text-xs sm:text-sm mb-4 sm:mb-6 leading-relaxed min-h-[3rem] sm:min-h-[4rem]'>
+                  Dapatkan rekomendasi beasiswa yang dipersonalisasi menggunakan teknologi AI berdasarkan profil dan preferensi Anda.
                 </Typography>
 
                 <ButtonLink
-                  href='/dashboard/cv-boost'
+                  href='/scholarship-recommendation'
                   variant='primary'
-                  className='w-full bg-primary-blue hover:bg-primary-orange text-white rounded-xl transition-colors px-4 py-3 text-center'
+                  className='w-full bg-primary-blue hover:bg-primary-orange text-white rounded-lg sm:rounded-xl transition-colors px-3 sm:px-4 py-2.5 sm:py-3 text-center'
                 >
-                  <Typography className='text-sm font-semibold'>
-                    Mulai CV Boost
+                  <Typography className='text-xs sm:text-sm font-semibold'>
+                    Mulai Scholra
                   </Typography>
                 </ButtonLink>
               </div>
 
-              {/* Essay Boost Card */}
-              <div className='bg-white rounded-2xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-shadow'>
-                <div className='flex justify-between items-start mb-4'>
-                  <Typography className='text-xl font-bold text-primary-blue leading-tight'>
-                    Essay Boost
+              {/* BISA Learning Card */}
+              <div className='bg-white rounded-xl sm:rounded-2xl shadow-lg border border-gray-200 p-4 sm:p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1'>
+                <div className='flex justify-between items-start mb-3 sm:mb-4'>
+                  <Typography className='text-lg sm:text-xl font-bold text-primary-blue leading-tight'>
+                    BISA Learning
                   </Typography>
-                </div>
-
-                <div className='flex items-center justify-center mb-6'>
-                  <NextImage
-                    src='/images/dashboard/essay-boost.png'
-                    width={120}
-                    height={80}
-                    alt='Essay Boost'
-                    className='w-24 h-auto object-contain'
-                  />
-                </div>
-
-                <Typography className='text-gray-700 text-sm mb-6 leading-relaxed'>
-                  Dapatkan bimbingan untuk menulis essay aplikasi beasiswa yang menarik dan berkesan bagi reviewer.
-                </Typography>
-
-                <ButtonLink
-                  href='/dashboard/essay-boost'
-                  variant='primary'
-                  className='w-full bg-primary-blue hover:bg-primary-orange text-white rounded-xl transition-colors px-4 py-3 text-center'
-                >
-                  <Typography className='text-sm font-semibold'>
-                    Mulai Essay Boost
-                  </Typography>
-                </ButtonLink>
-              </div>
-
-              {/* Interview Boost Card */}
-              <div className='bg-white rounded-2xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-shadow'>
-                <div className='flex justify-between items-start mb-4'>
-                  <Typography className='text-xl font-bold text-primary-blue leading-tight'>
-                    Interview Boost
-                  </Typography>
-                </div>
-
-                <div className='flex items-center justify-center mb-6'>
-                  <NextImage
-                    src='/images/dashboard/interview-boost.png'
-                    width={120}
-                    height={80}
-                    alt='Interview Boost'
-                    className='w-24 h-auto object-contain'
-                  />
-                </div>
-
-                <Typography className='text-gray-700 text-sm mb-6 leading-relaxed'>
-                  Persiapkan diri untuk interview beasiswa dengan simulasi dan tips dari mentor berpengalaman.
-                </Typography>
-
-                <ButtonLink
-                  href='/dashboard/interview-boost'
-                  variant='primary'
-                  className='w-full bg-primary-blue hover:bg-primary-orange text-white rounded-xl transition-colors px-4 py-3 text-center'
-                >
-                  <Typography className='text-sm font-semibold'>
-                    Mulai Interview Boost
-                  </Typography>
-                </ButtonLink>
-              </div>
-
-              {/* LMS Card */}
-              <div className='bg-white rounded-2xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-shadow'>
-                <div className='flex justify-between items-start mb-4'>
-                  <Typography className='text-xl font-bold text-primary-blue leading-tight'>
-                    Learning Management
-                  </Typography>
-                  <div className='bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium'>
-                    Baru
+                  <div className='bg-green-100 text-green-700 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium'>
+                    Popular
                   </div>
                 </div>
 
-                <div className='flex items-center justify-center mb-6'>
+                <div className='flex items-center justify-center mb-4 sm:mb-6 h-16 sm:h-20'>
                   <NextImage
                     src='/images/dashboard/lms.png'
                     width={120}
                     height={80}
-                    alt='LMS'
-                    className='w-24 h-auto object-contain'
+                    alt='BISA Learning'
+                    className='w-16 sm:w-24 h-auto object-contain'
                   />
                 </div>
 
-                <Typography className='text-gray-700 text-sm mb-6 leading-relaxed'>
-                  Akses materi pembelajaran lengkap untuk mempersiapkan berbagai jenis tes dan persyaratan beasiswa.
+                <Typography className='text-gray-700 text-xs sm:text-sm mb-4 sm:mb-6 leading-relaxed min-h-[3rem] sm:min-h-[4rem]'>
+                  Akses koleksi video pembelajaran dan ebook untuk mempersiapkan tes dan persyaratan beasiswa.
                 </Typography>
 
                 <ButtonLink
-                  href='/dashboard/lms'
+                  href='/dashboard/bisa-learning'
                   variant='primary'
-                  className='w-full bg-primary-blue hover:bg-primary-orange text-white rounded-xl transition-colors px-4 py-3 text-center'
+                  className='w-full bg-primary-blue hover:bg-primary-orange text-white rounded-lg sm:rounded-xl transition-colors px-3 sm:px-4 py-2.5 sm:py-3 text-center'
                 >
-                  <Typography className='text-sm font-semibold'>
+                  <Typography className='text-xs sm:text-sm font-semibold'>
                     Mulai Belajar
+                  </Typography>
+                </ButtonLink>
+              </div>
+
+              {/* Dreamshub Card */}
+              <div className='bg-white rounded-xl sm:rounded-2xl shadow-lg border border-gray-200 p-4 sm:p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1'>
+                <div className='flex justify-between items-start mb-3 sm:mb-4'>
+                  <Typography className='text-lg sm:text-xl font-bold text-primary-blue leading-tight'>
+                    Dreamshub
+                  </Typography>
+                  <div className='bg-purple-100 text-purple-700 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium'>
+                    Expert
+                  </div>
+                </div>
+
+                <div className='flex items-center justify-center mb-4 sm:mb-6 h-16 sm:h-20'>
+                  <NextImage
+                    src='/images/dashboard/interview-boost.png'
+                    width={120}
+                    height={80}
+                    alt='Dreamshub'
+                    className='w-16 sm:w-24 h-auto object-contain'
+                  />
+                </div>
+
+                <Typography className='text-gray-700 text-xs sm:text-sm mb-4 sm:mb-6 leading-relaxed min-h-[3rem] sm:min-h-[4rem]'>
+                  Platform konsultasi dengan mentor berpengalaman untuk bimbingan CV, essay, dan persiapan interview.
+                </Typography>
+
+                <ButtonLink
+                  href='/dashboard/dreamshub'
+                  variant='primary'
+                  className='w-full bg-primary-blue hover:bg-primary-orange text-white rounded-lg sm:rounded-xl transition-colors px-3 sm:px-4 py-2.5 sm:py-3 text-center'
+                >
+                  <Typography className='text-xs sm:text-sm font-semibold'>
+                    Mulai Konsultasi
                   </Typography>
                 </ButtonLink>
               </div>
@@ -193,27 +154,27 @@ function DashboardUserPage() {
         </section>
 
         {/* Quick Navigation */}
-        <section className='py-12'>
-          <div className='bg-white rounded-xl shadow-sm border border-gray-100 p-8 max-w-4xl mx-auto'>
-            <Typography className='text-xl font-semibold text-primary-blue text-center mb-8'>
+        <section className='py-8 sm:py-12'>
+          <div className='bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6 lg:p-8 max-w-4xl mx-auto'>
+            <Typography className='text-lg sm:text-xl font-semibold text-primary-blue text-center mb-6 sm:mb-8'>
               Navigasi Cepat
             </Typography>
             
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+            <div className='grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6'>
               <ButtonLink
                 href='/rekomendasi-beasiswa'
-                className='flex items-center gap-4 p-4 border-2 border-primary-blue text-primary-blue rounded-xl hover:bg-primary-blue hover:text-white transition-colors'
+                className='flex items-center gap-3 sm:gap-4 p-3 sm:p-4 border-2 border-primary-blue text-primary-blue rounded-lg sm:rounded-xl hover:bg-primary-blue hover:text-white transition-colors group'
               >
-                <div className='w-8 h-8 bg-primary-blue/10 rounded-lg flex items-center justify-center flex-shrink-0'>
-                  <Typography className='text-primary-blue font-bold text-sm'>
+                <div className='w-8 h-8 bg-primary-blue/10 group-hover:bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0'>
+                  <Typography className='text-primary-blue group-hover:text-white font-bold text-sm'>
                     AI
                   </Typography>
                 </div>
-                <div className='text-left'>
-                  <Typography className='font-medium'>
+                <div className='text-left flex-1'>
+                  <Typography className='font-medium text-sm sm:text-base'>
                     Rekomendasi Beasiswa
                   </Typography>
-                  <Typography className='text-sm opacity-75'>
+                  <Typography className='text-xs sm:text-sm opacity-75'>
                     Dapatkan rekomendasi berbasis AI
                   </Typography>
                 </div>
@@ -221,18 +182,18 @@ function DashboardUserPage() {
 
               <ButtonLink
                 href='/profile/edit'
-                className='flex items-center gap-4 p-4 border-2 border-gray-300 text-gray-700 rounded-xl hover:border-primary-blue hover:text-primary-blue transition-colors'
+                className='flex items-center gap-3 sm:gap-4 p-3 sm:p-4 border-2 border-gray-300 text-gray-700 rounded-lg sm:rounded-xl hover:border-primary-blue hover:text-primary-blue transition-colors group'
               >
-                <div className='w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0'>
-                  <Typography className='text-gray-600 font-bold text-sm'>
+                <div className='w-8 h-8 bg-gray-100 group-hover:bg-primary-blue/10 rounded-lg flex items-center justify-center flex-shrink-0'>
+                  <Typography className='text-gray-600 group-hover:text-primary-blue font-bold text-sm'>
                     P
                   </Typography>
                 </div>
-                <div className='text-left'>
-                  <Typography className='font-medium'>
+                <div className='text-left flex-1'>
+                  <Typography className='font-medium text-sm sm:text-base'>
                     Edit Profil
                   </Typography>
-                  <Typography className='text-sm opacity-75'>
+                  <Typography className='text-xs sm:text-sm opacity-75'>
                     Kelola informasi akun Anda
                   </Typography>
                 </div>

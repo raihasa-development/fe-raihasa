@@ -45,66 +45,30 @@ export default function Sidebar() {
 
   const menuSections = [
     {
-      id: 'booster',
-      title: 'Booster',
+      id: 'services',
+      title: 'Services',
       icon: IoSparkles,
       isOpen: isBoosterOpen,
       setIsOpen: setIsBoosterOpen,
       items: [
         {
-          title: 'CV Boost',
-          href: isAdmin ? '/admin/cv-boost' : '/dashboard/cv-boost',
-          icon: HiDocumentSearch,
-          paths: ['/dashboard/cv-boost', '/admin/cv-boost']
-        },
-        {
-          title: 'Essay Boost',
-          href: isAdmin ? '/admin/essay-boost' : '/dashboard/essay-boost',
-          icon: HiDocumentText,
-          paths: ['/dashboard/essay-boost', '/admin/essay-boost']
-        },
-        {
-          title: 'Interview Boost',
-          href: isAdmin ? '/admin/interview-boost' : '/dashboard/interview-boost',
-          icon: FaUsers,
-          paths: ['/dashboard/interview-boost', '/admin/interview-boost']
-        }
-      ]
-    },
-    {
-      id: 'lms',
-      title: 'Learning',
-      icon: FaBookReader,
-      isOpen: isLmsOpen,
-      setIsOpen: setIsLmsOpen,
-      items: [
-        {
-          title: 'Learning Management',
-          href: isAdmin ? '/admin/lms' : '/dashboard/lms',
-          icon: HiBookOpen,
-          paths: ['/dashboard/lms', '/admin/lms']
-        }
-      ]
-    },
-    {
-      id: 'beasiswa',
-      title: 'Beasiswa',
-      icon: FaGraduationCap,
-      isOpen: isBeasiswaOpen,
-      setIsOpen: setIsBeasiswaOpen,
-      items: [
-        {
-          title: 'Rekomendasi AI',
-          href: '/rekomendasi-beasiswa',
+          title: 'Scholra',
+          href: isAdmin ? '/admin/scholra' : '/scholarship-recommendation',
           icon: IoBulbOutline,
-          paths: ['/rekomendasi-beasiswa']
+          paths: ['/scholra', '/admin/scholra', '/rekomendasi-beasiswa']
         },
-        ...(isAdmin ? [{
-          title: 'Kelola Beasiswa',
-          href: '/admin/manajemen-beasiswa',
-          icon: MdManageAccounts,
-          paths: ['/admin/manajemen-beasiswa']
-        }] : [])
+        {
+          title: 'BISA Learning',
+          href: isAdmin ? '/admin/bisa-learning' : '/dashboard/bisa-learning',
+          icon: FaBookReader,
+          paths: ['/dashboard/bisa-learning', '/admin/bisa-learning']
+        },
+        {
+          title: 'Dreamshub',
+          href: isAdmin ? '/admin/dreamshub' : '/dashboard/dreamshub',
+          icon: FaUsers,
+          paths: ['/dashboard/dreamshub', '/admin/dreamshub']
+        }
       ]
     }
   ];
