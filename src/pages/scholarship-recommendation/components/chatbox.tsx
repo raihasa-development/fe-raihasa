@@ -224,7 +224,7 @@ export default function Chatbox({ onRecommendation }: ChatboxProps) {
       
       // Small delay for better UX
       setTimeout(() => {
-        router.push('/scholarship-recommendation/scholarship-result');
+        router.push('/scholarship-recommendation/results');
       }, 2000);
       
     } catch (error) {
