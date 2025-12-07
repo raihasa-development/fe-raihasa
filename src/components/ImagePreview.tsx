@@ -1,7 +1,7 @@
 import 'yet-another-react-lightbox/styles.css';
 import 'yet-another-react-lightbox/plugins/captions.css';
 
-import Image from 'next/legacy/image';
+import Image from 'next/image';
 import * as React from 'react';
 import { HiOutlineExternalLink } from 'react-icons/hi';
 import Lightbox from 'yet-another-react-lightbox';
@@ -70,15 +70,9 @@ const ImagePreview = ({
               {
                 src: imgSrc as string,
                 alt: alt,
-                title: `${label}`,
-                description: '',
               },
             ]}
             plugins={[Captions, Zoom, Download]}
-            animation={{ zoom: 500 }}
-            captions={{
-              descriptionTextAlign: 'start',
-            }}
           />
         )}
       </div>
