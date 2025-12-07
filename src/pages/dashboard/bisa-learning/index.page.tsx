@@ -11,7 +11,7 @@ const courseCategories = [
 		id: 'pertamina',
 		title: 'Pertamina Sobat Bumi',
 		description: 'Persiapan beasiswa Pertamina Sobat Bumi',
-		icon: 'PTMN',
+		// icon: 'PTMN',
 		color: 'bg-blue-500',
 	},
 	{
@@ -25,42 +25,42 @@ const courseCategories = [
 		id: 'bright',
 		title: 'Bright Scholarship',
 		description: 'Persiapan Bright Scholarship',
-		icon: 'BRGT',
+		// icon: 'BRGT',
 		color: 'bg-purple-500',
 	},
 	{
 		id: 'bca',
 		title: 'Bakti BCA',
 		description: 'Beasiswa Bakti BCA',
-		icon: 'BCA',
+		// icon: 'BCA',
 		color: 'bg-orange-500',
 	},
 	{
 		id: 'kse',
 		title: 'KSE',
 		description: 'Karya Salemba Empat',
-		icon: 'KSE',
+		// icon: 'KSE',
 		color: 'bg-red-500',
 	},
 	{
 		id: 'unggulan',
 		title: 'Beasiswa Unggulan',
 		description: 'Beasiswa Unggulan Indonesia',
-		icon: 'UNGL',
+		// icon: 'UNGL',
 		color: 'bg-indigo-500',
 	},
 	{
 		id: 'bangkit',
 		title: 'Indonesia Bangkit',
 		description: 'Beasiswa Indonesia Bangkit',
-		icon: 'BKGT',
+		// icon: 'BKGT',
 		color: 'bg-teal-500',
 	},
 	{
 		id: 'paragon',
 		title: 'Paragon',
 		description: 'Beasiswa Paragon',
-		icon: 'PRGN',
+		// icon: 'PRGN',
 		color: 'bg-pink-500',
 	},
 ];
@@ -304,7 +304,7 @@ function BISALearningPage() {
 										: 'bg-white text-gray-600 border border-gray-300 hover:border-primary-blue hover:text-primary-blue'
 								}`}
 							>
-								<span className='text-xs font-bold'>{category.icon}</span>
+								{/* <span className='text-xs font-bold'>{category.icon}</span> */}
 								{category.title}
 							</button>
 						))}
