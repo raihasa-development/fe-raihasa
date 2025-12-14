@@ -1,25 +1,15 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-    eslint: {
-    ignoreDuringBuilds: true, 
-  },
-    webpack: (config, { dev, isServer }) => {
-    if (dev && !isServer) {
-      config.watchOptions = {
-        poll: 1000,
-        aggregateTimeout: 300,
-      }
-    }
-    return config
-  },
+
+  turbopack: {},
+  
   images: {
-  unoptimized: true,
-},
+    unoptimized: true,
+  },
+  
   pageExtensions: ["page.tsx", "page.ts", "api.ts"],
   reactStrictMode: true,
-  swcMinify: true,
-
 
   async redirects() {
     return [
@@ -32,7 +22,5 @@ const nextConfig: NextConfig = {
     ];
   },
 };
-
-
 
 export default nextConfig;

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import { FiCalendar, FiDollarSign, FiExternalLink, FiCheckCircle } from 'react-icons/fi';
 import { FaArrowRightLong } from 'react-icons/fa6';
 
@@ -11,13 +11,12 @@ import Typography from '@/components/Typography';
 import Layout from '@/layouts/Layout';
 
 import Chatbox from './components/chatbox';
-import { ScholarshipRecommendation } from './types/type';
+import { ScholarshipRecommendationDisplay } from './types/type';
 
 export default function ScholarshipRecommendationPage() {
-  const [recommendations, setRecommendations] = useState<ScholarshipRecommendation[]>([]);
-
-  const handleRecommendation = (newRecommendations: ScholarshipRecommendation[]) => {
-    setRecommendations(newRecommendations);
+  const handleRecommendation = (newRecommendations: ScholarshipRecommendationDisplay[]) => {
+    // This function is no longer needed since we redirect to result page
+    console.log('Recommendations received, redirecting...');
   };
 
   return (
@@ -40,7 +39,7 @@ export default function ScholarshipRecommendationPage() {
             </div>
 
             {/* Chat Interface */}
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 max-w-7xl mx-auto">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-12 max-w-7xl mx-auto">
               {/* Chatbox */}
               <div className="order-2 xl:order-1">
                 <Chatbox onRecommendation={handleRecommendation} />
@@ -50,17 +49,17 @@ export default function ScholarshipRecommendationPage() {
               <div className="order-1 xl:order-2 flex flex-col items-center justify-center">
                 <NextImage
                   src="/images/landing/haira-hero-desktop.png"
-                  width={400}
-                  height={400}
+                  width={350}
+                  height={350}
                   alt="Haira AI Assistant"
-                  className="w-full max-w-[400px] h-auto"
+                  className="w-full max-w-[350px] h-auto"
                 />
-                <div className="text-center mt-4">
-                  <Typography className="text-2xl font-bold text-primary-blue mb-2">
+                <div className="text-center mt-6">
+                  <Typography className="text-xl font-semibold text-primary-blue mb-2">
                     Kenalan dengan Haira!
                   </Typography>
-                  <Typography className="text-gray-600">
-                    Asisten AI yang siap membantu menemukan beasiswa impian Anda
+                  <Typography className="text-gray-500 text-sm leading-relaxed">
+                    Asisten AI yang siap membantu menemukan<br />beasiswa impian Anda
                   </Typography>
                 </div>
               </div>
@@ -68,143 +67,66 @@ export default function ScholarshipRecommendationPage() {
           </div>
         </section>
 
-        {/* Recommendations Section */}
-        {recommendations.length > 0 && (
-          <section className="py-12 bg-white/50">
-            <div className="container mx-auto px-4">
-              <Typography className="text-3xl font-bold text-primary-blue text-center mb-8">
-                Rekomendasi Beasiswa untuk Anda
-              </Typography>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl mx-auto">
-                {recommendations.map((scholarship) => (
-                  <div
-                    key={scholarship.id}
-                    className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-shadow"
-                  >
-                    <div className="flex justify-between items-start mb-4">
-                      <Typography className="text-xl font-bold text-primary-blue leading-tight">
-                        {scholarship.title}
-                      </Typography>
-                      <div className="bg-primary-orange/10 text-primary-orange px-3 py-1 rounded-full text-sm font-medium">
-                        Rekomendasi
-                      </div>
-                    </div>
-
-                    <Typography className="text-gray-600 mb-4">
-                      {scholarship.provider}
-                    </Typography>
-
-                    <div className="space-y-3 mb-6">
-                      <div className="flex items-center gap-3">
-                        <FiCalendar className="text-primary-blue w-5 h-5" />
-                        <Typography className="text-sm">
-                          <span className="font-medium">Deadline:</span> {scholarship.deadline}
-                        </Typography>
-                      </div>
-                      
-                      <div className="flex items-center gap-3">
-                        <FiDollarSign className="text-primary-blue w-5 h-5" />
-                        <Typography className="text-sm">
-                          <span className="font-medium">Nilai:</span> {scholarship.amount}
-                        </Typography>
-                      </div>
-
-                      <div className="flex items-start gap-3">
-                        <FiCheckCircle className="text-primary-blue w-5 h-5 mt-0.5" />
-                        <Typography className="text-sm">
-                          <span className="font-medium">Syarat:</span> {scholarship.eligibility}
-                        </Typography>
-                      </div>
-                    </div>
-
-                    <Typography className="text-gray-700 text-sm mb-6 leading-relaxed">
-                      {scholarship.description}
-                    </Typography>
-
-                    <div className="flex gap-3">
-                    <ButtonLink
-                        href={scholarship.link}
-                        variant="primary"
-                        size="sm"
-                        className="flex-1 bg-primary-blue hover:bg-primary-orange text-white rounded-xl transition-colors px-4 py-2"
-                    >
-                        <Typography className="flex items-center justify-center gap-2 text-sm font-semibold">
-                            Lihat Detail <FaArrowRightLong />
-                        </Typography>
-                    </ButtonLink>
-                      
-                      {/* <button className="px-4 py-2 border-2 border-[#1B7691] text-[#1B7691] rounded-xl hover:bg-[#1B7691] hover:text-white transition-colors">
-                        <FiExternalLink className="w-5 h-5" />
-                      </button> */}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-        )}
-
         {/* Tips Section */}
-        <section className="py-12">
+        <section className="py-16">
           <div className="container mx-auto px-4">
-            <div className="bg-white rounded-2xl shadow-lg p-8 max-w-4xl mx-auto">
-              <Typography className="text-2xl font-bold text-primary-blue text-center mb-6">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-10 max-w-4xl mx-auto">
+              <Typography className="text-xl font-semibold text-primary-blue text-center mb-8">
                 Tips untuk Mendapatkan Rekomendasi Terbaik
               </Typography>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="flex gap-4">
-                  <div className="w-8 h-8 bg-primary-orange text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
+                  <div className="w-6 h-6 bg-primary-blue text-white rounded-full flex items-center justify-center text-xs font-medium flex-shrink-0 mt-1">
                     1
                   </div>
                   <div>
-                    <Typography className="font-semibold text-primary-blue mb-2">
+                    <Typography className="font-medium text-gray-900 mb-2 text-sm">
                       Berikan Informasi Lengkap
                     </Typography>
-                    <Typography className="text-gray-600 text-sm">
+                    <Typography className="text-gray-500 text-sm leading-relaxed">
                       Sebutkan universitas, jurusan, semester, dan IPK untuk rekomendasi yang lebih akurat.
                     </Typography>
                   </div>
                 </div>
 
                 <div className="flex gap-4">
-                  <div className="w-8 h-8 bg-primary-orange text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
+                  <div className="w-6 h-6 bg-primary-blue text-white rounded-full flex items-center justify-center text-xs font-medium flex-shrink-0 mt-1">
                     2
                   </div>
                   <div>
-                    <Typography className="font-semibold text-primary-blue mb-2">
+                    <Typography className="font-medium text-gray-900 mb-2 text-sm">
                       Ceritakan Minat Anda
                     </Typography>
-                    <Typography className="text-gray-600 text-sm">
+                    <Typography className="text-gray-500 text-sm leading-relaxed">
                       Bagikan bidang studi atau karir yang Anda minati untuk mendapat beasiswa yang sesuai.
                     </Typography>
                   </div>
                 </div>
 
                 <div className="flex gap-4">
-                  <div className="w-8 h-8 bg-primary-orange text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
+                  <div className="w-6 h-6 bg-primary-blue text-white rounded-full flex items-center justify-center text-xs font-medium flex-shrink-0 mt-1">
                     3
                   </div>
                   <div>
-                    <Typography className="font-semibold text-primary-blue mb-2">
+                    <Typography className="font-medium text-gray-900 mb-2 text-sm">
                       Sebutkan Prestasi
                     </Typography>
-                    <Typography className="text-gray-600 text-sm">
+                    <Typography className="text-gray-500 text-sm leading-relaxed">
                       Ceritakan prestasi akademik atau non-akademik untuk beasiswa yang lebih kompetitif.
                     </Typography>
                   </div>
                 </div>
 
                 <div className="flex gap-4">
-                  <div className="w-8 h-8 bg-primary-orange text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
+                  <div className="w-6 h-6 bg-primary-blue text-white rounded-full flex items-center justify-center text-xs font-medium flex-shrink-0 mt-1">
                     4
                   </div>
                   <div>
-                    <Typography className="font-semibold text-primary-blue mb-2">
+                    <Typography className="font-medium text-gray-900 mb-2 text-sm">
                       Tentukan Preferensi
                     </Typography>
-                    <Typography className="text-gray-600 text-sm">
+                    <Typography className="text-gray-500 text-sm leading-relaxed">
                       Sebutkan jika Anda ingin beasiswa dalam negeri, luar negeri, atau keduanya.
                     </Typography>
                   </div>
