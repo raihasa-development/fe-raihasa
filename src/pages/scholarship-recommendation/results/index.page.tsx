@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
-import { FiCalendar, FiDollarSign, FiCheckCircle, FiFilter, FiSearch, FiClock, FiLock, FiUnlock } from 'react-icons/fi';
+import { FiCalendar, FiDollarSign, FiCheckCircle, FiFilter, FiSearch, FiClock, FiLock, FiUnlock, FiAlertCircle } from 'react-icons/fi';
 import { FaArrowRightLong } from 'react-icons/fa6';
 import { IoMdCloseCircleOutline } from 'react-icons/io';
 
@@ -26,6 +26,7 @@ export default function ScholarshipResultPage() {
   const [recommendations, setRecommendations] = useState<ScholarshipRecommendationDisplay[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showMobileFilter, setShowMobileFilter] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const [filters, setFilters] = useState<FilterState>({
     status: 'all',
@@ -34,6 +35,101 @@ export default function ScholarshipResultPage() {
     minMatchScore: 0,
     search: ''
   });
+
+  // Helper function to get cookie value - IMPROVED
+  const getCookie = (name: string): string | null => {
+    // Escape special characters in cookie name for regex
+    const escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) {
+      return parts.pop()?.split(';').shift() || null;
+    }
+    return null;
+  };
+
+  // Check if user is authenticated - FIXED FOR @raihasa/token
+  useEffect(() => {
+    const checkAuth = () => {
+      // Log all localStorage keys
+      console.log('🔍 All localStorage keys:', Object.keys(localStorage));
+      
+      // Log all cookies
+      console.log('🍪 All cookies:', document.cookie);
+      
+      // Try multiple possible token key names in localStorage
+      const localStorageKeys = ['token', 'accessToken', 'authToken', 'access_token', 'jwt', 'bearerToken', '@raihasa/token'];
+      let token = null;
+      let foundKey = '';
+      let foundLocation = '';
+      
+      // Check localStorage
+      for (const key of localStorageKeys) {
+        const value = localStorage.getItem(key);
+        if (value) {
+          token = value;
+          foundKey = key;
+          foundLocation = 'localStorage';
+          break;
+        }
+      }
+      
+      // If not found in localStorage, check cookies (INCLUDING @raihasa/token)
+      if (!token) {
+        const cookieKeys = [
+          'token', 
+          'accessToken', 
+          'authToken', 
+          'access_token', 
+          'jwt', 
+          'bearerToken', 
+          'auth_token',
+          '@raihasa/token'  // ADD THIS!
+        ];
+        
+        for (const key of cookieKeys) {
+          const value = getCookie(key);
+          if (value) {
+            token = value;
+            foundKey = key;
+            foundLocation = 'cookies';
+            break;
+          }
+        }
+      }
+      
+      console.log('🔑 Auth Check - Token found:', !!token);
+      console.log('🔑 Token location:', foundLocation || 'NONE');
+      console.log('🔑 Token key used:', foundKey || 'NONE');
+      console.log('🔑 Token value:', token ? `${token.substring(0, 30)}...` : 'undefined');
+      
+      setIsAuthenticated(!!token);
+    };
+
+    // Initial check
+    checkAuth();
+
+    // Listen for storage changes
+    const handleStorageChange = (e: StorageEvent) => {
+      console.log('🔑 Storage event:', e.key, e.newValue ? 'SET' : 'REMOVED');
+      checkAuth();
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    // Check on focus
+    const handleFocus = () => {
+      console.log('🔑 Window focused, rechecking auth');
+      checkAuth();
+    };
+
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, []);
 
   // Load data from localStorage on mount
   useEffect(() => {
@@ -77,7 +173,7 @@ export default function ScholarshipResultPage() {
     }
   };
 
-  // Filter and search logic
+  // Filter and search logic - DON'T limit results here
   const filteredRecommendations = useMemo(() => {
     return recommendations.filter(scholarship => {
       // Status filter
@@ -174,71 +270,121 @@ export default function ScholarshipResultPage() {
     }
   };
 
-  const ScholarshipCard = ({ scholarship }: { scholarship: ScholarshipRecommendationDisplay }) => {
+  const ScholarshipCard = ({ scholarship, index }: { scholarship: ScholarshipRecommendationDisplay; index: number }) => {
     const status = getScholarshipStatus(scholarship.deadline, scholarship.eligibility);
+    const isLocked = !isAuthenticated && index >= 3;
+    
+    // Debug logging
+    console.log(`📝 Card ${index}: isAuthenticated=${isAuthenticated}, isLocked=${isLocked}`);
     
     return (
-      <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-shadow">
-        <div className="flex justify-between items-start mb-4">
-          <Typography className="text-xl font-bold text-primary-blue leading-tight">
-            {scholarship.title}
-          </Typography>
-          <div className="flex flex-col items-end gap-2">
-            <div className={`px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(status)}`}>
-              <div className="flex items-center gap-1">
-                {getStatusIcon(status)}
-                {getStatusLabel(status)}
+      <div className={`relative bg-white rounded-2xl shadow-lg border border-gray-200 p-6 transition-all ${
+        isLocked ? 'hover:shadow-2xl' : 'hover:shadow-xl'
+      }`}>
+        {/* Lock Overlay */}
+        {isLocked && (
+          <>
+            {/* Blur effect */}
+            <div className="absolute inset-0 backdrop-blur-sm bg-white/40 rounded-2xl z-10 flex items-center justify-center">
+              <div className="text-center p-6 bg-white/90 rounded-xl shadow-lg border-2 border-primary-blue/30">
+                <FiLock className="w-12 h-12 text-primary-blue mx-auto mb-3" />
+                <Typography className="text-primary-blue font-bold text-lg mb-2">
+                  Konten Terkunci
+                </Typography>
+                <Typography className="text-gray-600 text-sm mb-4">
+                  Login untuk melihat detail lengkap
+                </Typography>
+                <button
+                  onClick={() => router.push('/login')}
+                  className="bg-gradient-to-r from-primary-blue to-primary-orange text-white px-6 py-2 rounded-lg font-semibold hover:shadow-lg transition-all"
+                >
+                  Login Sekarang
+                </button>
               </div>
             </div>
-            {scholarship.match_score && (
-              <div className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-medium">
-                {Math.round(scholarship.match_score * 100)}% Match
+          </>
+        )}
+
+        {/* Card Content - slightly blurred if locked */}
+        <div className={isLocked ? 'filter blur-[2px]' : ''}>
+          <div className="flex justify-between items-start mb-4">
+            <Typography className="text-xl font-bold text-primary-blue leading-tight">
+              {scholarship.title}
+            </Typography>
+            <div className="flex flex-col items-end gap-2">
+              <div className={`px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(status)}`}>
+                <div className="flex items-center gap-1">
+                  {getStatusIcon(status)}
+                  {getStatusLabel(status)}
+                </div>
               </div>
-            )}
-          </div>
-        </div>
-
-        <Typography className="text-gray-600 mb-4">
-          {scholarship.provider}
-        </Typography>
-
-        <div className="space-y-3 mb-6">
-          <div className="flex items-center gap-3">
-            <FiCalendar className="text-primary-blue w-5 h-5" />
-            <Typography className="text-sm">
-              <span className="font-medium">Deadline:</span> {scholarship.deadline}
-            </Typography>
-          </div>
-          
-          <div className="flex items-center gap-3">
-            <FiDollarSign className="text-primary-blue w-5 h-5" />
-            <Typography className="text-sm">
-              <span className="font-medium">Jenis:</span> {scholarship.amount}
-            </Typography>
+              {scholarship.match_score && (
+                <div className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-medium">
+                  {Math.round(scholarship.match_score * 100)}% Match
+                </div>
+              )}
+            </div>
           </div>
 
-          <div className="flex items-start gap-3">
-            <FiCheckCircle className="text-primary-blue w-5 h-5 mt-0.5" />
-            <Typography className="text-sm">
-              <span className="font-medium">Periode:</span> {scholarship.eligibility}
-            </Typography>
-          </div>
-        </div>
-
-        <Typography className="text-gray-700 text-sm mb-6 leading-relaxed">
-          {scholarship.description}
-        </Typography>
-
-        <ButtonLink
-          href={scholarship.link}
-          variant="primary"
-          size="sm"
-          className="w-full bg-primary-blue hover:bg-primary-orange text-white rounded-xl transition-colors px-4 py-3"
-        >
-          <Typography className="flex items-center justify-center gap-2 text-sm font-semibold">
-            Lihat Detail <FaArrowRightLong />
+          <Typography className="text-gray-600 mb-4">
+            {scholarship.provider}
           </Typography>
-        </ButtonLink>
+
+          <div className="space-y-3 mb-6">
+            <div className="flex items-center gap-3">
+              <FiCalendar className="text-primary-blue w-5 h-5" />
+              <Typography className="text-sm">
+                <span className="font-medium">Deadline:</span> {scholarship.deadline}
+              </Typography>
+            </div>
+            
+            <div className="flex items-center gap-3">
+              <FiDollarSign className="text-primary-blue w-5 h-5" />
+              <Typography className="text-sm">
+                <span className="font-medium">Jenis:</span> {scholarship.amount}
+              </Typography>
+            </div>
+
+            <div className="flex items-start gap-3">
+              <FiCheckCircle className="text-primary-blue w-5 h-5 mt-0.5" />
+              <Typography className="text-sm">
+                <span className="font-medium">Periode:</span> {scholarship.eligibility}
+              </Typography>
+            </div>
+          </div>
+
+          <Typography className="text-gray-700 text-sm mb-6 leading-relaxed line-clamp-3">
+            {scholarship.description}
+          </Typography>
+
+          <ButtonLink
+            href={isLocked ? '#' : scholarship.link}
+            variant="primary"
+            size="sm"
+            className={`w-full rounded-xl transition-colors px-4 py-3 ${
+              isLocked 
+                ? 'bg-gray-400 cursor-not-allowed opacity-50' 
+                : 'bg-primary-blue hover:bg-primary-orange'
+            }`}
+            onClick={(e: React.MouseEvent) => {
+              if (isLocked) {
+                e.preventDefault();
+              }
+            }}
+          >
+            <Typography className="flex items-center justify-center gap-2 text-sm font-semibold text-white">
+              {isLocked ? (
+                <>
+                  <FiLock /> Terkunci
+                </>
+              ) : (
+                <>
+                  Lihat Detail <FaArrowRightLong />
+                </>
+              )}
+            </Typography>
+          </ButtonLink>
+        </div>
       </div>
     );
   };
@@ -270,6 +416,35 @@ export default function ScholarshipResultPage() {
               <Typography className="text-lg md:text-xl mb-6">
                 Kami menemukan {recommendations.length} beasiswa yang cocok untuk Anda!
               </Typography>
+              
+              {/* Show login prompt if not authenticated */}
+              {!isAuthenticated && recommendations.length > 3 && (
+                <div className="bg-yellow-500/20 border-2 border-yellow-300 rounded-xl p-4 max-w-2xl mx-auto mb-4">
+                  <div className="flex items-center justify-center gap-3 text-white">
+                    <FiAlertCircle className="w-6 h-6" />
+                    <Typography className="font-semibold">
+                      🔒 {recommendations.length - 3} beasiswa lainnya terkunci. Login untuk akses penuh!
+                    </Typography>
+                  </div>
+                  <div className="mt-3 flex gap-3 justify-center">
+                    <Button
+                      variant="unstyled"
+                      onClick={() => router.push('/login')}
+                      className="bg-white text-primary-blue px-6 py-2 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+                    >
+                      Login Sekarang
+                    </Button>
+                    <Button
+                      variant="unstyled"
+                      onClick={() => router.push('/register')}
+                      className="bg-white/20 border-2 border-white text-white px-6 py-2 rounded-lg font-semibold hover:bg-white/30 transition-colors"
+                    >
+                      Daftar
+                    </Button>
+                  </div>
+                </div>
+              )}
+              
               <Button
                 variant="unstyled"
                 onClick={() => router.push('/scholarship-recommendation')}
@@ -446,9 +621,25 @@ export default function ScholarshipResultPage() {
               </div>
 
               {/* Results Count */}
-              <Typography className="text-sm text-gray-600">
-                Menampilkan {filteredRecommendations.length} dari {recommendations.length} beasiswa
-              </Typography>
+              <div className="flex items-center justify-between">
+                <Typography className="text-sm text-gray-600">
+                  Menampilkan {filteredRecommendations.length} dari {recommendations.length} beasiswa
+                </Typography>
+                
+                {!isAuthenticated && filteredRecommendations.length > 3 && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <FiUnlock className="text-green-600" />
+                    <Typography className="text-green-600 font-semibold">
+                      {Math.min(3, filteredRecommendations.length)} Terbuka
+                    </Typography>
+                    <span className="text-gray-400">|</span>
+                    <FiLock className="text-red-600" />
+                    <Typography className="text-red-600 font-semibold">
+                      {filteredRecommendations.length - 3} Terkunci
+                    </Typography>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </section>
@@ -475,10 +666,15 @@ export default function ScholarshipResultPage() {
                       <Typography className="text-2xl font-bold text-green-600">
                         Sedang Dibuka ({groupedScholarships.open.length})
                       </Typography>
+                      {!isAuthenticated && groupedScholarships.open.length > 3 && (
+                        <span className="bg-yellow-100 text-yellow-800 text-xs font-semibold px-3 py-1 rounded-full">
+                          {groupedScholarships.open.length - 3} Terkunci
+                        </span>
+                      )}
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {groupedScholarships.open.map(scholarship => (
-                        <ScholarshipCard key={scholarship.id} scholarship={scholarship} />
+                      {groupedScholarships.open.map((scholarship, index) => (
+                        <ScholarshipCard key={scholarship.id} scholarship={scholarship} index={index} />
                       ))}
                     </div>
                   </div>
@@ -494,9 +690,10 @@ export default function ScholarshipResultPage() {
                       </Typography>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {groupedScholarships.upcoming.map(scholarship => (
-                        <ScholarshipCard key={scholarship.id} scholarship={scholarship} />
-                      ))}
+                      {groupedScholarships.upcoming.map((scholarship, idx) => {
+                        const globalIndex = groupedScholarships.open.length + idx;
+                        return <ScholarshipCard key={scholarship.id} scholarship={scholarship} index={globalIndex} />;
+                      })}
                     </div>
                   </div>
                 )}
@@ -511,12 +708,42 @@ export default function ScholarshipResultPage() {
                       </Typography>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {groupedScholarships.closed.map(scholarship => (
-                        <ScholarshipCard key={scholarship.id} scholarship={scholarship} />
-                      ))}
+                      {groupedScholarships.closed.map((scholarship, idx) => {
+                        const globalIndex = groupedScholarships.open.length + groupedScholarships.upcoming.length + idx;
+                        return <ScholarshipCard key={scholarship.id} scholarship={scholarship} index={globalIndex} />;
+                      })}
                     </div>
                   </div>
                 )}
+              </div>
+            )}
+
+            {/* Login CTA at bottom if not authenticated */}
+            {!isAuthenticated && recommendations.length > 3 && (
+              <div className="mt-12 bg-gradient-to-r from-primary-blue to-primary-orange rounded-2xl p-8 text-center text-white shadow-xl">
+                <FiLock className="w-16 h-16 mx-auto mb-4 opacity-80" />
+                <Typography className="text-3xl font-bold mb-4">
+                  Unlock Semua Rekomendasi!
+                </Typography>
+                <Typography className="text-lg mb-6">
+                  Dapatkan akses ke {recommendations.length - 3} beasiswa lainnya yang cocok untukmu dengan login sekarang!
+                </Typography>
+                <div className="flex gap-4 justify-center">
+                  <Button
+                    variant="unstyled"
+                    onClick={() => router.push('/login')}
+                    className="bg-white text-primary-blue px-8 py-3 rounded-xl font-bold text-lg hover:bg-gray-100 transition-colors flex items-center gap-2"
+                  >
+                    <FiUnlock /> Login Sekarang
+                  </Button>
+                  <Button
+                    variant="unstyled"
+                    onClick={() => router.push('/register')}
+                    className="bg-white/20 border-2 border-white text-white px-8 py-3 rounded-xl font-bold text-lg hover:bg-white/30 transition-colors"
+                  >
+                    Daftar Gratis
+                  </Button>
+                </div>
               </div>
             )}
           </div>
