@@ -52,10 +52,10 @@ export default function ScholarshipResultPage() {
   useEffect(() => {
     const checkAuth = () => {
       // Log all localStorage keys
-      console.log('🔍 All localStorage keys:', Object.keys(localStorage));
+      // console.log('🔍 All localStorage keys:', Object.keys(localStorage));
       
       // Log all cookies
-      console.log('🍪 All cookies:', document.cookie);
+      // console.log('🍪 All cookies:', document.cookie);
       
       // Try multiple possible token key names in localStorage
       const localStorageKeys = ['token', 'accessToken', 'authToken', 'access_token', 'jwt', 'bearerToken', '@raihasa/token'];
@@ -98,10 +98,10 @@ export default function ScholarshipResultPage() {
         }
       }
       
-      console.log('🔑 Auth Check - Token found:', !!token);
-      console.log('🔑 Token location:', foundLocation || 'NONE');
-      console.log('🔑 Token key used:', foundKey || 'NONE');
-      console.log('🔑 Token value:', token ? `${token.substring(0, 30)}...` : 'undefined');
+      // console.log('🔑 Auth Check - Token found:', !!token);
+      // console.log('🔑 Token location:', foundLocation || 'NONE');
+      // console.log('🔑 Token key used:', foundKey || 'NONE');
+      // console.log('🔑 Token value:', token ? `${token.substring(0, 30)}...` : 'undefined');
       
       setIsAuthenticated(!!token);
     };
@@ -111,7 +111,7 @@ export default function ScholarshipResultPage() {
 
     // Listen for storage changes
     const handleStorageChange = (e: StorageEvent) => {
-      console.log('🔑 Storage event:', e.key, e.newValue ? 'SET' : 'REMOVED');
+      // console.log('🔑 Storage event:', e.key, e.newValue ? 'SET' : 'REMOVED');
       checkAuth();
     };
 
@@ -119,7 +119,7 @@ export default function ScholarshipResultPage() {
 
     // Check on focus
     const handleFocus = () => {
-      console.log('🔑 Window focused, rechecking auth');
+      // console.log('🔑 Window focused, rechecking auth');
       checkAuth();
     };
 
@@ -139,7 +139,7 @@ export default function ScholarshipResultPage() {
         const data = JSON.parse(savedRecommendations);
         setRecommendations(data);
       } catch (error) {
-        console.error('Error parsing saved recommendations:', error);
+        // console.error('Error parsing saved recommendations:', error);
         router.push('/scholarship-recommendation');
       }
     } else {
@@ -275,7 +275,7 @@ export default function ScholarshipResultPage() {
     const isLocked = !isAuthenticated && index >= 3;
     
     // Debug logging
-    console.log(`📝 Card ${index}: isAuthenticated=${isAuthenticated}, isLocked=${isLocked}`);
+    // console.log(`📝 Card ${index}: isAuthenticated=${isAuthenticated}, isLocked=${isLocked}`);
     
     return (
       <div className={`relative bg-white rounded-2xl shadow-lg border border-gray-200 p-6 transition-all ${

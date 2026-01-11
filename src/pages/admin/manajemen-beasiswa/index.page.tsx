@@ -76,7 +76,7 @@ function BeasiswaPage() {
 
     if (!res.ok) throw new Error(`Gagal memuat data (${res.status})`);
     const json = await res.json();
-    console.log('Fetched scholarship data:', json);
+    // console.log('Fetched scholarship data:', json);
     const list = Array.isArray(json)
       ? json
       : Array.isArray(json.data)
@@ -111,7 +111,7 @@ function BeasiswaPage() {
     setData(uniqueList);
     setFilteredData(uniqueList);
   } catch (error: any) {
-    console.error(error);
+    // console.error(error);
     showToast(error.message || 'Gagal memuat data beasiswa', DANGER_TOAST);
   } finally {
     setLoading(false);

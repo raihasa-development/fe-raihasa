@@ -33,7 +33,7 @@ export default function CheckoutPage() {
     const clientKey = process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY || '';
 
     if (!clientKey) {
-      console.error('❌ MIDTRANS_CLIENT_KEY not configured');
+      // console.error('❌ MIDTRANS_CLIENT_KEY not configured');
       setErrorMessage('Midtrans client key tidak dikonfigurasi');
       return;
     }
@@ -44,12 +44,12 @@ export default function CheckoutPage() {
     script.async = true;
     
     script.onload = () => {
-      console.log('✅ Snap script loaded');
+      // console.log('✅ Snap script loaded');
       setSnapLoaded(true);
     };
     
     script.onerror = () => {
-      console.error('❌ Failed to load Snap script');
+      // console.error('❌ Failed to load Snap script');
       setErrorMessage('Gagal memuat script pembayaran');
     };
 
@@ -101,12 +101,12 @@ export default function CheckoutPage() {
       return response.data.data;
     },
     onSuccess: (data) => {
-      console.log('✅ Payment created:', data);
+      // console.log('✅ Payment created:', data);
       setPaymentData(data);
       setPaymentStatus('pending');
     },
     onError: (error: any) => {
-      console.error('❌ Payment error:', error);
+      // console.error('❌ Payment error:', error);
       setPaymentStatus('failed');
     },
   });
@@ -275,20 +275,20 @@ export default function CheckoutPage() {
                     // @ts-ignore
                     window.snap.pay(paymentData.token, {
                       onSuccess: (result: any) => {
-                        console.log('✅ Payment success:', result);
+                        // console.log('✅ Payment success:', result);
                         router.push(`/payment/success?orderId=${result.order_id || paymentData.order_id}`);
                       },
                       onPending: (result: any) => {
-                        console.log('⏳ Payment pending:', result);
+                        // console.log('⏳ Payment pending:', result);
                         setErrorMessage('Pembayaran pending, mohon selesaikan pembayaran Anda');
                       },
                       onError: (result: any) => {
-                        console.error('❌ Payment error:', result);
+                        // console.error('❌ Payment error:', result);
                         setErrorMessage('Pembayaran gagal, silakan coba lagi');
                         setPaymentStatus('failed');
                       },
                       onClose: () => {
-                        console.log('🚪 Payment popup closed');
+                        // console.log('🚪 Payment popup closed');
                       },
                     });
                   }}

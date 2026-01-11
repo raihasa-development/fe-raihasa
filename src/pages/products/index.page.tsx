@@ -182,10 +182,10 @@ export default function ProductsPage() {
           isPremium: p.isPremium,
         }));
         
-        console.log('📦 Products loaded from API:', transformed);
+        // console.log('📦 Products loaded from API:', transformed);
         return transformed;
       } catch (error) {
-        console.warn('⚠️ Failed to fetch products, using hardcoded data');
+        // console.warn('⚠️ Failed to fetch products, using hardcoded data');
         return null;
       }
     },

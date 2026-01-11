@@ -45,25 +45,25 @@ export const loadSnapScript = (clientKey) => {
 
 export const openSnap = (token, callbacks) => {
   if (!window.snap) {
-    console.error('Snap.js is not loaded');
+    // console.error('Snap.js is not loaded');
     return;
   }
 
   window.snap.pay(token, {
     onSuccess: (result) => {
-      console.log('Payment success:', result);
+      // console.log('Payment success:', result);
       if (callbacks.onSuccess) callbacks.onSuccess(result);
     },
     onPending: (result) => {
-      console.log('Payment pending:', result);
+      // console.log('Payment pending:', result);
       if (callbacks.onPending) callbacks.onPending(result);
     },
     onError: (result) => {
-      console.error('Payment error:', result);
+      // console.error('Payment error:', result);
       if (callbacks.onError) callbacks.onError(result);
     },
     onClose: () => {
-      console.log('Payment modal closed');
+      // console.log('Payment modal closed');
       if (callbacks.onClose) callbacks.onClose();
     },
   });

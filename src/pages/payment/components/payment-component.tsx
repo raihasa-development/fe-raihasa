@@ -43,7 +43,7 @@ export default function PaymentComponent({
 
       // Decode JWT to get user_id
       const payload = JSON.parse(atob(token.split('.')[1]));
-      console.log('🔍 JWT Payload:', payload); // Debug: lihat isi token
+      // console.log('🔍 JWT Payload:', payload); // Debug: lihat isi token
       const user_id = payload.user_id || payload.id || payload.sub;
       
       if (!user_id) {
@@ -53,12 +53,12 @@ export default function PaymentComponent({
       }
       
       // Log untuk debugging
-      console.log('🔐 Token:', token ? 'Available' : 'Missing');
-      console.log('👤 User ID:', user_id);
-      console.log('📦 Payload:', {
-        product_id: productId,
-        user_id: user_id,
-      });
+      // console.log('🔐 Token:', token ? 'Available' : 'Missing');
+      // console.log('👤 User ID:', user_id);
+      // console.log('📦 Payload:', {
+      //   product_id: productId,
+      //   user_id: user_id,
+      // });
 
       const response = await api.post(
         '/payments/create',
@@ -74,16 +74,16 @@ export default function PaymentComponent({
         }
       );
 
-      console.log('✅ Payment response:', response.data);
+      // console.log('✅ Payment response:', response.data);
 
       // Handle response
       const paymentData = response.data.data || response.data;
       
       if (paymentData.redirect_url) {
-        console.log('🔗 Redirecting to:', paymentData.redirect_url);
+        // console.log('🔗 Redirecting to:', paymentData.redirect_url);
         window.location.href = paymentData.redirect_url;
       } else if (paymentData.token) {
-        console.log('💳 Opening Snap with token');
+        // console.log('💳 Opening Snap with token');
         // Check if Snap is loaded
         if (typeof window.snap === 'undefined') {
           setError('Midtrans Snap belum dimuat. Silakan refresh halaman.');
@@ -93,19 +93,19 @@ export default function PaymentComponent({
         // @ts-ignore - Midtrans Snap global
         window.snap.pay(paymentData.token, {
           onSuccess: (result: any) => {
-            console.log('✅ Payment success:', result);
+            // console.log('✅ Payment success:', result);
             onPaymentSuccess(result.order_id);
           },
           onPending: (result: any) => {
-            console.log('⏳ Payment pending:', result);
+            // console.log('⏳ Payment pending:', result);
             setError('Pembayaran sedang diproses. Silakan cek email untuk instruksi lebih lanjut.');
           },
           onError: (result: any) => {
-            console.error('❌ Payment error:', result);
+            // console.error('❌ Payment error:', result);
             setError('Pembayaran gagal. Silakan coba lagi.');
           },
           onClose: () => {
-            console.log('🚪 Payment popup closed');
+            // console.log('🚪 Payment popup closed');
             setLoading(false);
           },
         });
@@ -113,8 +113,8 @@ export default function PaymentComponent({
         setError('Response tidak valid dari server. Silakan hubungi customer support.');
       }
     } catch (err: any) {
-      console.error('❌ Payment error:', err);
-      console.error('Error response:', err.response);
+      // console.error('❌ Payment error:', err);
+      // console.error('Error response:', err.response);
       
       if (err.response?.status === 404) {
         setError('Endpoint pembayaran tidak ditemukan. Silakan hubungi customer support.');

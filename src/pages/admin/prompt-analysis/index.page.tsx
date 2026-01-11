@@ -75,7 +75,7 @@ export default function PromptAnalysisPage() {
         const value = getCookie(key);
         if (value) {
           token = value;
-          console.log('🔑 Token found in cookie:', key);
+          // console.log('🔑 Token found in cookie:', key);
           break;
         }
       }
@@ -91,14 +91,14 @@ export default function PromptAnalysisPage() {
       );
       
       if (!response.ok) {
-        console.error('❌ API Error:', response.status, response.statusText);
+        // console.error('❌ API Error:', response.status, response.statusText);
         throw new Error('Failed to fetch logs');
       }
       
       const result = await response.json();
-      console.log('📊 API Response:', result);
-      console.log('📊 Data array:', result?.data?.data);
-      console.log('📊 Pagination:', result?.data?.pagination);
+      // console.log('📊 API Response:', result);
+      // console.log('📊 Data array:', result?.data?.data);
+      // console.log('📊 Pagination:', result?.data?.pagination);
       
       return result;
     },

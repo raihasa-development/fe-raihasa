@@ -122,7 +122,7 @@ export default function DreamshubPage() {
       
       const url = `${apiUrl}/manifestations`;
       
-      console.log('📡 Fetching ALL public manifestations from:', url);
+      // console.log('📡 Fetching ALL public manifestations from:', url);
 
       const token = getAuthToken();
       const headers: HeadersInit = token 
@@ -133,7 +133,7 @@ export default function DreamshubPage() {
 
       if (response.ok) {
         const result = await response.json();
-        console.log('✅ Manifestations result:', result);
+        // console.log('✅ Manifestations result:', result);
         
         const data = result.data || result;
         if (Array.isArray(data)) {
@@ -144,14 +144,14 @@ export default function DreamshubPage() {
             new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
           );
           setManifestations(sortedData);
-          console.log(`📊 Loaded ${sortedData.length} manifestations from scholarships`);
+          // console.log(`📊 Loaded ${sortedData.length} manifestations from scholarships`);
         }
       } else {
         const errorText = await response.text();
-        console.error('❌ Failed to fetch manifestations:', response.status, errorText);
+        // console.error('❌ Failed to fetch manifestations:', response.status, errorText);
       }
     } catch (error) {
-      console.error('❌ Error fetching manifestations:', error);
+      // console.error('❌ Error fetching manifestations:', error);
     } finally {
       setIsLoadingManifestations(false);
     }

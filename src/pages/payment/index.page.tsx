@@ -79,7 +79,7 @@ export default function PaymentPage() {
         const response = await api.get<{ data: any[] }>('/products/lms');
         const products = response.data.data;
         
-        console.log('📦 Raw API response from /products/lms:', products);
+        // console.log('📦 Raw API response from /products/lms:', products);
         
         // Transform backend data to match our ProductData type
         // Backend returns ProductProgram with PaketLMS array
@@ -93,7 +93,7 @@ export default function PaymentPage() {
           masa_aktif: p.PaketLMS?.[0]?.masa_aktif || p.masa_aktif || 0,
         }));
         
-        console.log('📦 Transformed products:', transformedProducts);
+        // console.log('📦 Transformed products:', transformedProducts);
         const productIdLower = productId.toString().toLowerCase();
         
         // Try matching by jenis (basic, ideal)
@@ -102,7 +102,7 @@ export default function PaymentPage() {
         );
         
         if (found) {
-          console.log('✅ Found by jenis:', found);
+          // console.log('✅ Found by jenis:', found);
           return found;
         }
 
@@ -112,7 +112,7 @@ export default function PaymentPage() {
         );
         
         if (found) {
-          console.log('✅ Found by id:', found);
+          // console.log('✅ Found by id:', found);
           return found;
         }
 
@@ -123,11 +123,11 @@ export default function PaymentPage() {
         );
         
         if (found) {
-          console.log('✅ Found by nama:', found);
+          // console.log('✅ Found by nama:', found);
           return found;
         }
         
-        console.warn('⚠️ Product not found in API, using fallback');
+        // console.warn('⚠️ Product not found in API, using fallback');
         const fallbackProduct = PRODUCT_CATALOG.find(p =>
           p.jenis?.toLowerCase() === productIdLower ||
           p.id?.toLowerCase() === productIdLower
@@ -135,7 +135,7 @@ export default function PaymentPage() {
         
         return fallbackProduct || null;
       } catch (err) {
-        console.error('❌ Error fetching product:', err);
+        // console.error('❌ Error fetching product:', err);
         
         // Use hardcoded fallback on error
         const productIdLower = productId.toString().toLowerCase();
@@ -144,7 +144,7 @@ export default function PaymentPage() {
           p.id?.toLowerCase() === productIdLower
         );
         
-        console.log('✅ Using hardcoded fallback:', fallback);
+        // console.log('✅ Using hardcoded fallback:', fallback);
         return fallback || null;
       }
     },
@@ -156,14 +156,14 @@ export default function PaymentPage() {
   // Redirect if no productId
   useEffect(() => {
     if (!productId && !isLoading) {
-      console.log('❌ No productId, redirecting to products page');
+      // console.log('❌ No productId, redirecting to products page');
       router.push('/products');
     }
   }, [productId, isLoading, router]);
 
   // Handle payment success
   const handlePaymentSuccess = (userProgramId: string) => {
-    console.log('✅ Payment successful, redirecting to dashboard');
+    // console.log('✅ Payment successful, redirecting to dashboard');
     setTimeout(() => {
       router.push('/dashboard');
     }, 2000);

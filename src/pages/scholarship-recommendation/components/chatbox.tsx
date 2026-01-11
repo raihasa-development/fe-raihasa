@@ -168,8 +168,8 @@ export default function Chatbox({ onRecommendation }: ChatboxProps) {
       const fullUrl = `${apiUrl}/scholarship/recommend-guest`;
       
       // Debug logging
-      console.log('API URL:', fullUrl);
-      console.log('Request Data:', requestData);
+      // console.log('API URL:', fullUrl);
+      // console.log('Request Data:', requestData);
 
       const response = await fetch(fullUrl, {
         method: 'POST',
@@ -179,17 +179,17 @@ export default function Chatbox({ onRecommendation }: ChatboxProps) {
         body: JSON.stringify(requestData),
       });
 
-      console.log('Response status:', response.status);
-      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+      // console.log('Response status:', response.status);
+      // console.log('Response headers:', Object.fromEntries(response.headers.entries()));
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('Error response body:', errorText);
+        // console.error('Error response body:', errorText);
         throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`);
       }
 
       const responseData = await response.json();
-      console.log('Full response:', responseData);
+      // console.log('Full response:', responseData);
       
       // Handle backend API response structure
       if (responseData.code !== 200 || !responseData.status || !responseData.data) {
@@ -228,7 +228,7 @@ export default function Chatbox({ onRecommendation }: ChatboxProps) {
       }, 2000);
       
     } catch (error) {
-      console.error('Error fetching recommendations:', error);
+      // console.error('Error fetching recommendations:', error);
       
       // Show error message with more helpful info
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';

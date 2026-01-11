@@ -16,7 +16,7 @@ import { ScholarshipRecommendationDisplay } from './types/type';
 export default function ScholarshipRecommendationPage() {
   const handleRecommendation = (newRecommendations: ScholarshipRecommendationDisplay[]) => {
     // This function is no longer needed since we redirect to result page
-    console.log('Recommendations received, redirecting...');
+    // console.log('Recommendations received, redirecting...');
   };
 
   return (

@@ -56,16 +56,16 @@ export default function ScholarshipDetailPage() {
 
   // Get auth token - CHECK @raihasa/token in cookies
   const getAuthToken = () => {
-    console.log('🔐 Getting auth token...');
-    console.log('🔐 localStorage keys:', Object.keys(localStorage));
-    console.log('🔐 document.cookie:', document.cookie);
+    // console.log('🔐 Getting auth token...');
+    // console.log('🔐 localStorage keys:', Object.keys(localStorage));
+    // console.log('🔐 document.cookie:', document.cookie);
     
     // Try localStorage first
     const localStorageKeys = ['token', 'accessToken', 'authToken', 'access_token', 'jwt', 'bearerToken', '@raihasa/token'];
     for (const key of localStorageKeys) {
       const value = localStorage.getItem(key);
       if (value) {
-        console.log(`🔐 ✅ Found token in localStorage with key: ${key}`);
+        // console.log(`🔐 ✅ Found token in localStorage with key: ${key}`);
         return value;
       }
     }
@@ -85,19 +85,19 @@ export default function ScholarshipDetailPage() {
     for (const key of cookieKeys) {
       const value = getCookie(key);
       if (value) {
-        console.log(`🔐 ✅ Found token in cookies with key: ${key}`);
+        // console.log(`🔐 ✅ Found token in cookies with key: ${key}`);
         return value;
       }
     }
     
-    console.log('🔐 ❌ Token NOT FOUND in localStorage or cookies');
+    // console.log('🔐 ❌ Token NOT FOUND in localStorage or cookies');
     return null;
   };
 
   // Helper to get scholarship ID
   const getScholarshipId = () => {
     const id = scholarshipDetail?.id || recommendation_id as string;
-    console.log('📌 Scholarship ID:', id);
+    // console.log('📌 Scholarship ID:', id);
     return id;
   };
 
@@ -106,13 +106,13 @@ export default function ScholarshipDetailPage() {
     try {
       const token = getAuthToken();
       if (!token) {
-        console.log('❌ No token, skipping wishlist check');
+        // console.log('❌ No token, skipping wishlist check');
         return;
       }
 
       const apiUrl = process.env.NEXT_PUBLIC_BACKEND_API_URL;
       const url = `${apiUrl}/wishlist/check/${beasiswaId}`;
-      console.log('🔍 Fetching wishlist status from:', url);
+      // console.log('🔍 Fetching wishlist status from:', url);
 
       const response = await fetch(url, {
         headers: {
@@ -120,14 +120,14 @@ export default function ScholarshipDetailPage() {
         },
       });
 
-      console.log('📡 Wishlist check response status:', response.status);
+      // console.log('📡 Wishlist check response status:', response.status);
       const responseText = await response.text();
-      console.log('📡 Wishlist check response body:', responseText);
+      // console.log('📡 Wishlist check response body:', responseText);
       
       if (response.ok) {
         try {
           const result = JSON.parse(responseText);
-          console.log('✅ Wishlist check result:', result);
+          // console.log('✅ Wishlist check result:', result);
           
           // Handle different response structures
           if (result.data && typeof result.data.isWishlisted !== 'undefined') {
@@ -135,17 +135,17 @@ export default function ScholarshipDetailPage() {
           } else if (typeof result.isWishlisted !== 'undefined') {
             setIsWishlisted(result.isWishlisted);
           } else {
-            console.warn('⚠️ Unknown response structure:', result);
+            // console.warn('⚠️ Unknown response structure:', result);
             setIsWishlisted(false);
           }
         } catch (parseError) {
-          console.error('❌ Error parsing wishlist response:', parseError);
+          // console.error('❌ Error parsing wishlist response:', parseError);
         }
       } else {
-        console.error('❌ Wishlist check error:', response.status, responseText);
+        // console.error('❌ Wishlist check error:', response.status, responseText);
       }
     } catch (error) {
-      console.error('❌ Error fetching wishlist status:', error);
+      // console.error('❌ Error fetching wishlist status:', error);
     }
   };
 
@@ -155,14 +155,14 @@ export default function ScholarshipDetailPage() {
       setManifestationLoading(true);
       const token = getAuthToken();
       if (!token) {
-        console.log('❌ No token, skipping manifestations fetch');
+        // console.log('❌ No token, skipping manifestations fetch');
         setManifestationLoading(false);
         return;
       }
 
       const apiUrl = process.env.NEXT_PUBLIC_BACKEND_API_URL;
       const url = `${apiUrl}/manifestations?beasiswa_v3_id=${beasiswaId}`; // ✅ CORRECT
-      console.log('🔍 Fetching manifestations from:', url);
+      // console.log('🔍 Fetching manifestations from:', url);
 
       const response = await fetch(url, {
         headers: {
@@ -170,14 +170,14 @@ export default function ScholarshipDetailPage() {
         },
       });
 
-      console.log('📡 Manifestations response status:', response.status);
+      // console.log('📡 Manifestations response status:', response.status);
       const responseText = await response.text();
-      console.log('📡 Manifestations response body:', responseText);
+      // console.log('📡 Manifestations response body:', responseText);
 
       if (response.ok) {
         try {
           const result = JSON.parse(responseText);
-          console.log('✅ Manifestations result:', result);
+          // console.log('✅ Manifestations result:', result);
           
           // Handle different response structures
           if (Array.isArray(result.data)) {
@@ -185,18 +185,18 @@ export default function ScholarshipDetailPage() {
           } else if (Array.isArray(result)) {
             setManifestations(result);
           } else {
-            console.warn('⚠️ Unknown response structure:', result);
+            // console.warn('⚠️ Unknown response structure:', result);
             setManifestations([]);
           }
         } catch (parseError) {
-          console.error('❌ Error parsing manifestations response:', parseError);
+          // console.error('❌ Error parsing manifestations response:', parseError);
           setManifestations([]);
         }
       } else {
-        console.error('❌ Manifestations fetch error:', response.status, responseText);
+        // console.error('❌ Manifestations fetch error:', response.status, responseText);
       }
     } catch (error) {
-      console.error('❌ Error fetching manifestations:', error);
+      // console.error('❌ Error fetching manifestations:', error);
     } finally {
       setManifestationLoading(false);
     }
@@ -207,7 +207,7 @@ export default function ScholarshipDetailPage() {
     const scholarshipId = getScholarshipId();
     
     if (!scholarshipId) {
-      console.log('❌ No scholarship ID');
+      // console.log('❌ No scholarship ID');
       alert('ID beasiswa tidak ditemukan');
       return;
     }
@@ -217,7 +217,7 @@ export default function ScholarshipDetailPage() {
       const token = getAuthToken();
       if (!token) {
         alert('Silakan login terlebih dahulu');
-        console.log('❌ No token for wishlist toggle');
+        // console.log('❌ No token for wishlist toggle');
         return;
       }
 
@@ -226,7 +226,7 @@ export default function ScholarshipDetailPage() {
       if (isWishlisted) {
         // Remove from wishlist
         const url = `${apiUrl}/wishlist/beasiswa/${scholarshipId}`;
-        console.log('🗑️ Removing from wishlist:', url);
+        // console.log('🗑️ Removing from wishlist:', url);
 
         const response = await fetch(url, {
           method: 'DELETE',
@@ -236,20 +236,20 @@ export default function ScholarshipDetailPage() {
         });
 
         const responseText = await response.text();
-        console.log('📡 Remove wishlist response:', response.status, responseText);
+        // console.log('📡 Remove wishlist response:', response.status, responseText);
 
         if (response.ok) {
           setIsWishlisted(false);
           alert('Berhasil menghapus dari wishlist');
         } else {
-          console.error('❌ Remove wishlist error:', responseText);
+          // console.error('❌ Remove wishlist error:', responseText);
           alert(`Gagal menghapus dari wishlist: ${response.status}`);
         }
       } else {
         // Add to wishlist
         const url = `${apiUrl}/wishlist`;
         const payload = { beasiswaId: scholarshipId };
-        console.log('➕ Adding to wishlist:', url, payload);
+        // console.log('➕ Adding to wishlist:', url, payload);
 
         const response = await fetch(url, {
           method: 'POST',
@@ -261,18 +261,18 @@ export default function ScholarshipDetailPage() {
         });
 
         const responseText = await response.text();
-        console.log('📡 Add wishlist response:', response.status, responseText);
+        // console.log('📡 Add wishlist response:', response.status, responseText);
 
         if (response.ok) {
           setIsWishlisted(true);
           alert('Berhasil menambahkan ke wishlist');
         } else {
-          console.error('❌ Add wishlist error:', responseText);
+          // console.error('❌ Add wishlist error:', responseText);
           alert(`Gagal menambahkan ke wishlist: ${response.status}`);
         }
       }
     } catch (error) {
-      console.error('❌ Error toggling wishlist:', error);
+      // console.error('❌ Error toggling wishlist:', error);
       alert('Gagal mengubah wishlist. Silakan coba lagi.');
     } finally {
       setWishlistLoading(false);
@@ -284,12 +284,12 @@ export default function ScholarshipDetailPage() {
     const scholarshipId = getScholarshipId();
     
     if (!manifestation.trim()) {
-      console.log('❌ No manifestation text');
+      // console.log('❌ No manifestation text');
       return;
     }
     
     if (!scholarshipId) {
-      console.log('❌ No scholarship ID');
+      // console.log('❌ No scholarship ID');
       alert('ID beasiswa tidak ditemukan');
       return;
     }
@@ -299,7 +299,7 @@ export default function ScholarshipDetailPage() {
       const token = getAuthToken();
       if (!token) {
         alert('Silakan login terlebih dahulu');
-        console.log('❌ No token for manifestation submit');
+        // console.log('❌ No token for manifestation submit');
         return;
       }
 
@@ -310,7 +310,7 @@ export default function ScholarshipDetailPage() {
         manifestation: manifestation.trim(),
       };
       
-      console.log('💬 Creating manifestation:', url, payload);
+      // console.log('💬 Creating manifestation:', url, payload);
 
       const response = await fetch(url, {
         method: 'POST',
@@ -322,12 +322,12 @@ export default function ScholarshipDetailPage() {
       });
 
       const responseText = await response.text();
-      console.log('📡 Create manifestation response:', response.status, responseText);
+      // console.log('📡 Create manifestation response:', response.status, responseText);
 
       if (response.ok) {
         try {
           const result = JSON.parse(responseText);
-          console.log('✅ Create manifestation result:', result);
+          // console.log('✅ Create manifestation result:', result);
           
           // Handle different response structures
           const newManifestation = result.data || result;
@@ -335,15 +335,15 @@ export default function ScholarshipDetailPage() {
           setManifestation('');
           alert('Manifestasi berhasil disimpan!');
         } catch (parseError) {
-          console.error('❌ Error parsing manifestation response:', parseError);
+          // console.error('❌ Error parsing manifestation response:', parseError);
           alert('Terjadi kesalahan saat menyimpan manifestasi');
         }
       } else {
-        console.error('❌ Create manifestation error:', responseText);
+        // console.error('❌ Create manifestation error:', responseText);
         alert(`Gagal menyimpan manifestasi: ${response.status}`);
       }
     } catch (error) {
-      console.error('❌ Error submitting manifestation:', error);
+      // console.error('❌ Error submitting manifestation:', error);
       alert('Gagal menyimpan manifestasi. Silakan coba lagi.');
     } finally {
       setIsSubmitting(false);
@@ -357,13 +357,13 @@ export default function ScholarshipDetailPage() {
     try {
       const token = getAuthToken();
       if (!token) {
-        console.log('❌ No token for delete manifestation');
+        // console.log('❌ No token for delete manifestation');
         return;
       }
 
       const apiUrl = process.env.NEXT_PUBLIC_BACKEND_API_URL;
       const url = `${apiUrl}/manifestations/${id}`; // ✅ CORRECT
-      console.log('🗑️ Deleting manifestation:', url);
+      // console.log('🗑️ Deleting manifestation:', url);
 
       const response = await fetch(url, {
         method: 'DELETE',
@@ -373,17 +373,17 @@ export default function ScholarshipDetailPage() {
       });
 
       const responseText = await response.text();
-      console.log('📡 Delete manifestation response:', response.status, responseText);
+      // console.log('📡 Delete manifestation response:', response.status, responseText);
 
       if (response.ok) {
         setManifestations(prev => prev.filter(m => m.id !== id));
         alert('Manifestasi berhasil dihapus');
       } else {
-        console.error('❌ Delete manifestation error:', responseText);
+        // console.error('❌ Delete manifestation error:', responseText);
         alert(`Gagal menghapus manifestasi: ${response.status}`);
       }
     } catch (error) {
-      console.error('❌ Error deleting manifestation:', error);
+      // console.error('❌ Error deleting manifestation:', error);
       alert('Gagal menghapus manifestasi. Silakan coba lagi.');
     }
   };
@@ -398,14 +398,14 @@ export default function ScholarshipDetailPage() {
         const apiUrl = process.env.NEXT_PUBLIC_BACKEND_API_URL;
         const fullUrl = `${apiUrl}/scholarship/${recommendation_id}`;
         
-        console.log('📡 Fetching scholarship from DATABASE:', fullUrl);
-        console.log('📌 ID:', recommendation_id);
+        // console.log('📡 Fetching scholarship from DATABASE:', fullUrl);
+        // console.log('📌 ID:', recommendation_id);
         
         const response = await fetch(fullUrl);
         
         if (!response.ok) {
           const errorText = await response.text();
-          console.error('❌ Backend error:', response.status, errorText);
+          // console.error('❌ Backend error:', response.status, errorText);
           
           if (response.status === 404) {
             throw new Error('Beasiswa tidak ditemukan di database. Mungkin data dari AI belum disinkronkan.');
@@ -417,7 +417,7 @@ export default function ScholarshipDetailPage() {
         }
 
         const responseData = await response.json();
-        console.log('✅ Scholarship from DATABASE:', responseData);
+        // console.log('✅ Scholarship from DATABASE:', responseData);
         
         // Handle response
         let data: any;
@@ -429,7 +429,7 @@ export default function ScholarshipDetailPage() {
           throw new Error('Invalid response format');
         }
         
-        console.log('✅ Scholarship ID from DB:', data.id);
+        // console.log('✅ Scholarship ID from DB:', data.id);
         
         // Set scholarship detail
         setScholarshipDetail({
@@ -462,7 +462,7 @@ export default function ScholarshipDetailPage() {
 
         // Use ACTUAL database ID for wishlist and manifestations
         const scholarshipId = data.id;
-        console.log('📌 Using DATABASE ID for wishlist/manifestation:', scholarshipId);
+        // console.log('📌 Using DATABASE ID for wishlist/manifestation:', scholarshipId);
 
         // Fetch wishlist and manifestations
         await Promise.all([
@@ -470,7 +470,7 @@ export default function ScholarshipDetailPage() {
           fetchManifestations(scholarshipId),
         ]);
       } catch (error) {
-        console.error('❌ Error:', error);
+        // console.error('❌ Error:', error);
         const errorMessage = error instanceof Error ? error.message : 'Gagal memuat detail beasiswa';
         setError(errorMessage);
       } finally {
