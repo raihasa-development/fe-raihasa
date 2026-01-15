@@ -42,12 +42,12 @@ export default function CheckoutPage() {
     script.src = snapScript;
     script.setAttribute('data-client-key', clientKey);
     script.async = true;
-    
+
     script.onload = () => {
       // console.log('✅ Snap script loaded');
       setSnapLoaded(true);
     };
-    
+
     script.onerror = () => {
       // console.error('❌ Failed to load Snap script');
       setErrorMessage('Gagal memuat script pembayaran');
@@ -63,13 +63,13 @@ export default function CheckoutPage() {
     queryKey: ['product-checkout', productId],
     queryFn: async () => {
       if (!productId) return null;
-      
+
       const response = await api.get<{ data: any[] }>('/products/lms');
       const products = response.data.data;
-      
+
       const found = products.find(p => p.id === productId);
       if (!found) return null;
-      
+
       return {
         id: found.id,
         nama: found.name,
@@ -254,24 +254,25 @@ export default function CheckoutPage() {
                     </Typography>
                   </div>
                 </div>
-                
+
                 <button
                   onClick={() => {
+                    // console.log('✅ Snap script loaded');
                     if (!snapLoaded) {
                       setErrorMessage('Snap belum dimuat, tunggu sebentar...');
                       return;
                     }
-                    
+
                     if (!paymentData.token) {
                       setErrorMessage('Token pembayaran tidak tersedia');
                       return;
                     }
-                    
+
                     if (typeof window.snap === 'undefined') {
                       setErrorMessage('Midtrans Snap tidak tersedia, silakan refresh halaman');
                       return;
                     }
-                    
+
                     // @ts-ignore
                     window.snap.pay(paymentData.token, {
                       onSuccess: (result: any) => {

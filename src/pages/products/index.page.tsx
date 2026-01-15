@@ -14,7 +14,7 @@ import { getToken } from '@/lib/cookies';
 // Helper function to get cookie value (works on server and client)
 const getCookie = (name: string): string | null => {
   if (typeof document === 'undefined') return null;
-  
+
   const escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
@@ -34,27 +34,27 @@ const checkAuthentication = (): boolean => {
   if (token) {
     return true;
   }
-  
+
   const cookieKeys = [
-    'token', 
-    'accessToken', 
-    'authToken', 
-    'access_token', 
-    'jwt', 
-    'bearerToken', 
+    'token',
+    'accessToken',
+    'authToken',
+    'access_token',
+    'jwt',
+    'bearerToken',
     'auth_token'
   ];
-  
+
   for (const key of cookieKeys) {
     const value = getCookie(key);
     if (value) {
       return true;
     }
   }
-  
+
   try {
     const localStorageKeys = ['token', 'accessToken', 'authToken', 'access_token', 'jwt', 'bearerToken', '@raihasa/token'];
-    
+
     for (const key of localStorageKeys) {
       const value = localStorage.getItem(key);
       if (value) {
@@ -64,7 +64,7 @@ const checkAuthentication = (): boolean => {
   } catch (e) {
     // ignore
   }
-  
+
   return false;
 };
 
@@ -167,7 +167,7 @@ export default function ProductsPage() {
       try {
         // Use /products/lms endpoint (note: plural 'products')
         const response = await api.get<{ data: any[] }>('/products/lms');
-        
+
         // Transform backend data to match our ProductData type
         const transformed: ProductData[] = response.data.data.map((p: any) => ({
           id: p.id,
@@ -181,7 +181,7 @@ export default function ProductsPage() {
           isPopular: p.isPopular,
           isPremium: p.isPremium,
         }));
-        
+
         // console.log('📦 Products loaded from API:', transformed);
         return transformed;
       } catch (error) {
@@ -207,7 +207,7 @@ export default function ProductsPage() {
       router.push(`/login?redirect=/payment/checkout?productId=${productId}`);
       return;
     }
-    
+
     // Langsung ke checkout page (no form needed)
     router.push(`/payment/checkout?productId=${productId}`);
   };
@@ -242,16 +242,14 @@ export default function ProductsPage() {
                   key={product.id}
                   data-aos='fade-up'
                   data-aos-delay={index * 100}
-                  className={`group relative bg-white rounded-2xl border-2 transition-all duration-300 overflow-hidden ${
-                    product.isPopular
+                  className={`group relative bg-white rounded-2xl border-2 transition-all duration-300 overflow-hidden ${product.isPopular
                       ? 'border-[#FB991A] shadow-xl hover:shadow-2xl hover:-translate-y-2'
                       : 'border-gray-200 hover:border-[#FB991A]/50 hover:shadow-xl hover:-translate-y-1'
-                  }`}
+                    }`}
                 >
                   {/* Gradient Accent Line */}
-                  <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#FB991A] to-[#C0172A] transition-all duration-300 ${
-                    product.isPopular ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
-                  }`} />
+                  <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#FB991A] to-[#C0172A] transition-all duration-300 ${product.isPopular ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+                    }`} />
 
                   {/* Background Pattern */}
                   <div className="absolute inset-0 opacity-0 group-hover:opacity-5 transition-opacity duration-300">
@@ -316,8 +314,8 @@ export default function ProductsPage() {
                     {/* Features with staggered animation */}
                     <div className="mb-8 space-y-3">
                       {product.features?.map((feature, idx) => (
-                        <div 
-                          key={idx} 
+                        <div
+                          key={idx}
                           className="flex items-start gap-3 group/item hover:translate-x-1 transition-transform duration-200"
                           style={{ transitionDelay: `${idx * 50}ms` }}
                         >
@@ -335,15 +333,14 @@ export default function ProductsPage() {
                     {/* CTA Button with gradient hover */}
                     <button
                       onClick={() => handleSelectProduct(product.id, product.isPremium)}
-                      className={`relative w-full py-3 px-4 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 text-sm overflow-hidden group/btn ${
-                        product.isPopular
+                      className={`relative w-full py-3 px-4 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 text-sm overflow-hidden group/btn ${product.isPopular
                           ? 'bg-gradient-to-r from-[#FB991A] to-[#C0172A] text-white shadow-lg hover:shadow-xl'
                           : 'bg-gray-900 text-white hover:bg-gradient-to-r hover:from-[#FB991A] hover:to-[#C0172A]'
-                      }`}
+                        }`}
                     >
                       {/* Button shine effect */}
                       <div className="absolute inset-0 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-                      
+
                       <span className="relative z-10">
                         {isAuthenticated || product.isPremium ? 'Pilih Paket' : 'Login untuk Beli'}
                       </span>
@@ -351,9 +348,8 @@ export default function ProductsPage() {
                     </button>
 
                     {/* Corner decoration */}
-                    <div className={`absolute bottom-0 right-0 w-20 h-20 bg-gradient-to-tl from-[#FB991A]/10 to-transparent rounded-tl-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
-                      product.isPopular ? 'opacity-50' : ''
-                    }`} />
+                    <div className={`absolute bottom-0 right-0 w-20 h-20 bg-gradient-to-tl from-[#FB991A]/10 to-transparent rounded-tl-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${product.isPopular ? 'opacity-50' : ''
+                      }`} />
                   </div>
                 </div>
               ))}
@@ -376,7 +372,7 @@ export default function ProductsPage() {
             <div className="bg-white rounded-2xl border-2 border-gray-200 overflow-hidden shadow-xl hover:shadow-2xl transition-shadow duration-300 max-w-5xl mx-auto" data-aos='fade-up' data-aos-delay='200'>
               {/* Gradient top border */}
               <div className="h-1 bg-gradient-to-r from-[#FB991A] to-[#C0172A]" />
-              
+
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead className="bg-gradient-to-r from-gray-50 to-orange-50/30 border-b-2 border-gray-200">
@@ -457,10 +453,10 @@ export default function ProductsPage() {
             <div className="relative bg-white rounded-2xl border-2 border-gray-200 p-6 lg:p-10 shadow-xl overflow-hidden max-w-5xl mx-auto group" data-aos='fade-up'>
               {/* Animated background gradient */}
               <div className="absolute inset-0 bg-gradient-to-r from-[#FB991A]/5 via-[#C0172A]/5 to-[#FB991A]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-              
+
               {/* Top gradient line */}
               <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#FB991A] to-[#C0172A]" />
-              
+
               <div className="relative grid md:grid-cols-3 gap-8 md:gap-0 md:divide-x-2 divide-gray-200">
                 <div className="px-4 lg:px-8 text-center group/stat hover:scale-105 transition-transform duration-300">
                   <Typography variant="h2" weight="bold" className="text-transparent bg-clip-text bg-gradient-to-r from-[#FB991A] to-[#C0172A] mb-2 text-3xl lg:text-4xl">

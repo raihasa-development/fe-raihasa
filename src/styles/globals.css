@@ -29,15 +29,15 @@
 
   /* Shadow */
   --shadow-20: 0px 0.5px 2px rgba(65, 78, 98, 0.12),
-               0px 0px 1px rgba(65, 78, 98, 0.05);
+    0px 0px 1px rgba(65, 78, 98, 0.05);
   --shadow-40: 0px 2px 4px rgba(65, 78, 98, 0.12),
-               0px 0px 1px rgba(65, 78, 98, 0.05);
+    0px 0px 1px rgba(65, 78, 98, 0.05);
   --shadow-60: 0px 4px 8px rgba(65, 78, 98, 0.12),
-               0px 0px 1px rgba(65, 78, 98, 0.05);
+    0px 0px 1px rgba(65, 78, 98, 0.05);
   --shadow-80: 0px 8px 16px rgba(65, 78, 98, 0.12),
-               0px 0px 1px rgba(65, 78, 98, 0.05);
+    0px 0px 1px rgba(65, 78, 98, 0.05);
   --shadow-100: 0px 16px 24px rgba(65, 78, 98, 0.12),
-                0px 0px 1px rgba(65, 78, 98, 0.05);
+    0px 0px 1px rgba(65, 78, 98, 0.05);
 }
 
 @font-face {
@@ -45,8 +45,7 @@
   src: url('../styles/font/Poppins/Poppins-ExtraLight.eot');
   src: local('../styles/font/Poppins/Poppins ExtraLight'),
     local('../styles/font/Poppins/Poppins-ExtraLight'),
-    url('../styles/font/Poppins/Poppins-ExtraLight.eot?#iefix')
-      format('embedded-opentype'),
+    url('../styles/font/Poppins/Poppins-ExtraLight.eot?#iefix') format('embedded-opentype'),
     url('../styles/font/Poppins/Poppins-ExtraLight.woff2') format('woff2'),
     url('../styles/font/Poppins/Poppins-ExtraLight.woff') format('woff'),
     url('../styles/font/Poppins/Poppins-ExtraLight.ttf') format('truetype');
@@ -59,8 +58,7 @@
   src: url('../styles/font/Poppins/Poppins-Medium.eot');
   src: local('../styles/font/Poppins/Poppins Medium'),
     local('../styles/font/Poppins/Poppins-Medium'),
-    url('../styles/font/Poppins/Poppins-Medium.eot?#iefix')
-      format('embedded-opentype'),
+    url('../styles/font/Poppins/Poppins-Medium.eot?#iefix') format('embedded-opentype'),
     url('../styles/font/Poppins/Poppins-Medium.woff2') format('woff2'),
     url('../styles/font/Poppins/Poppins-Medium.woff') format('woff'),
     url('../styles/font/Poppins/Poppins-Medium.ttf') format('truetype');
@@ -73,8 +71,7 @@
   src: url('../styles/font/Poppins/Poppins-LightItalic.eot');
   src: local('../styles/font/Poppins/Poppins Light Italic'),
     local('../styles/font/Poppins/Poppins-LightItalic'),
-    url('../styles/font/Poppins/Poppins-LightItalic.eot?#iefix')
-      format('embedded-opentype'),
+    url('../styles/font/Poppins/Poppins-LightItalic.eot?#iefix') format('embedded-opentype'),
     url('../styles/font/Poppins/Poppins-LightItalic.woff2') format('woff2'),
     url('../styles/font/Poppins/Poppins-LightItalic.woff') format('woff'),
     url('../styles/font/Poppins/Poppins-LightItalic.ttf') format('truetype');
@@ -87,12 +84,10 @@
   src: url('../styles/font/Poppins/Poppins-ExtraLightItalic.eot');
   src: local('../styles/font/Poppins/Poppins ExtraLight Italic'),
     local('../styles/font/Poppins/Poppins-ExtraLightItalic'),
-    url('../styles/font/Poppins/Poppins-ExtraLightItalic.eot?#iefix')
-      format('embedded-opentype'),
+    url('../styles/font/Poppins/Poppins-ExtraLightItalic.eot?#iefix') format('embedded-opentype'),
     url('../styles/font/Poppins/Poppins-ExtraLightItalic.woff2') format('woff2'),
     url('../styles/font/Poppins/Poppins-ExtraLightItalic.woff') format('woff'),
-    url('../styles/font/Poppins/Poppins-ExtraLightItalic.ttf')
-      format('truetype');
+    url('../styles/font/Poppins/Poppins-ExtraLightItalic.ttf') format('truetype');
   font-weight: 200;
   font-style: italic;
 }
@@ -102,8 +97,7 @@
   src: url('../styles/font/Poppins/Poppins-Regular.eot');
   src: local('../styles/font/Poppins/Poppins Regular'),
     local('../styles/font/Poppins/Poppins-Regular'),
-    url('../styles/font/Poppins/Poppins-Regular.eot?#iefix')
-      format('embedded-opentype'),
+    url('../styles/font/Poppins/Poppins-Regular.eot?#iefix') format('embedded-opentype'),
     url('../styles/font/Poppins/Poppins-Regular.woff2') format('woff2'),
     url('../styles/font/Poppins/Poppins-Regular.woff') format('woff'),
     url('../styles/font/Poppins/Poppins-Regular.ttf') format('truetype');
@@ -116,8 +110,7 @@
   src: url('../styles/font/Poppins/Poppins-SemiBold.eot');
   src: local('../styles/font/Poppins/Poppins SemiBold'),
     local('../styles/font/Poppins/Poppins-SemiBold'),
-    url('../styles/font/Poppins/Poppins-SemiBold.eot?#iefix')
-      format('embedded-opentype'),
+    url('../styles/font/Poppins/Poppins-SemiBold.eot?#iefix') format('embedded-opentype'),
     url('../styles/font/Poppins/Poppins-SemiBold.woff2') format('woff2'),
     url('../styles/font/Poppins/Poppins-SemiBold.woff') format('woff'),
     url('../styles/font/Poppins/Poppins-SemiBold.ttf') format('truetype');
@@ -130,8 +123,7 @@
   src: url('../styles/font/Poppins/Poppins-Black.eot');
   src: local('../styles/font/Poppins/Poppins Black'),
     local('../styles/font/Poppins/Poppins-Black'),
-    url('../styles/font/Poppins/Poppins-Black.eot?#iefix')
-      format('embedded-opentype'),
+    url('../styles/font/Poppins/Poppins-Black.eot?#iefix') format('embedded-opentype'),
     url('../styles/font/Poppins/Poppins-Black.woff2') format('woff2'),
     url('../styles/font/Poppins/Poppins-Black.woff') format('woff'),
     url('../styles/font/Poppins/Poppins-Black.ttf') format('truetype');
@@ -144,8 +136,7 @@
   src: url('../styles/font/Poppins/Poppins-ExtraBoldItalic.eot');
   src: local('../styles/font/Poppins/Poppins ExtraBold Italic'),
     local('../styles/font/Poppins/Poppins-ExtraBoldItalic'),
-    url('../styles/font/Poppins/Poppins-ExtraBoldItalic.eot?#iefix')
-      format('embedded-opentype'),
+    url('../styles/font/Poppins/Poppins-ExtraBoldItalic.eot?#iefix') format('embedded-opentype'),
     url('../styles/font/Poppins/Poppins-ExtraBoldItalic.woff2') format('woff2'),
     url('../styles/font/Poppins/Poppins-ExtraBoldItalic.woff') format('woff'),
     url('../styles/font/Poppins/Poppins-ExtraBoldItalic.ttf') format('truetype');
@@ -158,8 +149,7 @@
   src: url('../styles/font/Poppins/Poppins-MediumItalic.eot');
   src: local('../styles/font/Poppins/Poppins Medium Italic'),
     local('../styles/font/Poppins/Poppins-MediumItalic'),
-    url('../styles/font/Poppins/Poppins-MediumItalic.eot?#iefix')
-      format('embedded-opentype'),
+    url('../styles/font/Poppins/Poppins-MediumItalic.eot?#iefix') format('embedded-opentype'),
     url('../styles/font/Poppins/Poppins-MediumItalic.woff2') format('woff2'),
     url('../styles/font/Poppins/Poppins-MediumItalic.woff') format('woff'),
     url('../styles/font/Poppins/Poppins-MediumItalic.ttf') format('truetype');
@@ -172,8 +162,7 @@
   src: url('../styles/font/Poppins/Poppins-Light.eot');
   src: local('../styles/font/Poppins/Poppins Light'),
     local('../styles/font/Poppins/Poppins-Light'),
-    url('../styles/font/Poppins/Poppins-Light.eot?#iefix')
-      format('embedded-opentype'),
+    url('../styles/font/Poppins/Poppins-Light.eot?#iefix') format('embedded-opentype'),
     url('../styles/font/Poppins/Poppins-Light.woff2') format('woff2'),
     url('../styles/font/Poppins/Poppins-Light.woff') format('woff'),
     url('../styles/font/Poppins/Poppins-Light.ttf') format('truetype');
@@ -186,8 +175,7 @@
   src: url('../styles/font/Poppins/Poppins-Bold.eot');
   src: local('../styles/font/Poppins/Poppins Bold'),
     local('../styles/font/Poppins/Poppins-Bold'),
-    url('../styles/font/Poppins/Poppins-Bold.eot?#iefix')
-      format('embedded-opentype'),
+    url('../styles/font/Poppins/Poppins-Bold.eot?#iefix') format('embedded-opentype'),
     url('../styles/font/Poppins/Poppins-Bold.woff2') format('woff2'),
     url('../styles/font/Poppins/Poppins-Bold.woff') format('woff'),
     url('../styles/font/Poppins/Poppins-Bold.ttf') format('truetype');
@@ -200,8 +188,7 @@
   src: url('../styles/font/Poppins/Poppins-Thin.eot');
   src: local('../styles/font/Poppins/Poppins Thin'),
     local('../styles/font/Poppins/Poppins-Thin'),
-    url('../styles/font/Poppins/Poppins-Thin.eot?#iefix')
-      format('embedded-opentype'),
+    url('../styles/font/Poppins/Poppins-Thin.eot?#iefix') format('embedded-opentype'),
     url('../styles/font/Poppins/Poppins-Thin.woff2') format('woff2'),
     url('../styles/font/Poppins/Poppins-Thin.woff') format('woff'),
     url('../styles/font/Poppins/Poppins-Thin.ttf') format('truetype');
@@ -214,8 +201,7 @@
   src: url('../styles/font/Poppins/Poppins-Italic.eot');
   src: local('../styles/font/Poppins/Poppins Italic'),
     local('../styles/font/Poppins/Poppins-Italic'),
-    url('../styles/font/Poppins/Poppins-Italic.eot?#iefix')
-      format('embedded-opentype'),
+    url('../styles/font/Poppins/Poppins-Italic.eot?#iefix') format('embedded-opentype'),
     url('../styles/font/Poppins/Poppins-Italic.woff2') format('woff2'),
     url('../styles/font/Poppins/Poppins-Italic.woff') format('woff'),
     url('../styles/font/Poppins/Poppins-Italic.ttf') format('truetype');
@@ -228,8 +214,7 @@
   src: url('../styles/font/Poppins/Poppins-ThinItalic.eot');
   src: local('../styles/font/Poppins/Poppins Thin Italic'),
     local('../styles/font/Poppins/Poppins-ThinItalic'),
-    url('../styles/font/Poppins/Poppins-ThinItalic.eot?#iefix')
-      format('embedded-opentype'),
+    url('../styles/font/Poppins/Poppins-ThinItalic.eot?#iefix') format('embedded-opentype'),
     url('../styles/font/Poppins/Poppins-ThinItalic.woff2') format('woff2'),
     url('../styles/font/Poppins/Poppins-ThinItalic.woff') format('woff'),
     url('../styles/font/Poppins/Poppins-ThinItalic.ttf') format('truetype');
@@ -242,8 +227,7 @@
   src: url('../styles/font/Poppins/Poppins-BlackItalic.eot');
   src: local('../styles/font/Poppins/Poppins Black Italic'),
     local('../styles/font/Poppins/Poppins-BlackItalic'),
-    url('../styles/font/Poppins/Poppins-BlackItalic.eot?#iefix')
-      format('embedded-opentype'),
+    url('../styles/font/Poppins/Poppins-BlackItalic.eot?#iefix') format('embedded-opentype'),
     url('../styles/font/Poppins/Poppins-BlackItalic.woff2') format('woff2'),
     url('../styles/font/Poppins/Poppins-BlackItalic.woff') format('woff'),
     url('../styles/font/Poppins/Poppins-BlackItalic.ttf') format('truetype');
@@ -256,8 +240,7 @@
   src: url('../styles/font/Poppins/Poppins-BoldItalic.eot');
   src: local('../styles/font/Poppins/Poppins Bold Italic'),
     local('../styles/font/Poppins/Poppins-BoldItalic'),
-    url('../styles/font/Poppins/Poppins-BoldItalic.eot?#iefix')
-      format('embedded-opentype'),
+    url('../styles/font/Poppins/Poppins-BoldItalic.eot?#iefix') format('embedded-opentype'),
     url('../styles/font/Poppins/Poppins-BoldItalic.woff2') format('woff2'),
     url('../styles/font/Poppins/Poppins-BoldItalic.woff') format('woff'),
     url('../styles/font/Poppins/Poppins-BoldItalic.ttf') format('truetype');
@@ -270,8 +253,7 @@
   src: url('../styles/font/Poppins/Poppins-SemiBoldItalic.eot');
   src: local('../styles/font/Poppins/Poppins SemiBold Italic'),
     local('../styles/font/Poppins/Poppins-SemiBoldItalic'),
-    url('../styles/font/Poppins/Poppins-SemiBoldItalic.eot?#iefix')
-      format('embedded-opentype'),
+    url('../styles/font/Poppins/Poppins-SemiBoldItalic.eot?#iefix') format('embedded-opentype'),
     url('../styles/font/Poppins/Poppins-SemiBoldItalic.woff2') format('woff2'),
     url('../styles/font/Poppins/Poppins-SemiBoldItalic.woff') format('woff'),
     url('../styles/font/Poppins/Poppins-SemiBoldItalic.ttf') format('truetype');
@@ -284,8 +266,7 @@
   src: url('../styles/font/Poppins/Poppins-ExtraBold.eot');
   src: local('../styles/font/Poppins/Poppins ExtraBold'),
     local('../styles/font/Poppins/Poppins-ExtraBold'),
-    url('../styles/font/Poppins/Poppins-ExtraBold.eot?#iefix')
-      format('embedded-opentype'),
+    url('../styles/font/Poppins/Poppins-ExtraBold.eot?#iefix') format('embedded-opentype'),
     url('../styles/font/Poppins/Poppins-ExtraBold.woff2') format('woff2'),
     url('../styles/font/Poppins/Poppins-ExtraBold.woff') format('woff'),
     url('../styles/font/Poppins/Poppins-ExtraBold.ttf') format('truetype');
@@ -309,6 +290,7 @@
   max-width: 88.75rem;
   @apply mx-auto w-[96%];
 }
+
 .text-shadow-lg {
   text-shadow: 0px 0px 6.315789699554443px rgba(255, 255, 255, 0.52);
 }
@@ -316,9 +298,11 @@
 .text-shadow-lg {
   text-shadow: 0px 0px 12px rgba(255, 255, 255, 0.52);
 }
+
 .text-shadow-md {
   text-shadow: 0px 4px 20px rgba(255, 255, 255, 0.25);
 }
+
 .text-shadow-xl {
   text-shadow: 0px 4px 20px rgba(255, 255, 255, 0.5);
 }
@@ -326,6 +310,7 @@
 .text-shadow-yellow {
   text-shadow: 0px 4px 20px rgba(251, 153, 26, 0.4);
 }
+
 .text-shadow-bg {
   text-shadow: 0px 0px 6.315789699554443px rgba(255, 255, 255, 0.52);
 }
@@ -333,15 +318,19 @@
 .shadow-card-orange {
   filter: drop-shadow(-11px 9px 0px #f39636);
 }
+
 .shadow-card {
   box-shadow: 4.49879px 4.49879px 26.99274px 0px rgba(0, 0, 0, 0.25);
 }
+
 .shadow-white {
   box-shadow: 0px 0px 15px 0px rgba(255, 255, 255, 0.5);
 }
+
 .shadow-header {
   box-shadow: -8px 8px 0px 0px rgba(0, 0, 0, 0.25);
 }
+
 .shadow-pagination {
   box-shadow: -3px 2px 0px 0px #fb991a;
 }
@@ -354,6 +343,7 @@
 .strikethrough {
   position: relative;
 }
+
 .strikethrough:before {
   position: absolute;
   content: '';
@@ -377,4 +367,19 @@
 .detailbeasiswa-benefit li::marker {
   color: #fb991a;
   font-size: 24px;
+}
+
+/* Smooth Floating Animation */
+@keyframes float {
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(-6px);
+  }
+}
+
+.animate-float {
+  animation: float 2s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite alternate;
 }

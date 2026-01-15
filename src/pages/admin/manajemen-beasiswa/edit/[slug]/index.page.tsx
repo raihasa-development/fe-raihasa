@@ -136,9 +136,9 @@ function EditBeasiswaPage() {
 
         if (!res.ok) throw new Error('Gagal memuat data beasiswa');
         const resJson = await res.json();
-        console.log('🧱 resJson:', resJson);
-        console.log('🧱 resJson.data:', resJson.data);
-        console.log('🧱 resJson.data[0]:', resJson.data?.[0]);
+        // console.log('🧱 resJson:', resJson);
+        // console.log('🧱 resJson.data:', resJson.data);
+        // console.log('🧱 resJson.data[0]:', resJson.data?.[0]);
         const data =
           Array.isArray(resJson.data) ? resJson.data[0] : resJson.data || resJson;
 

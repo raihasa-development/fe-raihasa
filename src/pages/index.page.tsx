@@ -5,9 +5,10 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 
 
+import { animate, Timeline, stagger, utils } from 'animejs';
 import Aos from 'aos';
-import React from 'react';
-import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
+import React, { useEffect, useRef } from 'react';
+import { FaArrowLeft, FaArrowRight, FaWhatsapp } from 'react-icons/fa';
 import { FaArrowRightLong } from 'react-icons/fa6';
 import { Autoplay, Navigation } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -22,90 +23,214 @@ import { VelocityScroll } from '@/components/TextCustom/ScrollBasedVelocity';
 import SparklesText from '@/components/TextCustom/SparklesText';
 import Typography from '@/components/Typography';
 import { TESTIMONIALS } from '@/contents/landing';
-import { Sponsor } from '@/contents/sponsor';
+import { sponsorList } from '@/contents/sponsor';
 import Layout from '@/layouts/Layout';
 
 export default function Home() {
-  const aboutRef = React.useRef<HTMLElement>(null);
+  const aboutRef = useRef<HTMLElement>(null);
 
-  React.useEffect(() => {
-    Aos.init({ once: true });
+  // Animation Refs
+  const pillRef = useRef<HTMLDivElement>(null);
+  const titleSmallRef = useRef<HTMLDivElement>(null);
+  const titleMainRef = useRef<HTMLDivElement>(null);
+  const descRef = useRef<HTMLDivElement>(null);
+  const btnRef = useRef<HTMLDivElement>(null);
+  const imageDesktopRef = useRef<HTMLDivElement>(null);
+  const imageMobileRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    Aos.init({
+      once: true,
+      duration: 800,
+      easing: 'ease-out-cubic',
+    });
+
+    // Simple floating animation for hero image using anime.js
+    try {
+      const imageElements = [imageDesktopRef.current, imageMobileRef.current].filter(Boolean);
+      if (imageElements.length > 0) {
+        animate(imageElements, {
+          translateY: [-8, 8],
+          duration: 2500,
+          direction: 'alternate',
+          loop: true,
+          ease: 'in-out-sine',
+        });
+      }
+    } catch (error) {
+      console.error('Animation error:', error);
+    }
   }, []);
 
   return (
     <Layout withNavbar={true} withFooter={true}>
       <SEO title='Home' />
       <PromoPopup />
+
+      {/* Floating WhatsApp Button */}
+      <a
+        href='https://wa.me/' // Replace with actual number
+        target='_blank'
+        rel='noreferrer'
+        className='fixed z-[999] bottom-6 right-6 md:bottom-10 md:right-10 flex items-center justify-center w-14 h-14 md:w-16 md:h-16 bg-[#25D366] rounded-full shadow-lg hover:shadow-xl transition-transform hover:scale-110 cursor-pointer'
+        title='Hubungi Kami di WhatsApp'
+      >
+        <FaWhatsapp className='w-8 h-8 text-white md:w-10 md:h-10' />
+      </a>
+
       <main className='scroll-smooth overflow-hidden bg-[#fff]'>
-        <section className='relative grid py-20 mt-12 place-items-center md:min-h-screen'>
-          <div className='container mx-auto grid grid-cols-1 xl:grid-cols-2 md:px-10 px-4 !place-items-center z-20'>
-            <div className='flex flex-col items-center order-2 col-span-1 gap-2 mt-5 xl:order-none xl:items-start xl:mt-0'>
-              <Typography
-                variant='h5'
-                weight='regular'
-                className='text-sm md:text-[20px] text-[#1B7691] text-center xl:text-left'
-                data-aos='zoom-in'
-                data-aos-delay='600'
+        <section className='relative min-h-screen pt-8 pb-16 md:pt-12 md:pb-24 mt-16 md:mt-20'>
+          {/* Main Hero Content */}
+          <div className='container relative z-20 grid grid-cols-1 gap-8 px-4 mx-auto md:px-10 xl:grid-cols-2 xl:gap-16 place-items-center'>
+            {/* Left Column - Text Content */}
+            <div className='flex flex-col items-center order-2 w-full max-w-2xl gap-5 xl:order-1 xl:items-start md:gap-6'>
+
+              {/* Awards Badges - Horizontal Pills */}
+              <div className='flex flex-wrap items-center justify-center gap-2 md:gap-3 xl:justify-start' data-aos='fade-down' data-aos-delay='0'>
+                <div className='flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-gradient-to-r from-yellow-100 to-orange-100 border border-yellow-300'>
+                  <div className='flex items-center justify-center w-5 h-5 md:w-6 md:h-6 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500'>
+                    <svg className='w-3 h-3 md:w-3.5 md:h-3.5 text-white' fill='currentColor' viewBox='0 0 20 20'>
+                      <path d='M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z' />
+                    </svg>
+                  </div>
+                  <span className='text-[10px] md:text-xs font-bold text-yellow-700'>#1 EdTech Indonesia</span>
+                </div>
+                <div className='flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-gradient-to-r from-blue-100 to-cyan-100 border border-blue-300'>
+                  <div className='flex items-center justify-center w-5 h-5 md:w-6 md:h-6 rounded-full bg-gradient-to-br from-blue-400 to-cyan-500'>
+                    <svg className='w-3 h-3 md:w-3.5 md:h-3.5 text-white' fill='currentColor' viewBox='0 0 20 20'>
+                      <path fillRule='evenodd' d='M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z' clipRule='evenodd' />
+                    </svg>
+                  </div>
+                  <span className='text-[10px] md:text-xs font-bold text-blue-700'>Dikti Verified</span>
+                </div>
+              </div>
+
+              {/* Pill Badge - Counting */}
+              <div
+                ref={pillRef}
+                data-aos='fade-up'
+                data-aos-delay='100'
+                className='flex items-center gap-3 px-4 py-2 md:px-5 md:py-2.5 rounded-full shadow-md bg-white border border-gray-200 w-fit'
               >
-                <i>Temukan kesempatan, wujudkan impian</i>
-              </Typography>
-              <Typography
-                data-aos='zoom-in'
-                data-aos-delay='600'
-                className='font-bold text-3xl md:text-[60px] text-[#FB991A] mt-3 leading-none text-center xl:text-left'
-              >
-                Raih Beasiswa Impianmu dengan Lebih Mudah
-              </Typography>
-              <Typography
-                data-aos='zoom-in'
-                data-aos-delay='600'
-                className='text-sm md:text-[20px] text-[#1B7691] mt-3 text-center xl:text-left'
-              >
-                Jelajahi kesempatan beasiswa terbaik dari seluruh Indonesia dan
-                dunia. Temukan peluang pendidikan yang sesuai dengan passion dan
-                cita-citamu!
-              </Typography>
-              <ButtonLink
-                  href='/rekomendasi-beasiswa'
-                  data-aos='zoom-in'
-                  data-aos-delay='600'
-                  variant='primary'
-                  size='lg'
-                  className='max-w-sm px-5 mt-4 md:mt-8 font-poppins'
+                <div className='flex -space-x-2'>
+                  <div className='w-7 h-7 md:w-8 md:h-8 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 border-2 border-white flex items-center justify-center'>
+                    <span className='text-[10px] text-white font-bold'>👨</span>
+                  </div>
+                  <div className='w-7 h-7 md:w-8 md:h-8 rounded-full bg-gradient-to-br from-blue-400 to-cyan-500 border-2 border-white flex items-center justify-center'>
+                    <span className='text-[10px] text-white font-bold'>👩</span>
+                  </div>
+                  <div className='w-7 h-7 md:w-8 md:h-8 rounded-full bg-gradient-to-br from-pink-400 to-purple-500 border-2 border-white flex items-center justify-center'>
+                    <span className='text-[10px] text-white font-bold'>🎓</span>
+                  </div>
+                </div>
+                <Typography className='text-xs md:text-sm text-gray-700 font-medium'>
+                  Gabung bareng <NumberTicker value={100} suffix='+' className='!text-[#FB991A] font-extrabold' /> awardee di Indonesia
+                </Typography>
+              </div>
+
+              {/* Tagline */}
+              <div ref={titleSmallRef} data-aos='fade-up' data-aos-delay='200'>
+                <Typography
+                  variant='h5'
+                  weight='regular'
+                  className='text-base md:text-lg lg:text-xl text-[#1B7691] text-center xl:text-left font-medium'
                 >
-                  <Typography
-                    className='flex items-center w-full gap-2 px-4 py-3 text-base font-semibold text-white transition-colors duration-300 bg-[#1B7691] rounded-2xl hover:bg-yellow-400 hover:text-white'
-                  >
-                    Ambil Kesempatan Sekarang <FaArrowRightLong />
-                  </Typography>
+                  <i>Temukan kesempatan, wujudkan impian</i>
+                </Typography>
+              </div>
+
+              {/* Main Headline */}
+              <div ref={titleMainRef} data-aos='fade-up' data-aos-delay='300'>
+                <Typography
+                  className='font-extrabold text-3xl md:text-4xl lg:text-5xl xl:text-6xl text-[#FB991A] leading-tight text-center xl:text-left'
+                >
+                  Raih Beasiswa Impianmu dengan Lebih Mudah
+                </Typography>
+              </div>
+
+              {/* Description */}
+              <div ref={descRef} data-aos='fade-up' data-aos-delay='400'>
+                <Typography
+                  className='text-sm md:text-base lg:text-lg text-[#1B7691]/80 text-center xl:text-left leading-relaxed max-w-lg'
+                >
+                  Jelajahi kesempatan beasiswa terbaik dari seluruh Indonesia dan
+                  dunia. Temukan peluang pendidikan yang sesuai dengan passion dan
+                  cita-citamu!
+                </Typography>
+              </div>
+
+              {/* CTA Section */}
+              <div className='flex flex-col items-center w-full gap-4 mt-2 xl:items-start md:mt-4' ref={btnRef} data-aos='fade-up' data-aos-delay='500'>
+                <ButtonLink
+                  href='https://raihasa.myr.id/bundling'
+                  variant='unstyled'
+                  size='lg'
+                  className='group'
+                >
+                  <div className='flex items-center justify-center gap-2 px-6 py-3 md:px-8 md:py-4 text-sm md:text-base font-bold text-white bg-gradient-to-r from-[#1B7691] to-[#0e5c71] rounded-full shadow-lg hover:shadow-xl hover:shadow-[#1B7691]/30 transition-all duration-300 hover:scale-105'>
+                    Daftar BISA Membership
+                    <FaArrowRightLong className='transition-transform duration-300 group-hover:translate-x-1' />
+                  </div>
                 </ButtonLink>
 
+                {/* Trusted By Section */}
+                <div className='flex items-center gap-3 mt-2'>
+                  <div className='flex -space-x-2'>
+                    <div className='w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 border-2 border-white shadow-sm flex items-center justify-center'>
+                      <span className='text-[10px] text-white'>👨‍🎓</span>
+                    </div>
+                    <div className='w-8 h-8 rounded-full bg-gradient-to-br from-pink-400 to-pink-600 border-2 border-white shadow-sm flex items-center justify-center'>
+                      <span className='text-[10px] text-white'>👩‍🎓</span>
+                    </div>
+                    <div className='w-8 h-8 rounded-full bg-gradient-to-br from-green-400 to-green-600 border-2 border-white shadow-sm flex items-center justify-center'>
+                      <span className='text-[10px] text-white'>👨‍👩‍👧</span>
+                    </div>
+                    <div className='w-8 h-8 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 border-2 border-white shadow-sm flex items-center justify-center text-white text-[10px] font-bold'>
+                      +99k
+                    </div>
+                  </div>
+                  <div className='flex flex-col'>
+                    <Typography className='text-sm md:text-base font-semibold text-gray-700'>
+                      <span className='text-[#FB991A] font-bold'>100k+</span> sudah bergabung
+                    </Typography>
+                    <Typography className='text-[10px] md:text-xs text-gray-500'>
+                      Students, Parents, and Partners
+                    </Typography>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <NextImage
-              src='/images/landing/haira-hero-desktop.png'
-              width={590}
-              height={625}
-              quality={100}
-              alt='Haira Raih Asa'
-              className='hidden lg:block lg:relative w-full max-w-[590px] h-auto'
-              priority
-              data-aos='fade-left'
-            />
+            {/* Right Column - Hero Image */}
+            <div className='relative order-1 w-full max-w-lg mx-auto xl:order-2 xl:max-w-none' data-aos='fade-left' data-aos-delay='200'>
+              <div ref={imageDesktopRef} className='hidden xl:block'>
+                <NextImage
+                  src='/images/landing/haira-hero-desktop.png'
+                  width={590}
+                  height={625}
+                  quality={100}
+                  alt='Haira Raih Asa'
+                  className='w-full h-auto drop-shadow-2xl animate-float'
+                  priority
+                />
+              </div>
 
-            <NextImage
-              src='/images/landing/haira-hero-mobile.png'
-              width={295}
-              height={328}
-              quality={100}
-              alt='Haira Raih Asa'
-              className='block lg:hidden relative w-full max-w-[295px]'
-              imgClassName='w-auto h-auto object-contain'
-              priority
-              data-aos='fade-left'
-            />
+              <div ref={imageMobileRef} className='block xl:hidden'>
+                <NextImage
+                  src='/images/landing/haira-hero-mobile.png'
+                  width={295}
+                  height={328}
+                  quality={100}
+                  alt='Haira Raih Asa'
+                  className='w-full max-w-sm mx-auto drop-shadow-xl animate-float'
+                  imgClassName='w-auto h-auto object-contain'
+                  priority
+                />
+              </div>
+            </div>
           </div>
 
+          {/* Background Decorations */}
           <NextImage
             src={'/images/landing/hero-b.png'}
             width={264}
@@ -137,6 +262,7 @@ export default function Home() {
             imgClassName='object-cover w-full h-full'
             data-aos='fade-right'
           />
+
         </section>
 
         <section
@@ -201,51 +327,114 @@ export default function Home() {
           </div> */}
         </section>
 
-        <section className='relative px-4 md:px-10'>
-          <div className='py-11 '>
-            <div
-              className='bg-[#1B7691] w-full text-center -rotate-[.6deg]'
-              data-aos='fade-up'
-            >
-              <SparklesText
-                className='lg:text-[60px] text-2xl py-3 lg:py-7 font-bold !text-white text-shadow-md shadow-[-8px_8px_0_0_rgba(0,0,0,0.25)]'
-                text='PROGRAM UNGGULAN'
-              />
+        <section className='relative px-4 md:px-10 py-20 md:py-28'>
+          <div className='container mx-auto max-w-6xl'>
+            {/* Section Header */}
+            <div className='text-center mb-14 md:mb-20' data-aos='fade-up'>
+              <Typography className='text-sm md:text-base font-medium text-[#1B7691] uppercase tracking-widest mb-3'>
+                Ekosistem Beasiswa Terlengkap
+              </Typography>
+              <Typography className='text-3xl md:text-4xl lg:text-[42px] font-bold text-gray-900 leading-tight'>
+                Semua yang Kamu Butuhkan untuk
+                <span className='block text-[#FB991A]'>Raih Beasiswa Impian</span>
+              </Typography>
             </div>
 
-            <div className='flex flex-col lg:flex-row justify-center gap-5 md:gap-8 py-[60px] items-center'>
-              <ProgramCardLanding
-                data-aos='fade-right'
-                data-aos-delay='400'
-                gradientColor='from-[#C0172AB5] to-[#12121280]'
-                buttonClassName='bg-[#E94759] hover:bg-[#ff99a5]'
-                title='Scholarships Fair'
-                desc='Program singkat yang dikurasi khusus untuk raih beasiswa yang kamu impikan!'
-                img='images/landing/card-1.png'
-                href='/programs/scholarship-fair/scholarship-camp'
-              />
+            {/* Program Cards - 3 Column Grid */}
+            <div className='grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8'>
 
-              <ProgramCardLanding
-                data-aos='fade-right'
-                data-aos-delay='600'
-                gradientColor='from-[#E47F1A] to-[#12121280]'
-                buttonClassName='bg-[#FB991A] hover:bg-[#ffc77d]'
-                title='Booster Series: A La Carte'
-                desc='Tingkatkan kualitas satuan berkas beasiswamu secepat kilat!'
-                img='images/landing/card-2.png'
-                href='/programs/booster-series-a-la-carte/cv-boost'
-              />
+              {/* Card 1 - Scholra */}
+              <div
+                className='bg-white rounded-2xl p-6 md:p-8 border border-gray-200 hover:border-[#1B7691]/30 hover:shadow-lg transition-all duration-300'
+                data-aos='fade-up'
+              >
+                <div className='w-14 h-14 rounded-xl bg-[#1B7691] flex items-center justify-center mb-5'>
+                  <svg className='w-7 h-7 text-white' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                    <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={1.5} d='M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z' />
+                  </svg>
+                </div>
+                <span className='text-[#1B7691] text-xs font-medium bg-[#1B7691]/10 px-2 py-1 rounded'>AI</span>
+                <Typography className='text-xl font-bold text-gray-900 mt-3 mb-2'>
+                  Scholra
+                </Typography>
+                <Typography className='text-gray-600 text-sm leading-relaxed mb-4'>
+                  Asisten cerdas yang menganalisis profilmu dan merekomendasikan beasiswa paling sesuai. Hemat waktu riset dengan rekomendasi personal.
+                </Typography>
+                <span className='inline-flex items-center gap-1 text-[#1B7691] text-sm font-medium hover:gap-2 transition-all cursor-pointer'>
+                  Pelajari <FaArrowRightLong className='text-xs' />
+                </span>
+              </div>
+
+              {/* Card 2 - Dreamshub */}
+              <div
+                className='bg-white rounded-2xl p-6 md:p-8 border border-gray-200 hover:border-[#FB991A]/30 hover:shadow-lg transition-all duration-300'
+                data-aos='fade-up'
+                data-aos-delay='100'
+              >
+                <div className='w-14 h-14 rounded-xl bg-[#FB991A] flex items-center justify-center mb-5'>
+                  <svg className='w-7 h-7 text-white' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                    <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={1.5} d='M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z' />
+                  </svg>
+                </div>
+                <span className='text-[#FB991A] text-xs font-medium bg-[#FB991A]/10 px-2 py-1 rounded'>Forum</span>
+                <Typography className='text-xl font-bold text-gray-900 mt-3 mb-2'>
+                  Dreamshub
+                </Typography>
+                <Typography className='text-gray-600 text-sm leading-relaxed mb-4'>
+                  Komunitas eksklusif untuk konsultasi langsung dengan mentor dan awardee. Dapat feedback real dan tips praktis.
+                </Typography>
+                <span className='inline-flex items-center gap-1 text-[#FB991A] text-sm font-medium hover:gap-2 transition-all cursor-pointer'>
+                  Gabung <FaArrowRightLong className='text-xs' />
+                </span>
+              </div>
+
+              {/* Card 3 - BISA Learning */}
+              <div
+                className='bg-white rounded-2xl p-6 md:p-8 border border-gray-200 hover:border-[#1B7691]/30 hover:shadow-lg transition-all duration-300'
+                data-aos='fade-up'
+                data-aos-delay='200'
+              >
+                <div className='w-14 h-14 rounded-xl bg-[#1B7691] flex items-center justify-center mb-5'>
+                  <svg className='w-7 h-7 text-white' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                    <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={1.5} d='M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253' />
+                  </svg>
+                </div>
+                <span className='text-[#1B7691] text-xs font-medium bg-[#1B7691]/10 px-2 py-1 rounded'>Video & E-book</span>
+                <Typography className='text-xl font-bold text-gray-900 mt-3 mb-2'>
+                  BISA Learning
+                </Typography>
+                <Typography className='text-gray-600 text-sm leading-relaxed mb-4'>
+                  Akses ratusan video tutorial dan e-book persiapan beasiswa. Dari CV, motivation letter, hingga interview.
+                </Typography>
+                <span className='inline-flex items-center gap-1 text-[#1B7691] text-sm font-medium hover:gap-2 transition-all cursor-pointer'>
+                  Akses <FaArrowRightLong className='text-xs' />
+                </span>
+              </div>
+            </div>
+
+            {/* Bottom CTA */}
+            <div className='text-center mt-14 md:mt-20' data-aos='fade-up'>
+              <div className='inline-flex flex-col sm:flex-row items-center gap-4 p-6 md:p-8 bg-gradient-to-r from-[#1B7691] to-[#0d5a6e] rounded-2xl'>
+                <div className='text-white text-center sm:text-left'>
+                  <Typography className='text-lg md:text-xl font-bold mb-1'>
+                    Akses Semua Fitur dengan BISA Membership
+                  </Typography>
+                  <Typography className='text-white/80 text-sm'>
+                    Satu langganan untuk Scholra, Dreamshub, dan BISA Learning
+                  </Typography>
+                </div>
+                <ButtonLink
+                  href='https://raihasa.myr.id/bundling'
+                  variant='unstyled'
+                  className='flex-shrink-0'
+                >
+                  <div className='px-6 py-3 text-sm md:text-base font-bold text-[#1B7691] bg-white rounded-full hover:bg-gray-100 transition-colors'>
+                    Daftar Sekarang
+                  </div>
+                </ButtonLink>
+              </div>
             </div>
           </div>
-
-          <NextImage
-            src={'/images/landing/uvp-b.png'}
-            width={1260}
-            height={104}
-            alt='UVP Background'
-            className='relative bottom-0 z-10 w-full'
-            data-aos='zoom-in-up'
-          />
         </section>
 
         <section className='relative pb-[500px] lg:pb-0 lg:min-h-screen'>
@@ -337,7 +526,7 @@ export default function Home() {
                   </Typography>
                 </div>
                 <Typography className='text-[8px] sm:text-[10px] md:text-xl text-[#1B7691] text-center'>
-                  <b>Universitas</b> di
+                  <b>Universitas</b> di Indonesia
                 </Typography>
               </div>
             </div>
@@ -509,29 +698,110 @@ export default function Home() {
             </div>
           </div>
         </section> */}
-        <section>
-          <div className='bg-[#FB991A] '>
-            <div className='py-6 md:py-5 bg-primary-blue -rotate-[1.25deg] flex justify-center items-center w-full'>
-              <SparklesText
-                data-aos='fade-up'
-                className='!text-white !text-center md:text-[48px] md:leading-[64px]'
-                text='Partner yang telah Berkolaborasi'
-              />
+        <section className='bg-white py-16 md:py-24 overflow-hidden border-t border-gray-100'>
+
+          {/* SECTION 1: AS SEEN ON (Static, Premium, Trusted) */}
+          <div className='container mx-auto px-4 mb-20 text-center' data-aos='fade-up'>
+            <div className='inline-block py-2 px-6 bg-blue-50/50 rounded-full mb-6 border border-blue-100'>
+              <Typography className='text-[#1B7691] font-bold uppercase tracking-widest text-xs md:text-sm'>
+                AS SEEN ON
+              </Typography>
+            </div>
+
+            {/* Main Sponsors Grid - Balanced Layout with Safe Margins */}
+            <div className='flex flex-wrap items-center justify-center gap-12 md:gap-20 pt-10 pb-10'>
+              {sponsorList.filter(s =>
+                s.alt.toLowerCase().includes('kemendik') ||
+                s.alt.toLowerCase().includes('puspresnas') ||
+                s.alt.toLowerCase().includes('pertamuda')
+              ).map((sponsor, idx) => (
+                <div key={idx} className='relative w-[220px] h-[120px] md:w-[260px] md:h-[140px] flex items-center justify-center group select-none'>
+                  <NextImage
+                    src={sponsor.src}
+                    width={260}
+                    height={140}
+                    alt={sponsor.alt}
+                    className='object-contain max-w-full max-h-[100px] md:max-h-[120px] transition-all duration-300 group-hover:scale-105 filter drop-shadow-sm'
+                    draggable={false}
+                  />
+                </div>
+              ))}
             </div>
           </div>
-          <div className='flex flex-wrap justify-center pt-5 pb-20 mt-10 max-lg:px-4 md:grid-cols-3 gap-x-6 gap-y-10'>
-            {Sponsor.map((img, index) => (
-              <div
-                data-aos='fade-right'
-                data-aos-delay={400 * (index + 1)}
-                key={index}
-                className='flex flex-col items-center justify-center gap-4'
-              >
-                <NextImage {...img} className='' />
-                <Typography>{img.alt}</Typography>
+
+          {/* SECTION 2: COMMUNITY PARTNERS (Marquee) */}
+          <div className='pt-16 border-t border-gray-50' data-aos='fade-up' data-aos-delay='200'>
+            <div className='text-center mb-10'>
+              <Typography className='text-gray-400 font-medium uppercase tracking-widest text-xs'>
+                Berkolaborasi dengan Komunitas
+              </Typography>
+            </div>
+
+            <div className='relative w-full overflow-hidden hover:pause-animation py-6'>
+              {/* Gradient Overlays */}
+              <div className='absolute top-0 left-0 z-10 h-full w-[50px] md:w-[200px] bg-gradient-to-r from-white to-transparent pointer-events-none'></div>
+              <div className='absolute top-0 right-0 z-10 h-full w-[50px] md:w-[200px] bg-gradient-to-l from-white to-transparent pointer-events-none'></div>
+
+              <div className='flex animate-marquee w-fit items-center gap-0 whitespace-nowrap px-10 py-4'>
+                {/* Render helper function for marquee list */}
+                {[0, 1].map((round) => (
+                  <React.Fragment key={round}>
+                    {sponsorList.filter(s =>
+                      !s.alt.toLowerCase().includes('kemendik') &&
+                      !s.alt.toLowerCase().includes('puspresnas') &&
+                      !s.alt.toLowerCase().includes('pertamuda')
+                    ).map((sponsor, idx) => (
+                      <div
+                        key={`partner-${round}-${idx}`}
+                        className='relative group w-[180px] h-[100px] shrink-0 flex flex-col items-center justify-center select-none'
+                      >
+                        <div className="w-[140px] h-[70px] flex items-center justify-center transition-all duration-300 grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110">
+                          <NextImage
+                            src={sponsor.src}
+                            width={140}
+                            height={70}
+                            alt={sponsor.alt}
+                            className='object-contain max-w-[120px] max-h-[60px]'
+                            draggable={false}
+                          />
+                        </div>
+
+                        {/* Hover Name Label */}
+                        <div className='h-6 flex items-end justify-center overflow-visible mt-2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-1 group-hover:translate-y-0'>
+                          <span className='text-[10px] font-bold text-gray-500 bg-gray-50 px-2 py-0.5 rounded border border-gray-100 shadow-sm whitespace-normal text-center leading-tight max-w-[160px]'>
+                            {sponsor.alt}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </React.Fragment>
+                ))}
               </div>
-            ))}
+            </div>
           </div>
+
+          <style jsx global>{`
+            /* Global Image Protection for Landing Page */
+            section img {
+               pointer-events: none !important;
+               user-select: none !important;
+               -webkit-user-drag: none !important;
+               -webkit-touch-callout: none !important;
+            }
+
+            @keyframes marquee {
+              0% { transform: translateX(0); }
+              100% { transform: translateX(-50%); }
+            }
+            .animate-marquee {
+              display: flex;
+              width: max-content;
+              animation: marquee 60s linear infinite;
+            }
+            .hover\\:pause-animation:hover .animate-marquee {
+              animation-play-state: paused;
+            }
+          `}</style>
         </section>
       </main>
     </Layout>

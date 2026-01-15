@@ -65,7 +65,7 @@ function JourneyPage() {
         setIsLoading(false);
       } catch (err) {
         // eslint-disable-next-line no-console
-        console.log(err);
+        // console.log(err);
         setIsLoading(false);
       }
     };

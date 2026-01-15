@@ -104,9 +104,9 @@ export default function Chatbox({ onRecommendation }: ChatboxProps) {
   const handleOptionSelect = (option: string) => {
     const currentQuestion = questionFlow[currentQuestionIndex];
     setUserData(prev => ({ ...prev, [currentQuestion.id as keyof UserData]: option }));
-    
+
     addMessage(option, 'user');
-    
+
     if (currentQuestionIndex < questionFlow.length - 1) {
       const nextQuestion = questionFlow[currentQuestionIndex + 1];
       addMessage(nextQuestion.question, 'bot');
@@ -121,13 +121,13 @@ export default function Chatbox({ onRecommendation }: ChatboxProps) {
 
   const handleTextSubmit = (text: string) => {
     if (!text.trim()) return;
-    
+
     const currentQuestion = questionFlow[currentQuestionIndex];
     setUserData(prev => ({ ...prev, [currentQuestion.id as keyof UserData]: text }));
-    
+
     addMessage(text, 'user');
     setInputValue('');
-    
+
     if (currentQuestionIndex < questionFlow.length - 1) {
       const nextQuestion = questionFlow[currentQuestionIndex + 1];
       addMessage(nextQuestion.question, 'bot');
@@ -146,7 +146,7 @@ export default function Chatbox({ onRecommendation }: ChatboxProps) {
 
   const generateRecommendations = async () => {
     setIsLoading(true);
-    
+
     try {
       // Construct request payload
       const requestData: RekomendasiBeasiswaRequest = {
@@ -166,7 +166,7 @@ export default function Chatbox({ onRecommendation }: ChatboxProps) {
 
       const apiUrl = process.env.NEXT_PUBLIC_BACKEND_API_URL;
       const fullUrl = `${apiUrl}/scholarship/recommend-guest`;
-      
+
       // Debug logging
       // console.log('API URL:', fullUrl);
       // console.log('Request Data:', requestData);
@@ -190,14 +190,14 @@ export default function Chatbox({ onRecommendation }: ChatboxProps) {
 
       const responseData = await response.json();
       // console.log('Full response:', responseData);
-      
+
       // Handle backend API response structure
       if (responseData.code !== 200 || !responseData.status || !responseData.data) {
         throw new Error(`API Error: ${responseData.message || 'Invalid response format'}`);
       }
 
       const data = responseData.data;
-      
+
       // Transform backend data to frontend format
       const transformedRecommendations: ScholarshipRecommendationDisplay[] = data.recommendations.map((rec: any) => ({
         id: rec.id,
@@ -219,17 +219,17 @@ export default function Chatbox({ onRecommendation }: ChatboxProps) {
       // Save to localStorage and redirect to results page
       localStorage.setItem('scholarship_recommendations', JSON.stringify(transformedRecommendations));
       localStorage.setItem('scholarship_search_summary', data.search_summary);
-      
+
       addMessage(`${data.search_summary} Mengarahkan Anda ke halaman hasil...`, 'bot');
-      
+
       // Small delay for better UX
       setTimeout(() => {
         router.push('/scholarship-recommendation/results');
       }, 2000);
-      
+
     } catch (error) {
       // console.error('Error fetching recommendations:', error);
-      
+
       // Show error message with more helpful info
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       addMessage(`Terjadi kesalahan saat mencari rekomendasi: ${errorMessage}. Pastikan backend berjalan di ${process.env.NEXT_PUBLIC_BACKEND_API_URL || 'http://localhost:4000'}`, 'bot');
@@ -269,13 +269,12 @@ export default function Chatbox({ onRecommendation }: ChatboxProps) {
                 <Typography className="text-white text-xs font-medium">AI</Typography>
               </div>
             )}
-            
+
             <div
-              className={`max-w-[75%] px-4 py-3 rounded-2xl ${
-                message.type === 'user'
+              className={`max-w-[75%] px-4 py-3 rounded-2xl ${message.type === 'user'
                   ? 'bg-primary-blue text-white rounded-br-md'
                   : 'bg-gray-50 text-gray-800 rounded-bl-md'
-              }`}
+                }`}
             >
               <Typography className={`text-sm leading-relaxed ${message.type === 'user' ? 'text-white' : 'text-gray-800'}`}>
                 {message.content}
@@ -300,7 +299,7 @@ export default function Chatbox({ onRecommendation }: ChatboxProps) {
             </div>
           </div>
         )}
-        
+
         <div ref={messagesEndRef} />
       </div>
 
@@ -353,8 +352,8 @@ export default function Chatbox({ onRecommendation }: ChatboxProps) {
                 onChange={(e) => setInputValue(e.target.value)}
                 placeholder={
                   currentQuestion.id === 'age' ? 'Masukkan usia Anda...' :
-                  currentQuestion.id === 'gpa' ? 'Masukkan IPK/nilai rata-rata...' :
-                  'Ketik detail tambahan...'
+                    currentQuestion.id === 'gpa' ? 'Masukkan IPK/nilai rata-rata...' :
+                      'Ketik detail tambahan...'
                 }
                 className="flex-1 px-5 py-4 bg-transparent focus:outline-none text-sm placeholder-gray-400"
                 disabled={isLoading}

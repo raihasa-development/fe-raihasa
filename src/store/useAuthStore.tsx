@@ -31,7 +31,7 @@ const useAuthStoreBase = create<AuthStoreType>()(
           produce<AuthStoreType>((state) => {
             state.isAuthenticated = true;
             state.user = user;
-            state.token = user.token; 
+            state.token = user.token;
           })
         );
       },
@@ -57,7 +57,7 @@ const useAuthStoreBase = create<AuthStoreType>()(
     }),
     {
       name: 'auth-store',
-      storage: createJSONStorage(() => sessionStorage),
+      storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         user: state.user,
         token: state.token,

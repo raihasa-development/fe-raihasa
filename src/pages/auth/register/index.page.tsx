@@ -31,14 +31,14 @@ export default function RegisterPage() {
   const router = useRouter();
   const login = useAuthStore.useLogin();
 
-    const {
+  const {
     mutate: registerMutation,
     isPending,
   } = useMutation<void, AxiosError<ApiError>, RegisterForm>({
     mutationFn: async (data: RegisterForm) => {
       const res = await api.post('/auth/register', data);
       // eslint-disable-next-line no-console
-      console.log(res);
+      // console.log(res);
       showToast('Berhasil mendaftar', SUCCESS_TOAST);
 
       // Automatically log in the user after registration
