@@ -69,7 +69,7 @@ export default function Home() {
 
       {/* Floating WhatsApp Button */}
       <a
-        href='https://wa.me/' // Replace with actual number
+        href='https://wa.me/6285117323893?text=Halo%20min%2C%20saya%20tertarik%20dengan%20program%20Scholarship%20Mentoring%20di%20Raih%20Asa.%20Boleh%20minta%20info%20lebih%20lanjut%3F'
         target='_blank'
         rel='noreferrer'
         className='fixed z-[999] bottom-6 right-6 md:bottom-10 md:right-10 flex items-center justify-center w-14 h-14 md:w-16 md:h-16 bg-[#25D366] rounded-full shadow-lg hover:shadow-xl transition-transform hover:scale-110 cursor-pointer'

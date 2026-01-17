@@ -129,7 +129,16 @@ export default function ScholarshipDetailPage() {
 
         const responseData = await response.json();
         let rawData: any;
-        if (responseData.code === 200 && responseData.data) {
+
+        // Debugging structure handling based on user feedback
+        if (responseData.data?.data?.scholarship) {
+          // Case: { data: { data: { scholarship: { ... } } } }
+          rawData = responseData.data.data.scholarship;
+
+          // Merge requirements/benefits from sibling if needed, though they seem to be in scholarship object too based on sample
+          // But let's verify if 'requirement' sibling object has more info not present in 'scholarship'. 
+          // Sample shows 'scholarship' object has most fields including requirements array.
+        } else if (responseData.code === 200 && responseData.data) {
           rawData = responseData.data;
         } else if (responseData.id) {
           rawData = responseData;
@@ -142,23 +151,39 @@ export default function ScholarshipDetailPage() {
         const scholarshipName = rawData.nama || rawData.title || 'Nama Beasiswa Tidak Tersedia';
         const scholarshipType = rawData.jenis || rawData.amount || 'Jenis Pendanaan Tidak Tersedia';
 
-        // Parse dates safely
+        // ... (date parsing logic remains same)
         const openDate = parseIndonesianDate(rawData.open_registration) || new Date();
         const closeDate = parseIndonesianDate(rawData.close_registration) || new Date();
         const formattedEligibility = `Periode Pendaftaran: ${openDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })} - ${closeDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}`;
 
+        // Handle Requirements parsing from string array representation if needed
+        // Sample data shows requirements as: ["['Item 1', 'Item 2']"] (stringified array inside array?) or proper array
+        let parsedRequirements = rawData.persyaratan || rawData.requirements || [];
+        if (Array.isArray(parsedRequirements) && parsedRequirements.length === 1 && typeof parsedRequirements[0] === 'string' && parsedRequirements[0].startsWith('[')) {
+          try {
+            // Fix for weird double stringified array format: ["['Req 1', 'Req 2']"]
+            const innerStr = parsedRequirements[0].replace(/'/g, '"'); // Convert single quotes to double for JSON parse
+            parsedRequirements = JSON.parse(innerStr);
+          } catch (e) {
+            // Fallback if parse fails
+            parsedRequirements = [parsedRequirements[0]];
+          }
+        }
+
         setScholarshipDetail({
           ...rawData,
+          id: rawData.id,
           nama: scholarshipName,
           penyelenggara: providerName,
           jenis: scholarshipType,
-          description: rawData.description || `Program ${scholarshipName} dari ${providerName} ini dirancang untuk mendukung mahasiswa berprestasi.`,
-          requirements: Array.isArray(rawData.requirements) ? rawData.requirements : [
+          description: rawData.benefit || rawData.description || `Program ${scholarshipName} dari ${providerName} ini dirancang untuk mendukung mahasiswa berprestasi.`, // Use benefit as description if description empty? User sample has description: "", but benefit populated.
+          requirements: parsedRequirements.length > 0 ? parsedRequirements : [
             'Mahasiswa aktif / Lulusan baru',
             'Memiliki prestasi akademik baik',
             'Tidak sedang menerima beasiswa lain (kecuali diizinkan)',
             'Sehat jasmani dan rohani'
           ],
+          // ... (rest of the mapping)
           benefits: Array.isArray(rawData.benefits) ? rawData.benefits : [
             'Bantuan Biaya Pendidikan',
             'Uang Saku Bulanan',
@@ -169,12 +194,13 @@ export default function ScholarshipDetailPage() {
             'Transkrip Nilai',
             'Surat Rekomendasi'
           ],
-          applicationUrl: rawData.link || rawData.applicationUrl || '#',
+          applicationUrl: rawData.link_pendaftaran || rawData.applicationUrl || '#',
           eligibility: rawData.eligibility || formattedEligibility,
           open_registration: rawData.open_registration || openDate.toISOString(),
           close_registration: rawData.close_registration || closeDate.toISOString()
         });
 
+        // ... (rest of fetching)
         const scholarshipId = rawData.id;
         await Promise.all([
           fetchWishlistStatus(scholarshipId),
@@ -190,7 +216,7 @@ export default function ScholarshipDetailPage() {
     fetchScholarshipDetail();
   }, [recommendation_id]);
 
-  // Wishlist & Manifestation Handlers...
+  // Wishlist & Manifestation Handlers
   const fetchWishlistStatus = async (beasiswaId: string) => {
     try {
       const token = getAuthToken();
@@ -290,6 +316,25 @@ export default function ScholarshipDetailPage() {
     } catch (e) { alert('Gagal menghapus'); }
   };
 
+  const handleShare = async () => {
+    if (typeof window === 'undefined') return;
+
+    const shareData = {
+      title: scholarshipDetail?.nama || 'Beasiswa Scholra',
+      text: `Cek beasiswa ${scholarshipDetail?.nama} ini di Scholra!`,
+      url: window.location.href,
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(window.location.href);
+        alert('Link disalin ke clipboard!');
+      }
+    } catch (err) { }
+  };
+
   // Rendering
   if (isLoading) {
     return (
@@ -373,7 +418,11 @@ export default function ScholarshipDetailPage() {
                 >
                   <FiHeart className={`w-6 h-6 ${isWishlisted ? 'fill-current' : ''}`} />
                 </button>
-                <button className="p-3 rounded-full bg-white/10 text-white border border-white/20 hover:bg-white/20 transition-all">
+                <button
+                  onClick={handleShare}
+                  className="p-3 rounded-full bg-white/10 text-white border border-white/20 hover:bg-white/20 transition-all"
+                  title="Bagikan"
+                >
                   <FiShare2 className="w-6 h-6" />
                 </button>
               </div>

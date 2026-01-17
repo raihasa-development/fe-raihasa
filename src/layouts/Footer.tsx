@@ -37,7 +37,7 @@ export default function Footer() {
                 <FaInstagram size={18} />
               </a>
               <a
-                href='https://wa.me/'
+                href='https://wa.me/6285117323893?text=Halo%20Admin%20Raih%20Asa%2C%20saya%20ingin%20bertanya%20seputar%20program%20mentoring%20beasiswa.'
                 target='_blank'
                 rel='noreferrer'
                 className='w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors'
@@ -45,13 +45,15 @@ export default function Footer() {
                 <FaWhatsapp size={18} />
               </a>
               <a
-                href='#'
+                href='https://www.linkedin.com/company/raih-asa/'
+                target='_blank'
+                rel='noreferrer'
                 className='w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors'
               >
                 <FaLinkedin size={18} />
               </a>
               <a
-                href='mailto:hello@raihasa.co'
+                href='mailto:raihasa.edu@gmail.com'
                 className='w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors'
               >
                 <HiMail size={18} />
@@ -113,7 +115,7 @@ export default function Footer() {
                 </UnstyledLink>
               </li>
               <li>
-                <a href='https://wa.me/' target='_blank' rel='noreferrer' className='text-white/70 hover:text-white text-sm transition-colors'>
+                <a href='https://wa.me/6285117323893?text=Halo%20Admin%20Raih%20Asa%2C%20saya%20butuh%20bantuan.' target='_blank' rel='noreferrer' className='text-white/70 hover:text-white text-sm transition-colors'>
                   Hubungi Kami
                 </a>
               </li>
