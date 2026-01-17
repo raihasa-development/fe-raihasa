@@ -13,6 +13,7 @@ import Typography from '@/components/Typography';
 import Layout from '@/layouts/Layout';
 import { forumApi } from '@/lib/api/forum';
 import type { ForumPost, ForumComment } from '@/types/forum';
+import { Linkify } from '@/components/Linkify';
 
 // Helper: Format Time
 const formatTimestamp = (dateString: string) => {
@@ -34,7 +35,7 @@ export default function PostDetailPage() {
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const [userTokens, setUserTokens] = useState<number | null>(null);
-    const [currentUser, setCurrentUser] = useState<{ id: string, name: string } | null>(null);
+    const [currentUser, setCurrentUser] = useState<{ id: string, name: string, role?: string } | null>(null);
 
     // Helper: Get Auth
     const getAuthToken = () => {
@@ -47,7 +48,11 @@ export default function PostDetailPage() {
         if (!token) return null;
         try {
             const payload = JSON.parse(atob(token.split('.')[1]));
-            return { id: payload.id, name: payload.name || payload.username || 'User' };
+            return {
+                id: payload.id,
+                name: payload.name || payload.username || 'User',
+                role: payload.role
+            };
         } catch (e) { return null; }
     }
 
@@ -58,13 +63,12 @@ export default function PostDetailPage() {
 
         try {
             const token = getAuthToken();
-            const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/posts/tokens/${user.id}`, {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/posts/tokens/me`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (res.ok) {
                 const json = await res.json();
-                // Asumsi response format { data: { token: 5 } } atau { token: 5 }
-                const count = json.data?.token ?? json.data ?? json.token ?? 0;
+                const count = json.data?.forum_tokens ?? 0;
                 setUserTokens(Number(count));
             }
         } catch (e) { console.error('Token fetch error', e); }
@@ -132,6 +136,16 @@ export default function PostDetailPage() {
         }
     };
 
+    const handleDeleteComment = async (commentId: string) => {
+        if (!confirm('Apakah Anda yakin ingin menghapus komentar ini?')) return;
+        try {
+            await forumApi.deleteComment(commentId);
+            fetchPost();
+        } catch (error: any) {
+            alert(error.message || 'Gagal menghapus komentar');
+        }
+    };
+
     if (isLoading) {
         return (
             <Layout withNavbar={true} withFooter={true}>
@@ -196,8 +210,8 @@ export default function PostDetailPage() {
                         </div>
 
                         <div className="p-8 md:p-10">
-                            <div className="prose max-w-none text-gray-700 leading-relaxed text-lg">
-                                <p className="whitespace-pre-wrap">{post.content}</p>
+                            <div className="prose max-w-none text-gray-700 leading-relaxed text-lg whitespace-pre-wrap">
+                                <Linkify>{post.content}</Linkify>
                             </div>
                         </div>
 
@@ -264,19 +278,33 @@ export default function PostDetailPage() {
                         </div>
 
                         {/* Comment List */}
-                        <div className="space-y-8">
-                            {comments.map((comment, index) => (
-                                <div key={comment.id || index} className="flex gap-4">
+                        {comments.map((comment, index) => {
+                            const isCommentOwner = currentUser?.id === comment.author?.id || currentUser?.id === comment.author_id;
+                            return (
+                                <div key={comment.id || index} className="flex gap-4 group">
                                     <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 shrink-0">
                                         <FiUser />
                                     </div>
                                     <div className="flex-1">
-                                        <div className="bg-gray-50 p-5 rounded-2xl rounded-tl-none">
+                                        <div className="bg-gray-50 p-5 rounded-2xl rounded-tl-none relative">
                                             <div className="flex items-center justify-between mb-2">
                                                 <span className="font-bold text-gray-900">{comment.author?.name || 'User'}</span>
-                                                <span className="text-xs text-gray-400">{formatTimestamp(comment.created_at)}</span>
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-xs text-gray-400">{formatTimestamp(comment.created_at)}</span>
+                                                    {isCommentOwner && (
+                                                        <button
+                                                            onClick={() => handleDeleteComment(comment.id)}
+                                                            className="text-gray-400 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
+                                                            title="Hapus Komentar"
+                                                        >
+                                                            <FiTrash2 />
+                                                        </button>
+                                                    )}
+                                                </div>
                                             </div>
-                                            <p className="text-gray-700 leading-relaxed">{comment.content}</p>
+                                            <div className="text-gray-700 leading-relaxed">
+                                                <Linkify>{comment.content}</Linkify>
+                                            </div>
                                         </div>
                                         <div className="flex gap-4 mt-2 px-2 text-sm text-gray-500">
                                             <button className="hover:text-[#1B7691]">Suka</button>
@@ -284,13 +312,12 @@ export default function PostDetailPage() {
                                         </div>
                                     </div>
                                 </div>
-                            ))}
-                            {comments.length === 0 && (
-                                <p className="text-center text-gray-400 py-4">Belum ada komentar. Jadilah yang pertama berkomentar!</p>
-                            )}
-                        </div>
+                            );
+                        })}
+                        {comments.length === 0 && (
+                            <p className="text-center text-gray-400 py-4">Belum ada komentar. Jadilah yang pertama berkomentar!</p>
+                        )}
                     </div>
-
                 </div>
             </main>
         </Layout>

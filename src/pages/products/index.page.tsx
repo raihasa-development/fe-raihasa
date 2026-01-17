@@ -71,45 +71,51 @@ const checkAuthentication = (): boolean => {
 // Hardcoded product catalog matching the image
 const PRODUCT_CATALOG = [
   {
-    id: 'new-card',
-    nama: 'New Card',
-    harga: 49000,
-    deskripsi: 'Perfect untuk kamu yang baru mulai perjalanan beasiswa',
+    id: 'b02758b1-925f-4522-8385-79e69e3c8d86',
+    nama: 'GO Plan',
+    harga: 1000,
+    deskripsi: 'Start your journey with essential tools',
     jenis: 'basic',
     masa_aktif: 3,
     features: [
       'Akses Video dan berkas',
+      'Ebook Roadmap Kuliah',
+      'E-Learning Videos (LN & DN)',
+      'Monthly Live Class',
       '5x Dreamshub Consultation',
     ],
-    tag: 'Untuk Pemula'
+    tag: 'Best Starter'
   },
   {
-    id: 'ideal-plan',
-    nama: 'Ideal Plan',
-    harga: 169000,
+    id: 'a5edc065-212f-4ee7-afb3-8481ad577479',
+    nama: 'PRO Plan',
+    harga: 2000,
     deskripsi: 'Paket lengkap untuk persiapan beasiswa yang serius',
     jenis: 'ideal',
     masa_aktif: 12,
     features: [
-      'Akses Video dan berkas',
+      'Semua Fitur GO Plan',
+      'Akses Video dan berkas Premium',
+      'Ebook Roadmap Kuliah Lengkap',
+      'Monthly Exclusive Class',
       '10x Dreamshub Consultation',
     ],
-    tag: 'Paling Populer',
+    tag: 'Most Popular',
     isPopular: true
   },
   {
     id: 'private',
-    nama: 'Private Consultation',
+    nama: 'Bisnis / Partner',
     harga: 0,
-    deskripsi: 'Konsultasi pribadi langsung via WhatsApp',
+    deskripsi: 'Solusi untuk Sekolah, Yayasan/Enterprise, atau Orang Tua',
     jenis: 'private',
     masa_aktif: 0,
     features: [
-      'Private consultation: DM WA',
-      'Jadwal fleksibel',
-      'Bimbingan personal 1-on-1',
+      'For Enterprise & Parents',
+      'Recommended for School Partnership',
+      'Konsultasi intensif & personal',
     ],
-    tag: 'Premium',
+    tag: 'Exclusive',
     isPremium: true
   }
 ];
@@ -133,7 +139,7 @@ export default function ProductsPage() {
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    Aos.init({ once: true });
+    Aos.init({ once: true, duration: 800 });
     setIsMounted(true);
   }, []);
 
@@ -165,13 +171,10 @@ export default function ProductsPage() {
     queryKey: ['products'],
     queryFn: async () => {
       try {
-        // Use /products/lms endpoint (note: plural 'products')
         const response = await api.get<{ data: any[] }>('/products/lms');
-
-        // Transform backend data to match our ProductData type
         const transformed: ProductData[] = response.data.data.map((p: any) => ({
           id: p.id,
-          nama: p.name, // Backend uses 'name'
+          nama: p.name,
           harga: p.harga,
           deskripsi: p.PaketLMS?.[0]?.deskripsi || p.deskripsi || '',
           jenis: p.PaketLMS?.[0]?.name || p.name || '',
@@ -181,11 +184,8 @@ export default function ProductsPage() {
           isPopular: p.isPopular,
           isPremium: p.isPremium,
         }));
-
-        // console.log('📦 Products loaded from API:', transformed);
         return transformed;
       } catch (error) {
-        // console.warn('⚠️ Failed to fetch products, using hardcoded data');
         return null;
       }
     },
@@ -193,13 +193,14 @@ export default function ProductsPage() {
     staleTime: 5 * 60 * 1000,
   });
 
-  // Use API data if available, otherwise use hardcoded
-  const products = productsData || PRODUCT_CATALOG;
+  // Use API data if available, otherwise fallback to local catalog
+  // IMPORTANT: Check length > 0 to handle cases where API returns empty array []
+  const products = productsData && productsData.length > 0 ? productsData : PRODUCT_CATALOG;
 
   const handleSelectProduct = (productId: string, isPremium?: boolean) => {
     if (isPremium) {
-      // Redirect to WhatsApp for private consultation
-      window.open('https://wa.me/YOUR_WHATSAPP_NUMBER?text=Halo, saya tertarik dengan Private Consultation', '_blank');
+      const message = encodeURIComponent("Halo Admin Raih Asa, saya tertarik untuk paket Bisnis/Partner (Enterprise/Parents). Boleh minta info lebih lanjut?");
+      window.open(`https://wa.me/6285117323893?text=${message}`, '_blank');
       return;
     }
 
@@ -207,150 +208,107 @@ export default function ProductsPage() {
       router.push(`/login?redirect=/payment/checkout?productId=${productId}`);
       return;
     }
-
-    // Langsung ke checkout page (no form needed)
     router.push(`/payment/checkout?productId=${productId}`);
   };
 
   return (
     <Layout withNavbar={true} withFooter={true}>
-      <SEO title="Choose Your Plan | Raihasa" />
-      <main className="overflow-hidden">
+      <SEO title="Membership Plans | Raihasa" />
+      <main className="min-h-screen bg-[#FAFAFA] relative overflow-hidden font-poppins">
+
+        {/* Background Decorative Elements */}
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-orange-100 rounded-full blur-[100px] opacity-50 -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-red-50 rounded-full blur-[100px] opacity-40 translate-y-1/2 -translate-x-1/2 pointer-events-none" />
+
         {/* Hero Section */}
-        <section className='pt-20 mt-20 lg:pt-32 lg:mt-0'>
-          <div className='layout'>
-            <div
-              className='w-full text-center bg-gradient-to-r from-[#FB991A] to-[#C0172A] py-5 lg:py-8 shadow-header rounded-lg'
-              data-aos='fade-up'
-            >
-              <Typography variant="h1" weight="bold" className="text-white text-shadow-xl text-2xl lg:text-5xl">
-                Pilih Paket Anda
-              </Typography>
-              <Typography className="text-white mt-2 text-sm lg:text-base">
-                Mulai perjalanan beasiswamu dengan paket yang sesuai kebutuhanmu
-              </Typography>
-            </div>
+        <section className="pt-32 pb-12 px-4 relative z-10">
+          <div className="max-w-4xl mx-auto text-center" data-aos="fade-up">
+            <span className="inline-block py-1 px-3 rounded-full bg-orange-100 text-[#FB991A] text-sm font-semibold tracking-wide mb-4 border border-orange-200">
+              MEMBERSHIP PLANS
+            </span>
+            <Typography variant="h1" weight="bold" className="text-4xl md:text-5xl lg:text-6xl text-gray-900 mb-6 leading-tight">
+              Investasi Terbaik untuk <br />
+              <span className="bg-gradient-to-r from-[#FB991A] to-[#DB4B24] bg-clip-text text-transparent">Masa Depanmu</span>
+            </Typography>
+            <Typography className="text-gray-600 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
+              Pilih paket yang sesuai dengan kebutuhan belajarmu. Akses materi eksklusif, mentoring, dan komunitas ambis.
+            </Typography>
           </div>
         </section>
 
         {/* Pricing Cards Section */}
-        <section className='py-12 lg:py-24'>
-          <div className="layout">
-            <div className="grid lg:grid-cols-3 gap-6 lg:gap-8 max-w-7xl mx-auto">
+        <section className="py-12 px-4 relative z-10">
+          <div className="max-w-7xl mx-auto">
+            <div className="grid lg:grid-cols-3 gap-8 items-start">
               {products.map((product, index) => (
                 <div
                   key={product.id}
-                  data-aos='fade-up'
+                  data-aos="fade-up"
                   data-aos-delay={index * 100}
-                  className={`group relative bg-white rounded-2xl border-2 transition-all duration-300 overflow-hidden ${product.isPopular
-                      ? 'border-[#FB991A] shadow-xl hover:shadow-2xl hover:-translate-y-2'
-                      : 'border-gray-200 hover:border-[#FB991A]/50 hover:shadow-xl hover:-translate-y-1'
+                  className={`relative p-8 rounded-[2rem] transition-all duration-300 ${product.isPopular
+                    ? 'bg-white shadow-2xl border-2 border-[#FB991A] lg:-mt-8 lg:p-10 z-20'
+                    : 'bg-white/80 backdrop-blur-sm shadow-xl border border-gray-100 hover:shadow-2xl hover:bg-white'
                     }`}
                 >
-                  {/* Gradient Accent Line */}
-                  <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#FB991A] to-[#C0172A] transition-all duration-300 ${product.isPopular ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
-                    }`} />
-
-                  {/* Background Pattern */}
-                  <div className="absolute inset-0 opacity-0 group-hover:opacity-5 transition-opacity duration-300">
-                    <div className="absolute inset-0 bg-gradient-to-br from-[#FB991A] to-[#C0172A]" />
-                  </div>
-
-                  {/* Popular Badge */}
                   {product.isPopular && (
-                    <div className="absolute left-1/2 transform -translate-x-1/2 z-50">
-                      <span className="bg-gradient-to-r from-[#FB991A] to-[#C0172A] text-white px-4 py-1.5 rounded-full text-sm font-bold shadow-lg">
-                        {product.tag}
-                      </span>
+                    <div className="absolute top-0 right-0 bg-gradient-to-r from-[#FB991A] to-[#DB4B24] text-white text-xs font-bold px-4 py-1 rounded-bl-xl rounded-tr-[1.8rem] shadow-lg">
+                      MOST POPULAR
                     </div>
                   )}
 
-                  <div className="relative p-6 lg:p-8">
-                    {/* Header */}
-                    <div className="mb-6">
-                      {!product.isPopular && product.tag && (
-                        <span className="inline-block text-xs font-bold text-[#FB991A] uppercase tracking-wider bg-orange-50 px-3 py-1 rounded-full mb-3">
-                          {product.tag}
-                        </span>
-                      )}
-                      <Typography variant="h3" weight="bold" className="text-gray-900 mt-2 mb-2 text-xl lg:text-2xl group-hover:text-[#C0172A] transition-colors duration-300">
-                        {product.nama}
+                  {/* Header */}
+                  <div className="mb-6">
+                    <Typography weight="bold" className={`text-lg mb-2 ${product.isPopular ? 'text-[#FB991A]' : 'text-gray-500'}`}>
+                      {product.nama}
+                    </Typography>
+
+                    {product.isPremium ? (
+                      <Typography variant="h2" weight="bold" className="text-3xl md:text-4xl text-gray-900 mb-2">
+                        Hubungi Kami
                       </Typography>
-                      <Typography className="text-gray-600 text-sm leading-relaxed">
-                        {product.deskripsi}
-                      </Typography>
-                    </div>
+                    ) : (
+                      <div className="flex items-baseline gap-1">
+                        <Typography variant="h2" weight="bold" className="text-4xl md:text-5xl text-gray-900">
+                          Rp{product.harga.toLocaleString('id-ID').replace(',', '.')}
+                        </Typography>
+                        <span className="text-gray-400 font-medium">/{product.masa_aktif}bln</span>
+                      </div>
+                    )}
 
-                    {/* Pricing with animation */}
-                    <div className="mb-6 pb-6 border-b-2 border-gray-100 group-hover:border-[#FB991A]/20 transition-colors duration-300">
-                      {product.isPremium ? (
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 rounded-full bg-gradient-to-r from-[#FB991A] to-[#C0172A] animate-pulse" />
-                            <Typography variant="h2" weight="bold" className="bg-gradient-to-r from-[#FB991A] to-[#C0172A] bg-clip-text text-transparent text-2xl lg:text-3xl">
-                              Hubungi Kami
-                            </Typography>
-                          </div>
-                          <Typography className="text-sm text-gray-500 ml-4">
-                            Konsultasi personal langsung
-                          </Typography>
-                        </div>
-                      ) : (
-                        <div className="relative">
-                          <div className="flex items-baseline gap-1 mb-1">
-                            <Typography variant="h2" weight="bold" className="text-gray-900 text-2xl lg:text-3xl group-hover:scale-110 transition-transform duration-300 inline-block">
-                              Rp{product.harga.toLocaleString('id-ID')}
-                            </Typography>
-                          </div>
-                          <Typography className="text-sm text-gray-500">
-                            untuk {product.masa_aktif} bulan akses
-                          </Typography>
-                          {/* Price underline animation */}
-                          <div className="h-0.5 bg-gradient-to-r from-[#FB991A] to-[#C0172A] w-0 group-hover:w-full transition-all duration-500 mt-2" />
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Features with staggered animation */}
-                    <div className="mb-8 space-y-3">
-                      {product.features?.map((feature, idx) => (
-                        <div
-                          key={idx}
-                          className="flex items-start gap-3 group/item hover:translate-x-1 transition-transform duration-200"
-                          style={{ transitionDelay: `${idx * 50}ms` }}
-                        >
-                          <div className="relative flex-shrink-0">
-                            <FiCheck className="text-[#FB991A] w-5 h-5 mt-0.5 relative z-10" />
-                            <div className="absolute inset-0 bg-orange-100 rounded-full scale-0 group-hover/item:scale-150 transition-transform duration-300 opacity-50" />
-                          </div>
-                          <Typography className="text-sm text-gray-700 leading-snug group-hover/item:text-gray-900 transition-colors duration-200">
-                            {feature}
-                          </Typography>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* CTA Button with gradient hover */}
-                    <button
-                      onClick={() => handleSelectProduct(product.id, product.isPremium)}
-                      className={`relative w-full py-3 px-4 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 text-sm overflow-hidden group/btn ${product.isPopular
-                          ? 'bg-gradient-to-r from-[#FB991A] to-[#C0172A] text-white shadow-lg hover:shadow-xl'
-                          : 'bg-gray-900 text-white hover:bg-gradient-to-r hover:from-[#FB991A] hover:to-[#C0172A]'
-                        }`}
-                    >
-                      {/* Button shine effect */}
-                      <div className="absolute inset-0 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-
-                      <span className="relative z-10">
-                        {isAuthenticated || product.isPremium ? 'Pilih Paket' : 'Login untuk Beli'}
-                      </span>
-                      <FiArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform duration-300 relative z-10" />
-                    </button>
-
-                    {/* Corner decoration */}
-                    <div className={`absolute bottom-0 right-0 w-20 h-20 bg-gradient-to-tl from-[#FB991A]/10 to-transparent rounded-tl-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${product.isPopular ? 'opacity-50' : ''
-                      }`} />
+                    <Typography className="text-gray-500 mt-3 text-sm leading-relaxed">
+                      {product.deskripsi}
+                    </Typography>
                   </div>
+
+                  {/* Divider */}
+                  <div className="h-px w-full bg-gray-100 mb-6" />
+
+                  {/* Features */}
+                  <ul className="space-y-4 mb-8">
+                    {product.features?.map((feature, idx) => (
+                      <li key={idx} className="flex items-start gap-3">
+                        <div className={`mt-0.5 w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 ${product.isPopular ? 'bg-orange-100 text-[#FB991A]' : 'bg-gray-100 text-gray-600'
+                          }`}>
+                          <FiCheck className="w-3 h-3" />
+                        </div>
+                        <span className="text-gray-700 text-sm font-medium leading-snug">
+                          {feature}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  {/* Action Button */}
+                  <button
+                    onClick={() => handleSelectProduct(product.id, product.isPremium)}
+                    className={`w-full py-4 rounded-xl font-bold text-sm transition-all duration-300 flex items-center justify-center gap-2 ${product.isPopular
+                      ? 'bg-gradient-to-r from-[#FB991A] to-[#DB4B24] text-white shadow-lg hover:shadow-orange-500/30 hover:scale-[1.02]'
+                      : 'bg-white border-2 border-gray-100 text-gray-700 hover:border-[#FB991A] hover:text-[#FB991A] hover:bg-orange-50'
+                      }`}
+                  >
+                    {isAuthenticated || product.isPremium ? 'Pilih Paket Ini' : 'Login untuk Membeli'}
+                    <FiArrowRight className="w-4 h-4" />
+                  </button>
                 </div>
               ))}
             </div>
@@ -358,87 +316,53 @@ export default function ProductsPage() {
         </section>
 
         {/* Comparison Table Section */}
-        <section className='py-12 lg:py-24 bg-gradient-to-b from-gray-50 to-white'>
+        <section className='py-16 md:py-24 bg-white relative z-10'>
           <div className="layout">
-            <div className="text-center mb-8 lg:mb-12" data-aos='fade-up'>
-              <Typography variant="h2" weight="bold" className="text-gray-900 mb-2 text-2xl lg:text-4xl">
-                Perbandingan Paket
+            <div className="text-center mb-12" data-aos='fade-up'>
+              <Typography variant="h2" weight="bold" className="text-3xl md:text-4xl text-gray-900 mb-3">
+                Bandingkan Fitur
               </Typography>
-              <Typography className="text-gray-600 text-sm lg:text-base">
-                Lihat detail lengkap untuk memilih yang terbaik
+              <Typography className="text-gray-500">
+                Detail lengkap fitur yang akan kamu dapatkan
               </Typography>
             </div>
 
-            <div className="bg-white rounded-2xl border-2 border-gray-200 overflow-hidden shadow-xl hover:shadow-2xl transition-shadow duration-300 max-w-5xl mx-auto" data-aos='fade-up' data-aos-delay='200'>
-              {/* Gradient top border */}
-              <div className="h-1 bg-gradient-to-r from-[#FB991A] to-[#C0172A]" />
-
+            <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden max-w-5xl mx-auto" data-aos='fade-up'>
+              {/* Custom Responsive Table Wrapper */}
               <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead className="bg-gradient-to-r from-gray-50 to-orange-50/30 border-b-2 border-gray-200">
-                    <tr>
-                      <th className="px-4 lg:px-6 py-4 text-left font-bold text-gray-900">
-                        Fitur
-                      </th>
-                      <th className="px-4 lg:px-6 py-4 text-center font-bold text-gray-900">
-                        New Card
-                      </th>
-                      <th className="px-4 lg:px-6 py-4 text-center font-bold text-white bg-gradient-to-r from-[#FB991A] to-[#C0172A]">
-                        Ideal Plan
-                      </th>
-                      <th className="px-4 lg:px-6 py-4 text-center font-bold text-gray-900">
-                        Private
-                      </th>
+                <table className="w-full text-sm text-left">
+                  <thead>
+                    <tr className="bg-gray-50 border-b border-gray-100">
+                      <th className="px-6 py-5 font-bold text-gray-900 w-1/3">Fitur Utama</th>
+                      <th className="px-6 py-5 font-bold text-gray-900 text-center w-1/5">GO Plan</th>
+                      <th className="px-6 py-5 font-bold text-[#FB991A] text-center w-1/5 bg-orange-50">PRO Plan</th>
+                      <th className="px-6 py-5 font-bold text-gray-900 text-center w-1/5">Partner</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
-                    <tr className="hover:bg-orange-50/30 transition-colors duration-200">
-                      <td className="px-4 lg:px-6 py-4 text-gray-700 font-medium">Akses Video & Berkas</td>
-                      <td className="px-4 lg:px-6 py-4 text-center">
-                        <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-green-100">
-                          <FiCheck className="w-5 h-5 text-green-600" />
-                        </div>
-                      </td>
-                      <td className="px-4 lg:px-6 py-4 text-center bg-orange-50/50">
-                        <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-[#FB991A]/20">
-                          <FiCheck className="w-5 h-5 text-[#C0172A]" />
-                        </div>
-                      </td>
-                      <td className="px-4 lg:px-6 py-4 text-center">
-                        <span className="text-gray-300 text-lg">—</span>
-                      </td>
+                    <tr className="hover:bg-gray-50 transition-colors">
+                      <td className="px-6 py-4 font-medium text-gray-700">Akses Video & Berkas</td>
+                      <td className="px-6 py-4 text-center"><FiCheck className="mx-auto text-green-500" /></td>
+                      <td className="px-6 py-4 text-center bg-orange-50/30"><FiCheck className="mx-auto text-[#FB991A]" /></td>
+                      <td className="px-6 py-4 text-center"><span className="text-gray-300">-</span></td>
                     </tr>
-                    <tr className="hover:bg-orange-50/30 transition-colors duration-200">
-                      <td className="px-4 lg:px-6 py-4 text-gray-700 font-medium">Dreamshub Consultation</td>
-                      <td className="px-4 lg:px-6 py-4 text-center">
-                        <span className="inline-block px-3 py-1 bg-blue-100 text-blue-700 rounded-full font-semibold text-xs">5x</span>
-                      </td>
-                      <td className="px-4 lg:px-6 py-4 text-center bg-orange-50/50">
-                        <span className="inline-block px-3 py-1 bg-gradient-to-r from-[#FB991A] to-[#C0172A] text-white rounded-full font-bold text-xs shadow-md">10x</span>
-                      </td>
-                      <td className="px-4 lg:px-6 py-4 text-center">
-                        <span className="inline-block px-3 py-1 bg-green-100 text-green-700 rounded-full font-semibold text-xs">Unlimited</span>
-                      </td>
+                    <tr className="hover:bg-gray-50 transition-colors">
+                      <td className="px-6 py-4 font-medium text-gray-700">Dreamshub Consultation</td>
+                      <td className="px-6 py-4 text-center font-bold text-gray-900">5x</td>
+                      <td className="px-6 py-4 text-center font-bold text-[#FB991A] bg-orange-50/30">10x</td>
+                      <td className="px-6 py-4 text-center text-green-600 font-bold">Unlimited</td>
                     </tr>
-                    <tr className="hover:bg-orange-50/30 transition-colors duration-200">
-                      <td className="px-4 lg:px-6 py-4 text-gray-700 font-medium">Masa Aktif</td>
-                      <td className="px-4 lg:px-6 py-4 text-center text-gray-700">3 bulan</td>
-                      <td className="px-4 lg:px-6 py-4 text-center text-gray-700 bg-orange-50/50 font-semibold">12 bulan</td>
-                      <td className="px-4 lg:px-6 py-4 text-center text-gray-700">Fleksibel</td>
+                    <tr className="hover:bg-gray-50 transition-colors">
+                      <td className="px-6 py-4 font-medium text-gray-700">Durasi Akses</td>
+                      <td className="px-6 py-4 text-center text-gray-600">3 Bulan</td>
+                      <td className="px-6 py-4 text-center text-[#FB991A] font-bold bg-orange-50/30">12 Bulan</td>
+                      <td className="px-6 py-4 text-center text-gray-600">Fleksibel</td>
                     </tr>
-                    <tr className="hover:bg-orange-50/30 transition-colors duration-200">
-                      <td className="px-4 lg:px-6 py-4 text-gray-700 font-medium">Private WhatsApp</td>
-                      <td className="px-4 lg:px-6 py-4 text-center">
-                        <span className="text-gray-300 text-lg">—</span>
-                      </td>
-                      <td className="px-4 lg:px-6 py-4 text-center bg-orange-50/50">
-                        <span className="text-gray-300 text-lg">—</span>
-                      </td>
-                      <td className="px-4 lg:px-6 py-4 text-center">
-                        <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-green-100">
-                          <FiCheck className="w-5 h-5 text-green-600" />
-                        </div>
-                      </td>
+                    <tr className="hover:bg-gray-50 transition-colors">
+                      <td className="px-6 py-4 font-medium text-gray-700">Enterprise Service</td>
+                      <td className="px-6 py-4 text-center"><span className="text-gray-300">-</span></td>
+                      <td className="px-6 py-4 text-center bg-orange-50/30"><span className="text-gray-300">-</span></td>
+                      <td className="px-6 py-4 text-center"><FiCheck className="mx-auto text-green-500" /></td>
                     </tr>
                   </tbody>
                 </table>
@@ -447,48 +371,8 @@ export default function ProductsPage() {
           </div>
         </section>
 
-        {/* Stats Section */}
-        <section className='py-12 lg:py-24'>
-          <div className="layout">
-            <div className="relative bg-white rounded-2xl border-2 border-gray-200 p-6 lg:p-10 shadow-xl overflow-hidden max-w-5xl mx-auto group" data-aos='fade-up'>
-              {/* Animated background gradient */}
-              <div className="absolute inset-0 bg-gradient-to-r from-[#FB991A]/5 via-[#C0172A]/5 to-[#FB991A]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
 
-              {/* Top gradient line */}
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#FB991A] to-[#C0172A]" />
 
-              <div className="relative grid md:grid-cols-3 gap-8 md:gap-0 md:divide-x-2 divide-gray-200">
-                <div className="px-4 lg:px-8 text-center group/stat hover:scale-105 transition-transform duration-300">
-                  <Typography variant="h2" weight="bold" className="text-transparent bg-clip-text bg-gradient-to-r from-[#FB991A] to-[#C0172A] mb-2 text-3xl lg:text-4xl">
-                    500+
-                  </Typography>
-                  <Typography className="text-sm lg:text-base text-gray-600">
-                    Beasiswa Terdaftar
-                  </Typography>
-                  <div className="h-1 w-12 bg-gradient-to-r from-[#FB991A] to-[#C0172A] mx-auto mt-3 rounded-full opacity-0 group-hover/stat:opacity-100 transition-opacity duration-300" />
-                </div>
-                <div className="px-4 lg:px-8 text-center group/stat hover:scale-105 transition-transform duration-300">
-                  <Typography variant="h2" weight="bold" className="text-transparent bg-clip-text bg-gradient-to-r from-[#FB991A] to-[#C0172A] mb-2 text-3xl lg:text-4xl">
-                    1,000+
-                  </Typography>
-                  <Typography className="text-sm lg:text-base text-gray-600">
-                    Siswa Terbantu
-                  </Typography>
-                  <div className="h-1 w-12 bg-gradient-to-r from-[#FB991A] to-[#C0172A] mx-auto mt-3 rounded-full opacity-0 group-hover/stat:opacity-100 transition-opacity duration-300" />
-                </div>
-                <div className="px-4 lg:px-8 text-center group/stat hover:scale-105 transition-transform duration-300">
-                  <Typography variant="h2" weight="bold" className="text-transparent bg-clip-text bg-gradient-to-r from-[#FB991A] to-[#C0172A] mb-2 text-3xl lg:text-4xl">
-                    24/7
-                  </Typography>
-                  <Typography className="text-sm lg:text-base text-gray-600">
-                    Dukungan Tersedia
-                  </Typography>
-                  <div className="h-1 w-12 bg-gradient-to-r from-[#FB991A] to-[#C0172A] mx-auto mt-3 rounded-full opacity-0 group-hover/stat:opacity-100 transition-opacity duration-300" />
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
       </main>
     </Layout>
   );

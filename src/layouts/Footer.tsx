@@ -93,7 +93,7 @@ export default function Footer() {
             <h3 className='text-white font-semibold mb-4'>Membership</h3>
             <ul className='space-y-3'>
               <li>
-                <a href='https://raihasa.myr.id/bundling' target='_blank' rel='noreferrer' className='text-white/70 hover:text-white text-sm transition-colors'>
+                <a href='/products' target='_blank' rel='noreferrer' className='text-white/70 hover:text-white text-sm transition-colors'>
                   BISA Membership
                 </a>
               </li>

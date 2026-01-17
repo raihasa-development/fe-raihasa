@@ -162,7 +162,7 @@ export default function Home() {
               {/* CTA Section */}
               <div className='flex flex-col items-center w-full gap-4 mt-2 xl:items-start md:mt-4' ref={btnRef} data-aos='fade-up' data-aos-delay='500'>
                 <ButtonLink
-                  href='https://raihasa.myr.id/bundling'
+                  href='/products'
                   variant='unstyled'
                   size='lg'
                   className='group'
@@ -365,28 +365,7 @@ export default function Home() {
                 </span>
               </div>
 
-              {/* Card 2 - Dreamshub */}
-              <div
-                className='bg-white rounded-2xl p-6 md:p-8 border border-gray-200 hover:border-[#FB991A]/30 hover:shadow-lg transition-all duration-300'
-                data-aos='fade-up'
-                data-aos-delay='100'
-              >
-                <div className='w-14 h-14 rounded-xl bg-[#FB991A] flex items-center justify-center mb-5'>
-                  <svg className='w-7 h-7 text-white' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                    <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={1.5} d='M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z' />
-                  </svg>
-                </div>
-                <span className='text-[#FB991A] text-xs font-medium bg-[#FB991A]/10 px-2 py-1 rounded'>Forum</span>
-                <Typography className='text-xl font-bold text-gray-900 mt-3 mb-2'>
-                  Dreamshub
-                </Typography>
-                <Typography className='text-gray-600 text-sm leading-relaxed mb-4'>
-                  Komunitas eksklusif untuk konsultasi langsung dengan mentor dan awardee. Dapat feedback real dan tips praktis.
-                </Typography>
-                <span className='inline-flex items-center gap-1 text-[#FB991A] text-sm font-medium hover:gap-2 transition-all cursor-pointer'>
-                  Gabung <FaArrowRightLong className='text-xs' />
-                </span>
-              </div>
+
 
               {/* Card 3 - BISA Learning */}
               <div
@@ -410,6 +389,28 @@ export default function Home() {
                   Akses <FaArrowRightLong className='text-xs' />
                 </span>
               </div>
+              {/* Card 2 - Dreamshub */}
+              <div
+                className='bg-white rounded-2xl p-6 md:p-8 border border-gray-200 hover:border-[#FB991A]/30 hover:shadow-lg transition-all duration-300'
+                data-aos='fade-up'
+                data-aos-delay='100'
+              >
+                <div className='w-14 h-14 rounded-xl bg-[#FB991A] flex items-center justify-center mb-5'>
+                  <svg className='w-7 h-7 text-white' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                    <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={1.5} d='M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z' />
+                  </svg>
+                </div>
+                <span className='text-[#FB991A] text-xs font-medium bg-[#FB991A]/10 px-2 py-1 rounded'>Forum</span>
+                <Typography className='text-xl font-bold text-gray-900 mt-3 mb-2'>
+                  Dreamshub
+                </Typography>
+                <Typography className='text-gray-600 text-sm leading-relaxed mb-4'>
+                  Komunitas eksklusif untuk konsultasi langsung dengan mentor dan awardee. Dapat feedback real dan tips praktis.
+                </Typography>
+                <span className='inline-flex items-center gap-1 text-[#FB991A] text-sm font-medium hover:gap-2 transition-all cursor-pointer'>
+                  Gabung <FaArrowRightLong className='text-xs' />
+                </span>
+              </div>
             </div>
 
             {/* Bottom CTA */}
@@ -424,7 +425,7 @@ export default function Home() {
                   </Typography>
                 </div>
                 <ButtonLink
-                  href='https://raihasa.myr.id/bundling'
+                  href='/products'
                   variant='unstyled'
                   className='flex-shrink-0'
                 >

@@ -35,11 +35,11 @@ const PRODUCT_CATALOG: ProductData[] = [
     masa_aktif: 3,
   },
   {
-    id: 'ideal-plan',
+    id: 'ideal-plan', // Maps to PRO Plan
     nama: 'Ideal Plan',
     harga: 169000,
     harga_diskon: undefined,
-    deskripsi: 'Paket lengkap untuk persiapan beasiswa yang serius',
+    deskripsi: 'Paket lengkap untuk pendaftaran beasiswa (12 Bulan)',
     jenis: 'ideal',
     masa_aktif: 12,
   },

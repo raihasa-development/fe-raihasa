@@ -344,7 +344,7 @@ export default function ScholarshipResultPage() {
 
   const ScholarshipCard = ({ scholarship, index }: { scholarship: ScholarshipRecommendationDisplay; index: number }) => {
     const status = getScholarshipStatus(scholarship.deadline, scholarship.eligibility);
-    const isLocked = !isAuthenticated && index >= 3;
+    const isLocked = !isAuthenticated;
 
     // Formatting
     const formattedDeadline = formatDateFriendly(scholarship.deadline);
@@ -691,7 +691,7 @@ export default function ScholarshipResultPage() {
             )}
 
             {/* Login CTA at bottom if not authenticated */}
-            {!isAuthenticated && recommendations.length > 3 && (
+            {!isAuthenticated && recommendations.length > 0 && (
               <div className="mt-20 bg-gradient-to-r from-[#0d5a6e] to-[#1B7691] rounded-3xl p-10 text-center text-white shadow-2xl relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full translate-x-1/3 -translate-y-1/3 blur-3xl"></div>
                 <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#FB991A]/20 rounded-full -translate-x-1/3 translate-y-1/3 blur-3xl"></div>

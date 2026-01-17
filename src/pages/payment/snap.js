@@ -21,8 +21,11 @@ export const loadSnapScript = (clientKey) => {
     // Create script element
     const script = document.createElement('script');
     script.id = 'midtrans-snap';
-    script.src = 'https://app.sandbox.midtrans.com/snap/snap.js'; // Use sandbox for testing
-    // For production, use: https://app.midtrans.com/snap/snap.js
+    // Determine environment
+    const isProduction = process.env.NEXT_PUBLIC_MIDTRANS_IS_PRODUCTION === 'true';
+    script.src = isProduction
+      ? 'https://app.midtrans.com/snap/snap.js'
+      : 'https://app.sandbox.midtrans.com/snap/snap.js';
     script.setAttribute('data-client-key', clientKey);
     script.async = true;
 

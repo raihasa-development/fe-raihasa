@@ -377,7 +377,7 @@ export default function Navbar() {
             </li>
             <li>
               <a
-                href='https://raihasa.myr.id/bundling'
+                href='/products'
                 target='_blank'
                 rel='noreferrer'
                 className='flex rounded-xl hover:bg-[#1B7691]/5 hover:text-[#1B7691] transition-colors'

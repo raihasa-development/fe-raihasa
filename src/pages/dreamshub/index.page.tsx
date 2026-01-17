@@ -80,13 +80,13 @@ export default function DreamshubPage() {
         const token = getToken(); // Get fresh token from cookies
         if (!token) return;
 
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/posts/tokens/${user.id}`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/posts/tokens/me`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
 
         if (res.ok) {
           const json = await res.json();
-          const count = json.data?.token ?? json.data ?? json.token ?? 0;
+          const count = json.data?.forum_tokens ?? json.data?.token ?? 0;
           setUserTokens(Number(count));
         }
       } catch (e) {
