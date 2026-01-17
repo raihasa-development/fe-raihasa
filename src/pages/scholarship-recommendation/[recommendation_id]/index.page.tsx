@@ -611,14 +611,14 @@ export default function ScholarshipDetailPage() {
                   </p>
                 </div>
 
-                <div className="bg-[#1B7691]/5 p-6 rounded-3xl border border-[#1B7691]/10">
+                {/* <div className="bg-[#1B7691]/5 p-6 rounded-3xl border border-[#1B7691]/10">
                   <h4 className="font-bold text-[#1B7691] mb-2 flex items-center gap-2">
                     <FiCheckCircle /> Tips Scholra
                   </h4>
                   <p className="text-sm text-gray-600 leading-relaxed">
                     Pelamar dengan <strong>Match Score &gt;80%</strong> memiliki peluang lolos 3x lebih besar. Pastikan essay motivasi Anda menonjolkan prestasi yang relevan.
                   </p>
-                </div>
+                </div> */}
               </div>
             </div>
 

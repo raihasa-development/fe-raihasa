@@ -54,21 +54,21 @@ const PromoPopup: React.FC = () => {
   }, []);
 
   useEffect(() => {
-  const runCheck = async () => {
-    const token = getToken();
-    if (!token || !user) return; // kalau belum login, skip
+    const runCheck = async () => {
+      const token = getToken();
+      if (!token || !user) return; // kalau belum login, skip
 
-    const expired = await checkTrialStatus(user.id, user.token);
+      const expired = await checkTrialStatus(user.id, user.token);
 
-    if (expired) {
-      setIsTrialExpired(true);
-      setShowExpiredPopup(true);
-    }
-  };
+      if (expired) {
+        setIsTrialExpired(true);
+        setShowExpiredPopup(true);
+      }
+    };
 
-  const timer = setTimeout(runCheck, 1000);
-  return () => clearTimeout(timer);
-}, [user]);
+    const timer = setTimeout(runCheck, 1000);
+    return () => clearTimeout(timer);
+  }, [user]);
 
 
   useEffect(() => {
@@ -91,14 +91,14 @@ const PromoPopup: React.FC = () => {
         return;
       }
 
-    const result = await checkTrialStatus(user.id, user.token);
-    console.log('[PromoPopup] Trial expired status:', result);
-  
+      const result = await checkTrialStatus(user.id, user.token);
+      console.log('[PromoPopup] Trial expired status:', result);
+
       if (result) {
         setIsTrialExpired(true);
         setShowExpiredPopup(true);
       }
-      
+
     };
     runCheck();
 
@@ -168,164 +168,174 @@ const PromoPopup: React.FC = () => {
   return (
     <>
       <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        .font-poppins {
+          font-family: 'Poppins', sans-serif;
+        }
+
         @keyframes popupFadeIn {
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
+          from { opacity: 0; }
+          to { opacity: 1; }
         }
 
         @keyframes popupSlideIn {
-          from {
-            opacity: 0;
-            transform: translateY(20px) scale(0.96);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-          }
+          from { opacity: 0; transform: translateY(20px) scale(0.98); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
         }
       `}</style>
+
       {showPopup && (
-      <div
-        className="fixed inset-0 z-[9999] flex items-center justify-center p-2 sm:p-4 overflow-y-auto"
-        style={{
-          backgroundColor: 'rgba(0, 0, 0, 0.3)',
-          animation: 'popupFadeIn 0.4s ease-out forwards',
-        }}
-      >
         <div
-          className="relative w-full max-w-sm mx-auto my-8 overflow-hidden bg-white shadow-2xl rounded-2xl sm:max-w-lg md:max-w-2xl lg:max-w-3xl"
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 overflow-y-auto font-poppins"
           style={{
-            opacity: 0,
-            transform: 'translateY(20px) scale(0.96)',
-            animation: 'popupSlideIn 0.4s ease-out 0.1s forwards',
+            backgroundColor: 'rgba(0, 0, 0, 0.4)',
+            backdropFilter: 'blur(8px)',
+            animation: 'popupFadeIn 0.3s ease-out forwards',
           }}
         >
-          <button
-            onClick={handleCloseAll}
-            className="absolute z-10 flex items-center justify-center p-2 transition-all duration-200 bg-white rounded-full top-3 right-3 bg-opacity-90 hover:bg-opacity-100 hover:scale-110"
-          >
-            <X size={20} className="text-gray-600" />
-          </button>
-
           <div
-            className="px-4 pt-10 pb-5 text-center text-white sm:px-6"
+            className="relative w-full max-w-2xl bg-white shadow-2xl rounded-3xl overflow-hidden"
             style={{
-              background: 'linear-gradient(135deg, #1B7691 0%, #FB991A 70%)',
+              opacity: 0,
+              transform: 'translateY(20px) scale(0.98)',
+              animation: 'popupSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards',
             }}
           >
-            <div className="inline-flex items-center justify-center mb-3 bg-white rounded-full w-14 h-14 sm:w-16 sm:h-16 bg-opacity-20">
+            <button
+              onClick={handleCloseAll}
+              className="absolute top-4 right-4 z-10 p-2 bg-gray-100/50 hover:bg-gray-100 rounded-full transition-all duration-200 text-gray-500 hover:text-gray-800"
+            >
+              <X size={20} />
+            </button>
+
+            <div className="flex flex-col md:flex-row">
+              {/* Left Side: Visual/Brand */}
+              <div className="relative w-full md:w-2/5 md:min-h-[520px] bg-[#1B7691] p-8 text-white flex flex-col justify-between overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-full bg-[url('/images/pattern-dots.svg')] opacity-10"></div>
+                <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-[#FB991A] rounded-full blur-3xl opacity-30"></div>
+                <div className="absolute top-10 -right-10 w-40 h-40 bg-white rounded-full blur-3xl opacity-20"></div>
+
+                <div className="relative z-10">
+                  <div className="inline-flex items-center justify-center w-12 h-12 bg-white/10 backdrop-blur-sm rounded-xl mb-6 border border-white/20">
+                    <Image
+                      src="/images/landing/haira-hero-mobile.png"
+                      alt="icon"
+                      width={32}
+                      height={32}
+                      className="w-8 h-8 object-contain"
+                    />
+                  </div>
+                  <h3 className="text-2xl font-bold leading-tight mb-2">
+                    Unlock Your Potential
+                  </h3>
+                  <p className="text-white/80 text-sm leading-relaxed">
+                    Akses fitur premium untuk persiapan beasiswa yang lebih matang.
+                  </p>
+                </div>
+
+                <div className="relative z-10 mt-8">
+                  <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/10">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="flex -space-x-2">
+                        {[1, 2, 3].map(i => (
+                          <div key={i} className="w-6 h-6 rounded-full bg-gray-300 border border-[#1B7691]"></div>
+                        ))}
+                      </div>
+                      <span className="text-xs font-medium">+1,200 joined</span>
+                    </div>
+                    <p className="text-xs italic text-white/90">"Platform ini sangat membantu saya lolos beasiswa LPDP!"</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Side: Content */}
+              <div className="w-full md:w-3/5 p-8 md:p-10 flex flex-col justify-center bg-white">
+                <div className="mb-6 text-center md:text-left">
+                  <span className="inline-block px-3 py-1 bg-[#FB991A]/10 text-[#FB991A] text-xs font-bold rounded-full mb-3 tracking-wide uppercase">
+                    Limited Offer
+                  </span>
+                  <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+                    Mulai Trial Gratis
+                  </h2>
+                  <p className="text-gray-500 text-sm">
+                    Nikmati akses penuh ke semua fitur premium selama masa percobaan.
+                  </p>
+                </div>
+
+                <div className="space-y-4 mb-8">
+                  {[
+                    { icon: FaGraduationCap, label: 'Scholarship Matching AI', color: 'text-blue-500' },
+                    { icon: FaChalkboardTeacher, label: 'Video Materi Lengkap', color: 'text-green-500' },
+                    { icon: FaFileAlt, label: 'Bank Dokumen & E-book', color: 'text-yellow-500' },
+                    { icon: FaCalendarAlt, label: 'Kalender & Reminder', color: 'text-red-500' },
+                  ].map((item, i) => (
+                    <div key={i} className="flex items-center gap-4 group">
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center bg-gray-50 group-hover:bg-gray-100 transition-colors ${item.color}`}>
+                        <item.icon size={18} />
+                      </div>
+                      <span className="text-gray-700 font-medium text-sm group-hover:text-gray-900 transition-colors">
+                        {item.label}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                <button
+                  onClick={handleTrialClick}
+                  disabled={loading}
+                  className="w-full bg-[#1B7691] hover:bg-[#166076] text-white font-semibold py-4 rounded-xl transition-all duration-300 shadow-lg shadow-[#1B7691]/20 transform hover:-translate-y-1 block text-center"
+                >
+                  {loading ? 'Memproses...' : 'Klaim Free Trial Sekarang'}
+                </button>
+                {/* <p className="text-center text-xs text-gray-400 mt-4">
+                  Batalkan kapan saja • Tidak perlu kartu kredit
+                </p> */}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showExpiredPopup && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 font-poppins"
+          style={{ backgroundColor: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(5px)' }}>
+          <div className="relative bg-white rounded-3xl shadow-2xl max-w-sm w-full p-8 text-center animate-[popupSlideIn_0.3s_ease-out_forwards]">
+            <button
+              onClick={handleCloseAll}
+              className="absolute top-4 right-4 p-2 bg-gray-50 hover:bg-gray-100 rounded-full transition text-gray-400 hover:text-gray-600"
+            >
+              <X size={18} />
+            </button>
+
+            <div className="w-20 h-20 mx-auto bg-gradient-to-br from-[#1B7691]/10 to-[#FB991A]/10 rounded-full flex items-center justify-center mb-6">
               <Image
                 src="/images/landing/haira-hero-mobile.png"
                 alt="icon"
-                width={56}
-                height={56}
-                className="w-8 h-8 sm:w-10 sm:h-10"
+                width={48}
+                height={48}
+                className="w-12 h-12 object-contain drop-shadow-sm"
               />
             </div>
-            <h2 className="mb-2 text-xl font-bold sm:text-2xl md:text-3xl">
-              Saatnya <span style={{ color: '#26aebe' }}>#JadiBisa</span>
+
+            <h2 className="text-xl font-bold text-gray-900 mb-2">
+              Masa Trial Habis �
             </h2>
-            <p className="text-xs text-white sm:text-md md:text-base text-opacity-90">
-              <span style={{ color: '#26aebe' }}>#JadiBisa</span> Wujudkan Impianmu 🚀
-            </p>
-          </div>
-
-          <div className="px-4 py-6 sm:px-8 sm:py-8">
-            <div className="mb-6 space-y-5 sm:mb-8 sm:space-y-6">
-              {[
-                {
-                  icon: <FaGraduationCap size={24} className="mt-1 text-blue-600" />,
-                  title: 'Sholra Scholarship Matching',
-                  desc: 'Ngga bingung dan takut ketinggalan beasiswa yang 100% sesuai profilmu',
-                },
-                {
-                  icon: <FaChalkboardTeacher size={24} className="mt-1 text-green-600" />,
-                  title: 'A-Z Scholarship Series',
-                  desc: 'Video tutorial daftar dan tips lengkap dari mentor berpengalaman',
-                },
-                {
-                  icon: <FaFileAlt size={24} className="mt-1 text-yellow-600" />,
-                  title: 'E-book dan Contoh berkas asli',
-                  desc: 'Akses ke panduan dan berkas awardee',
-                },
-                {
-                  icon: <FaCalendarAlt size={24} className="mt-1 text-red-600" />,
-                  title: 'Konsultasi Langsung bersama mentor via komunitas',
-                  desc: 'Diskusi Real-Time Bareng Mentor, Biar Persiapan beasiswamu naik level.',
-                },
-              ].map((item, i) => (
-                <div key={i} className="flex items-start space-x-3">
-                  {item.icon}
-                  <div>
-                    <p className="text-sm font-semibold text-gray-800 sm:text-base md:text-lg">
-                      {item.title}
-                    </p>
-                    <p className="text-xs text-gray-600 sm:text-sm">{item.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <button
-              onClick={handleTrialClick}
-              className="w-full text-white font-semibold py-2.5 sm:py-3 md:py-4 px-5 sm:px-6 rounded-lg transition-all duration-200 hover:-translate-y-0.5 shadow-lg text-sm sm:text-base md:text-lg"
-              style={{
-                background: 'linear-gradient(135deg, #1B7691 0%, #FB991A 100%)',
-                boxShadow: '0 4px 15px rgba(27, 118, 145, 0.2)',
-              }}
-            >
-              Ambil Kesempatan Sekarang
-            </button>
-
-            <p className="mt-3 text-[10px] sm:text-xs md:text-sm text-center text-gray-500">
-              Tidak ada biaya tersembunyi • Batalkan kapan saja
-            </p>
-          </div>
-        </div>
-      </div>
-      )}
-       {showExpiredPopup && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 p-4">
-          <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 text-center animate-[popupSlideIn_0.3s_ease-out_forwards]">
-            <button
-              onClick={handleCloseAll}
-              className="absolute p-2 transition rounded-full top-3 right-3 bg-white/80 hover:scale-110"
-            >
-              <X className="text-gray-700" size={20} />
-            </button>
-
-            <Image
-              src="/images/landing/haira-hero-mobile.png"
-              alt="icon"
-              width={64}
-              height={64}
-              className="mx-auto mb-4 rounded-full bg-gradient-to-r from-[#1B7691] to-[#FB991A] p-2"
-            />
-
-            <h2 className="text-xl font-bold text-gray-800">
-              Cie ada yang nyaman pake fitur premium nih 😅
-            </h2>
-            <p className="mt-2 text-sm text-gray-600">
-              Yuk mending langsung upgrade ke{" "}
-              <span className="font-semibold text-[#1B7691]">Membership</span> biar
-              persiapan beasiswamu makin maksimal.
+            <p className="text-sm text-gray-500 leading-relaxed mb-8">
+              Wah, sepertinya kamu menikmati fitur premium kami. Lanjutkan aksesmu dengan berlangganan membership.
             </p>
 
-            <div className="flex flex-col gap-3 mt-6">
+            <div className="space-y-3">
               <button
                 onClick={handleGoPremium}
-                className="w-full py-3 font-semibold text-white rounded-lg bg-gradient-to-r from-[#1B7691] to-[#FB991A] hover:scale-[1.02] transition"
+                className="w-full py-3.5 px-6 font-semibold text-white rounded-xl bg-gradient-to-r from-[#1B7691] to-[#155b70] shadow-lg shadow-blue-900/10 hover:shadow-blue-900/20 transition-all hover:-translate-y-0.5"
               >
-                Gas Upgrade
+                Upgrade ke Premium
               </button>
 
               <button
                 onClick={handleCloseAll}
-                className="text-sm text-gray-500 underline hover:text-gray-700"
+                className="w-full py-3.5 px-6 text-sm font-medium text-gray-500 hover:text-gray-700 transition"
               >
                 Nanti saja
               </button>
@@ -333,82 +343,112 @@ const PromoPopup: React.FC = () => {
           </div>
         </div>
       )}
-       {showPricingPopup && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4">
-          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl p-6 sm:p-8 animate-[popupSlideIn_0.3s_ease-out_forwards]">
+
+      {showPricingPopup && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 font-poppins"
+          style={{ backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(5px)' }}>
+          <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto p-6 md:p-10 animate-[popupSlideIn_0.3s_ease-out_forwards]">
             <button
               onClick={handleCloseAll}
-              className="absolute p-2 transition rounded-full top-3 right-3 bg-white/80 hover:scale-110"
+              className="absolute top-6 right-6 p-2 bg-gray-50 hover:bg-gray-100 rounded-full transition text-gray-400 hover:text-gray-600"
             >
-              <X className="text-gray-700" size={20} />
+              <X size={20} />
             </button>
 
-            <h2 className="text-2xl font-bold text-center text-[#1B7691] mb-2">
-              Pilih Paket Premium ✨
-            </h2>
-            <p className="mb-6 text-sm text-center text-gray-600">
-              Akses semua fitur eksklusif & bimbingan mentor berpengalaman.
-            </p>
+            <div className="text-center max-w-2xl mx-auto mb-10">
+              <h2 className="text-3xl font-bold text-gray-900 mb-3">
+                Investasi Terbaik untuk Masa Depanmu 🚀
+              </h2>
+              <p className="text-gray-500">
+                Pilih paket yang sesuai dengan kebutuhan belajarmu. Upgrade sekarang untuk akses tak terbatas.
+              </p>
+            </div>
 
-            {/* Paket Pricing */}
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {[
                 {
-                  name: "Basic",
-                  price: "Rp29.000",
-                  features: ["Akses video tutorial", "E-book gratis", "Forum komunitas"],
+                  name: "Starter",
+                  price: "Rp29rb",
+                  period: "/bulan",
+                  desc: "Cukup untuk mulai belajar dasar.",
+                  features: ["Akses Video Dasar", "E-book Gratis", "Forum Diskusi"],
+                  cta: "Pilih Starter",
+                  popular: false
                 },
                 {
-                  name: "Pro",
-                  price: "Rp79.000",
+                  name: "Pro Learner",
+                  price: "Rp79rb",
+                  period: "/bulan",
+                  desc: "Paling direkomendasikan untukmu.",
                   features: [
-                    "Semua Basic",
-                    "Kelas mentor eksklusif",
-                    "Simulasi berkas beasiswa",
+                    "Semua Fitur Starter",
+                    "Akses Semua Video Premium",
+                    "Simulasi Wawancara AI",
+                    "Review CV by Expert"
                   ],
-                  highlight: true,
+                  cta: "Pilih Pro",
+                  popular: true
                 },
                 {
                   name: "Ultimate",
-                  price: "Rp149.000",
+                  price: "Rp149rb",
+                  period: "/bulan",
+                  desc: "Paket lengkap jaminan mutu.",
                   features: [
-                    "Semua Pro",
-                    "1-on-1 konsultasi mentor",
-                    "Prioritas event & beasiswa",
+                    "Semua Fitur Pro",
+                    "1-on-1 Mentoring (2x/bln)",
+                    "Garansi Uang Kembali",
+                    "Prioritas Support"
                   ],
+                  cta: "Pilih Ultimate",
+                  popular: false
                 },
               ].map((pkg, i) => (
                 <div
                   key={i}
-                  className={`rounded-2xl p-5 shadow-lg border ${
-                    pkg.highlight
-                      ? "border-[#FB991A] scale-[1.02] bg-gradient-to-br from-[#FFF9F2] to-[#FFFDF9]"
-                      : "border-gray-200"
-                  } transition`}
+                  className={`relative flex flex-col p-6 rounded-2xl border transition-all duration-300 ${pkg.popular
+                    ? "border-[#FB991A] bg-[#FFFBF5] shadow-xl scale-100 md:scale-105 z-10"
+                    : "border-gray-100 bg-white hover:border-gray-200 hover:shadow-lg"
+                    }`}
                 >
-                  <h3 className="text-lg font-semibold text-gray-800">{pkg.name}</h3>
-                  <p className="text-2xl font-bold text-[#1B7691] mt-2">{pkg.price}</p>
-                  <ul className="mt-3 space-y-2 text-sm text-gray-600">
+                  {pkg.popular && (
+                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#FB991A] text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
+                      Most Popular
+                    </div>
+                  )}
+                  <div className="mb-4">
+                    <h3 className={`text-lg font-bold ${pkg.popular ? "text-[#FB991A]" : "text-gray-900"}`}>{pkg.name}</h3>
+                    <p className="text-xs text-gray-500 mt-1">{pkg.desc}</p>
+                  </div>
+                  <div className="mb-6">
+                    <span className="text-3xl font-bold text-gray-900">{pkg.price}</span>
+                    <span className="text-gray-400 text-sm font-medium">{pkg.period}</span>
+                  </div>
+                  <ul className="space-y-3 mb-8 flex-1">
                     {pkg.features.map((f, idx) => (
-                      <li key={idx}>• {f}</li>
+                      <li key={idx} className="flex gap-3 text-sm text-gray-600">
+                        <div className={`mt-0.5 w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${pkg.popular ? 'bg-[#FB991A]/20 text-[#FB991A]' : 'bg-gray-100 text-gray-500'}`}>
+                          <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+                        </div>
+                        {f}
+                      </li>
                     ))}
                   </ul>
                   <button
                     onClick={() => alert(`Langganan paket ${pkg.name}`)}
-                    className={`mt-5 w-full py-2.5 rounded-lg font-semibold text-white ${
-                      pkg.highlight
-                        ? "bg-gradient-to-r from-[#1B7691] to-[#FB991A]"
-                        : "bg-[#1B7691] hover:opacity-90"
-                    }`}
+                    className={`w-full py-3.5 rounded-xl font-semibold transition-all ${pkg.popular
+                      ? "bg-[#FB991A] text-white hover:bg-[#e08916] shadow-lg shadow-orange-500/20"
+                      : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                      }`}
                   >
-                    Langganan
+                    {pkg.cta}
                   </button>
                 </div>
               ))}
             </div>
 
-            <p className="mt-5 text-xs text-center text-gray-500">
-              Semua harga sudah termasuk PPN • Batalkan kapan saja
+            <p className="mt-8 text-center text-sm text-gray-400">
+              Butuh bantuan memilih paket? <a href="#" className="text-[#1B7691] font-medium hover:underline">Chat Tim Kami</a>
             </p>
           </div>
         </div>
