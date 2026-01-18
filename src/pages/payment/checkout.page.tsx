@@ -21,21 +21,21 @@ type ProductData = {
 const PRODUCT_CATALOG_FALLBACK = [
   {
     id: 'b02758b1-925f-4522-8385-79e69e3c8d86',
-    nama: 'GO Plan',
-    harga: 1000,
-    deskripsi: 'Start your journey with essential tools',
+    nama: 'BISA Basic',
+    harga: 49000,
+    deskripsi: 'Akses Seluruh Tutorial Beasiswa Dalam Negeri dan Luar Negeri',
     jenis: 'new-card', // Keep legacy slug for mapping
     masa_aktif: 3,
-    features: ['Akses Video', '5x Consultation']
+    features: ['Exclusive E-Book', '5x Consultation']
   },
   {
     id: 'a5edc065-212f-4ee7-afb3-8481ad577479',
-    nama: 'PRO Plan',
-    harga: 2000,
-    deskripsi: 'Paket lengkap untuk persiapan beasiswa yang serius',
+    nama: 'BISA Plus+',
+    harga: 169000,
+    deskripsi: 'Akses Seluruh Tutorial Beasiswa & Mentoring',
     jenis: 'ideal-plan', // Keep legacy slug for mapping
     masa_aktif: 12,
-    features: ['All Features', '10x Consultation']
+    features: ['Monthly Live Class', '10x Consultation']
   }
 ];
 

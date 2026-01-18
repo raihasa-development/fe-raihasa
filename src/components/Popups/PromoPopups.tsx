@@ -8,22 +8,54 @@ import { User } from '@/types/entities/user';
 import { getToken } from '@/lib/cookies';
 import { FaWhatsapp } from 'react-icons/fa';
 
+import api from '@/lib/api';
+
 const PromoPopup: React.FC = () => {
   const [showPopup, setShowPopup] = useState(false);
   const router = useRouter();
   const user = useAuthStore.useUser() as User | null;
 
   useEffect(() => {
-    // Show popup only if not logged in or if logged in but hasn't seen it in session
-    // (Adjust logic as needed, usually promo pops up for everyone or based on rules)
+    // Check if already shown in this session
     const alreadyShown = sessionStorage.getItem('promoPopupShown');
     if (alreadyShown) return;
 
-    const timer = setTimeout(() => {
-      setShowPopup(true);
-      document.body.style.overflow = 'hidden';
-      sessionStorage.setItem('promoPopupShown', 'true');
-    }, 2000);
+    let timer: NodeJS.Timeout;
+
+    const checkPremiumAndShow = async () => {
+      try {
+        const token = getToken();
+        // If logged in, check premium status
+        if (token) {
+          const payload = JSON.parse(atob(token.split('.')[1]));
+          const userId = payload.user_id || payload.id || payload.sub;
+
+          if (userId) {
+            const res = await api.get(`/lms/user/${userId}`);
+            const lmsData = res.data?.data;
+
+            // If user has active subscription, don't show popup
+            if (lmsData?.end && new Date(lmsData.end) > new Date()) {
+              // Mark as shown so we don't check again this session
+              sessionStorage.setItem('promoPopupShown', 'true');
+              return;
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Error checking premium status for popup:", error);
+        // On error, we proceed to show popup (safer to show than not)
+      }
+
+      // If not premium (or not logged in), show popup after delay
+      timer = setTimeout(() => {
+        setShowPopup(true);
+        document.body.style.overflow = 'hidden';
+        sessionStorage.setItem('promoPopupShown', 'true');
+      }, 2000);
+    };
+
+    checkPremiumAndShow();
 
     return () => clearTimeout(timer);
   }, []);
@@ -34,17 +66,20 @@ const PromoPopup: React.FC = () => {
   };
 
   const handleSelectPlan = (planId: string) => {
-    // Redirect to payment page with product ID
     handleClose();
-    if (!user) {
-      router.push(`/auth/login?redirect=/payment?productId=${planId}`);
-    } else {
-      router.push(`/payment?productId=${planId}`);
-    }
+    router.push('/products');
   };
 
   const handleConsultation = () => {
-    const message = encodeURIComponent("Halo Admin Raih Asa, saya tertarik untuk paket Bisnis/Partner (Enterprise/Parents). Boleh minta info lebih lanjut?");
+    const message = encodeURIComponent(`Halo Raih Asa!
+Saya tertarik untuk berdiskusi mengenai paket Enterprise/Partnership.
+
+Nama:
+Nama Institusi:
+Asal Kota Institusi:
+Pertanyaan/Kebutuhan:
+
+Terima kasih!`);
     window.open(`https://wa.me/6285117323893?text=${message}`, '_blank');
   };
 
@@ -80,7 +115,9 @@ const PromoPopup: React.FC = () => {
               Special Offer
             </span>
             <h2 className="text-2xl md:text-4xl font-bold text-gray-900 mb-4 leading-tight">
-              Investasi Terbaik untuk <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FB991A] to-[#DB4B24]">Masa Depanmu</span>
+              Awali langkah   <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FB991A] to-[#DB4B24]">#JadiBisa </span>
+              bareng Raih Asa sekarang!
+
             </h2>
             <p className="text-gray-500 text-sm md:text-base">
               Pilih paket membership yang sesuai dengan target beasiswamu. Akses materi eksklusif dan mentoring langsung dari ahlinya.
@@ -89,25 +126,23 @@ const PromoPopup: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
 
-            {/* GO Package */}
+            {/* BISA Basic Package */}
             <div className="flex flex-col p-6 rounded-2xl border border-gray-100 bg-white hover:border-[#FB991A]/30 hover:shadow-xl hover:shadow-orange-500/5 transition-all duration-300 relative group">
               <div className="mb-4">
-                <h3 className="text-xl font-bold text-gray-900 group-hover:text-[#FB991A] transition-colors">GO Plan</h3>
+                <h3 className="text-xl font-bold text-gray-900 group-hover:text-[#FB991A] transition-colors">BISA Basic</h3>
                 <p className="text-xs text-gray-500 mt-1">Start your journey</p>
               </div>
               <div className="mb-6">
                 <div className="flex items-baseline gap-1">
-                  <span className="text-3xl font-bold text-gray-900">Rp49rb</span>
+                  <span className="text-3xl font-bold text-gray-900">49k</span>
                   <span className="text-gray-400 text-sm font-medium">/ 3 bulan</span>
                 </div>
               </div>
 
               <ul className="space-y-3 mb-8 flex-1">
                 {[
-                  "Akses Video dan berkas",
-                  "Ebook Roadmap Kuliah",
-                  "E-Learning Videos (LN & DN)",
-                  "Monthly Live Class",
+                  "Akses Seluruh Tutorial Beasiswa Dalam Negeri dan Luar Negeri",
+                  "Exclusive E-Book",
                   "5x Dreamshub Consultation"
                 ].map((feat, i) => (
                   <li key={i} className="flex gap-3 text-sm text-gray-600">
@@ -121,32 +156,31 @@ const PromoPopup: React.FC = () => {
                 onClick={() => handleSelectPlan('new-card')}
                 className="w-full py-3 rounded-xl font-semibold text-[#FB991A] bg-[#FB991A]/10 hover:bg-[#FB991A] hover:text-white transition-all duration-300"
               >
-                Pilih Paket GO
+                Pilih BISA Basic
               </button>
             </div>
 
-            {/* PRO Package (Highlighted) */}
+            {/* BISA Plus+ Package (Highlighted) */}
             <div className="flex flex-col p-6 rounded-2xl border-2 border-[#FB991A] bg-[#FFFBF5] shadow-xl relative scale-[1.02] z-10">
               <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#FB991A] to-[#DB4B24] text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider shadow-md">
                 Most Popular
               </div>
               <div className="mb-4 mt-2">
-                <h3 className="text-xl font-bold text-[#DB4B24]">PRO Plan</h3>
+                <h3 className="text-xl font-bold text-[#DB4B24]">BISA Plus+</h3>
                 <p className="text-xs text-[#d97706]/80 mt-1">Best value for serious learners</p>
               </div>
               <div className="mb-6">
                 <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-bold text-gray-900">Rp169rb</span>
+                  <span className="text-4xl font-bold text-gray-900">169k</span>
                   <span className="text-gray-500 text-sm font-medium">/ 12 bulan</span>
                 </div>
               </div>
 
               <ul className="space-y-3 mb-8 flex-1">
                 {[
-                  "Semua Fitur GO Plan",
-                  "Akses Video dan berkas Premium",
-                  "Ebook Roadmap Kuliah Lengkap",
-                  "Monthly Exclusive Class",
+                  "Akses Seluruh Tutorial Beasiswa Dalam Negeri dan Luar Negeri",
+                  "Exclusive E-Book",
+                  "Monthly Live Class with Mentors",
                   "10x Dreamshub Consultation"
                 ].map((feat, i) => (
                   <li key={i} className="flex gap-3 text-sm text-gray-800">
@@ -162,15 +196,15 @@ const PromoPopup: React.FC = () => {
                 onClick={() => handleSelectPlan('ideal-plan')}
                 className="w-full py-3.5 rounded-xl font-bold text-white bg-gradient-to-r from-[#FB991A] to-[#DB4B24] hover:shadow-lg hover:shadow-orange-500/30 hover:-translate-y-0.5 transition-all duration-300"
               >
-                Pilih Paket PRO
+                Pilih BISA Plus+
               </button>
             </div>
 
-            {/* Partner/Business Package */}
+            {/* For Enterprise & Partners Package */}
             <div className="flex flex-col p-6 rounded-2xl border border-gray-100 bg-white hover:border-[#1B7691]/30 hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-300 relative">
               <div className="mb-4">
-                <h3 className="text-xl font-bold text-gray-900">Bisnis / Partner</h3>
-                <p className="text-xs text-gray-500 mt-1">For Enterprise & Parents</p>
+                <h3 className="text-xl font-bold text-gray-900">For Enterprise & Partners</h3>
+                <p className="text-xs text-gray-500 mt-1">Untuk Sekolah, Yayasan, & Komunitas</p>
               </div>
               <div className="mb-6">
                 <div className="flex items-baseline gap-1">
@@ -181,13 +215,8 @@ const PromoPopup: React.FC = () => {
 
               <div className="flex-1 mb-6 space-y-4">
                 <p className="text-sm text-gray-600 leading-relaxed">
-                  Solusi terbaik untuk Sekolah, Yayasan/Enterprise, atau Orang Tua yang ingin bimbingan intensif dan personal.
+                  Berikan akses pendidikan beasiswa terbaik untuk seluruh siswa atau anak didik Anda secara terintegrasi. Solusi tepat untuk sekolah dan komunitas yang ingin mencetak lebih banyak peraih beasiswa dengan pemantauan terukur.
                 </p>
-                <div className="p-4 bg-gray-50 rounded-xl border border-dashed border-gray-200">
-                  <p className="text-xs text-gray-500 italic text-center">
-                    "Recommended for School Partnership program"
-                  </p>
-                </div>
               </div>
 
               <button

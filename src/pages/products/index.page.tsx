@@ -69,35 +69,33 @@ const checkAuthentication = (): boolean => {
 };
 
 // Hardcoded product catalog matching the image
+// Hardcoded product catalog matching the image
 const PRODUCT_CATALOG = [
   {
     id: 'b02758b1-925f-4522-8385-79e69e3c8d86',
-    nama: 'GO Plan',
-    harga: 1000,
-    deskripsi: 'Start your journey with essential tools',
+    nama: 'BISA Basic',
+    harga: 49000,
+    deskripsi: 'Akses Seluruh Tutorial Beasiswa Dalam Negeri dan Luar Negeri',
     jenis: 'basic',
     masa_aktif: 3,
     features: [
-      'Akses Video dan berkas',
-      'Ebook Roadmap Kuliah',
-      'E-Learning Videos (LN & DN)',
-      'Monthly Live Class',
+      'Akses Seluruh Tutorial Beasiswa Dalam Negeri dan Luar Negeri',
+      'Exclusive E-Book',
       '5x Dreamshub Consultation',
     ],
     tag: 'Best Starter'
   },
   {
     id: 'a5edc065-212f-4ee7-afb3-8481ad577479',
-    nama: 'PRO Plan',
-    harga: 2000,
-    deskripsi: 'Paket lengkap untuk persiapan beasiswa yang serius',
+    nama: 'BISA Plus+',
+    harga: 169000,
+    deskripsi: 'Akses Seluruh Tutorial Beasiswa & Mentoring',
     jenis: 'ideal',
     masa_aktif: 12,
     features: [
-      'Semua Fitur GO Plan',
-      'Akses Video dan berkas Premium',
-      'Ebook Roadmap Kuliah Lengkap',
-      'Monthly Exclusive Class',
+      'Akses Seluruh Tutorial Beasiswa Dalam Negeri dan Luar Negeri',
+      'Exclusive E-Book',
+      'Monthly Live Class with Mentors',
       '10x Dreamshub Consultation',
     ],
     tag: 'Most Popular',
@@ -105,15 +103,15 @@ const PRODUCT_CATALOG = [
   },
   {
     id: 'private',
-    nama: 'Bisnis / Partner',
+    nama: 'For Enterprise & Partners',
     harga: 0,
-    deskripsi: 'Solusi untuk Sekolah, Yayasan/Enterprise, atau Orang Tua',
+    deskripsi: 'Untuk Sekolah, Yayasan, & Komunitas. Solusi tepat untuk mencetak peraih beasiswa.',
     jenis: 'private',
     masa_aktif: 0,
     features: [
-      'For Enterprise & Parents',
-      'Recommended for School Partnership',
-      'Konsultasi intensif & personal',
+      'Untuk Sekolah, Yayasan, & Komunitas',
+      'Akses pendidikan terintegrasi',
+      'Pemantauan terukur',
     ],
     tag: 'Exclusive',
     isPremium: true
@@ -199,7 +197,15 @@ export default function ProductsPage() {
 
   const handleSelectProduct = (productId: string, isPremium?: boolean) => {
     if (isPremium) {
-      const message = encodeURIComponent("Halo Admin Raih Asa, saya tertarik untuk paket Bisnis/Partner (Enterprise/Parents). Boleh minta info lebih lanjut?");
+      const message = encodeURIComponent(`Halo Raih Asa!
+Saya tertarik untuk berdiskusi mengenai paket Enterprise/Partnership.
+
+Nama:
+Nama Institusi:
+Asal Kota Institusi:
+Pertanyaan/Kebutuhan:
+
+Terima kasih!`);
       window.open(`https://wa.me/6285117323893?text=${message}`, '_blank');
       return;
     }
@@ -226,9 +232,11 @@ export default function ProductsPage() {
             <span className="inline-block py-1 px-3 rounded-full bg-orange-100 text-[#FB991A] text-sm font-semibold tracking-wide mb-4 border border-orange-200">
               MEMBERSHIP PLANS
             </span>
-            <Typography variant="h1" weight="bold" className="text-4xl md:text-5xl lg:text-6xl text-gray-900 mb-6 leading-tight">
-              Investasi Terbaik untuk <br />
-              <span className="bg-gradient-to-r from-[#FB991A] to-[#DB4B24] bg-clip-text text-transparent">Masa Depanmu</span>
+            <Typography variant="h3" weight="bold" className="text-4xl md:text-5xl lg:text-6xl text-gray-900 mb-6 leading-tight">
+              Awali langkah
+              <span className="bg-gradient-to-r from-[#FB991A] to-[#DB4B24] bg-clip-text text-transparent"> #JadiBisa </span>
+              bareng Raih Asa sekarang! <br />
+
             </Typography>
             <Typography className="text-gray-600 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
               Pilih paket yang sesuai dengan kebutuhan belajarmu. Akses materi eksklusif, mentoring, dan komunitas ambis.
@@ -334,8 +342,8 @@ export default function ProductsPage() {
                   <thead>
                     <tr className="bg-gray-50 border-b border-gray-100">
                       <th className="px-6 py-5 font-bold text-gray-900 w-1/3">Fitur Utama</th>
-                      <th className="px-6 py-5 font-bold text-gray-900 text-center w-1/5">GO Plan</th>
-                      <th className="px-6 py-5 font-bold text-[#FB991A] text-center w-1/5 bg-orange-50">PRO Plan</th>
+                      <th className="px-6 py-5 font-bold text-gray-900 text-center w-1/5">BISA Basic</th>
+                      <th className="px-6 py-5 font-bold text-[#FB991A] text-center w-1/5 bg-orange-50">BISA Plus+</th>
                       <th className="px-6 py-5 font-bold text-gray-900 text-center w-1/5">Partner</th>
                     </tr>
                   </thead>

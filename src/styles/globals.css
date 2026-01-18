@@ -371,15 +371,15 @@
 
 /* Smooth Floating Animation */
 @keyframes float {
-  from {
+  0% {
     transform: translateY(0);
   }
 
-  to {
-    transform: translateY(-6px);
+  100% {
+    transform: translateY(-10px);
   }
 }
 
 .animate-float {
-  animation: float 2s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite alternate;
+  animation: float 3s ease-in-out infinite alternate;
 }

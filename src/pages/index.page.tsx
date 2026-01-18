@@ -5,7 +5,8 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 
 
-import { animate, Timeline, stagger, utils } from 'animejs';
+import Link from 'next/link';
+import { motion } from 'framer-motion';
 import Aos from 'aos';
 import React, { useEffect, useRef } from 'react';
 import { FaArrowLeft, FaArrowRight, FaWhatsapp } from 'react-icons/fa';
@@ -44,22 +45,6 @@ export default function Home() {
       duration: 800,
       easing: 'ease-out-cubic',
     });
-
-    // Simple floating animation for hero image using anime.js
-    try {
-      const imageElements = [imageDesktopRef.current, imageMobileRef.current].filter(Boolean);
-      if (imageElements.length > 0) {
-        animate(imageElements, {
-          translateY: [-8, 8],
-          duration: 2500,
-          direction: 'alternate',
-          loop: true,
-          ease: 'in-out-sine',
-        });
-      }
-    } catch (error) {
-      console.error('Animation error:', error);
-    }
   }, []);
 
   return (
@@ -69,7 +54,7 @@ export default function Home() {
 
       {/* Floating WhatsApp Button */}
       <a
-        href='https://wa.me/6285117323893?text=Halo%20min%2C%20saya%20tertarik%20dengan%20program%20Scholarship%20Mentoring%20di%20Raih%20Asa.%20Boleh%20minta%20info%20lebih%20lanjut%3F'
+        href='https://wa.me/6285117323893?text=Halo%20Kak%20Admin%20Raih%20Asa!%0AAku%20mau%20tanya-tanya%20soal%20paket%2Fbimbingan%20beasiswanya%20dong.%0A%0ANama%3A%20%0AAsal%20Univ%2FSekolah%3A%0APertanyaan%3A%0A%0AMakasih%20Kak!'
         target='_blank'
         rel='noreferrer'
         className='fixed z-[999] bottom-6 right-6 md:bottom-10 md:right-10 flex items-center justify-center w-14 h-14 md:w-16 md:h-16 bg-[#25D366] rounded-full shadow-lg hover:shadow-xl transition-transform hover:scale-110 cursor-pointer'
@@ -202,7 +187,12 @@ export default function Home() {
             </div>
 
             {/* Right Column - Hero Image */}
-            <div className='relative order-1 w-full max-w-lg mx-auto xl:order-2 xl:max-w-none' data-aos='fade-left' data-aos-delay='200'>
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className='relative order-1 w-full max-w-lg mx-auto xl:order-2 xl:max-w-none flex flex-col items-center xl:sticky xl:top-28'
+            >
               <div ref={imageDesktopRef} className='hidden xl:block'>
                 <NextImage
                   src='/images/landing/haira-hero-desktop.png'
@@ -227,7 +217,7 @@ export default function Home() {
                   priority
                 />
               </div>
-            </div>
+            </motion.div>
           </div>
 
           {/* Background Decorations */}
