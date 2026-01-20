@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FiCheckCircle, FiXCircle, FiSearch, FiGift } from 'react-icons/fi';
+import { FiCheckCircle, FiXCircle, FiSearch, FiGift, FiClock } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 
 import withAuth from '@/components/hoc/withAuth';
@@ -33,6 +33,7 @@ function AdminUsersPage() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isTokenModalOpen, setIsTokenModalOpen] = useState(false);
+  const [isMembershipModalOpen, setIsMembershipModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [tokenAmount, setTokenAmount] = useState<number>(0);
 
@@ -116,6 +117,11 @@ function AdminUsersPage() {
     setIsTokenModalOpen(true);
   };
 
+  const openMembershipModal = (user: User) => {
+    setSelectedUser(user);
+    setIsMembershipModalOpen(true);
+  };
+
   return (
     <AdminDashboard withSidebar>
       <div className='mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4'>
@@ -185,6 +191,13 @@ function AdminUsersPage() {
                     </td>
                     <td className='p-4 text-right flex justify-end gap-2'>
                       <button
+                        onClick={() => openMembershipModal(user)}
+                        className='text-xs text-blue-600 hover:text-blue-700 font-medium border border-blue-600/20 px-3 py-1.5 rounded-lg hover:bg-blue-600/5 transition-colors flex items-center gap-1'
+                        title="Set Membership"
+                      >
+                        <FiClock /> Member
+                      </button>
+                      <button
                         onClick={() => openTokenModal(user)}
                         className='text-xs text-[#E58941] hover:text-[#d37d3a] font-medium border border-[#E58941]/20 px-3 py-1.5 rounded-lg hover:bg-[#E58941]/5 transition-colors flex items-center gap-1'
                         title="Add Tokens"
@@ -234,16 +247,91 @@ function AdminUsersPage() {
               type="number"
               value={tokenAmount}
               onChange={(e) => setTokenAmount(Number(e.target.value))}
-              className="w-full border p-2 rounded mb-4"
+              className="w-full border p-2 rounded mb-4 focus:ring-2 focus:ring-[#E58941]"
               placeholder="Amount"
             />
             <div className="flex justify-end gap-2">
-              <button onClick={() => setIsTokenModalOpen(false)} className="px-4 py-2 text-gray-500">Cancel</button>
-              <button onClick={handleAddToken} className="px-4 py-2 bg-[#E58941] text-white rounded">Add</button>
+              <button onClick={() => setIsTokenModalOpen(false)} className="px-4 py-2 text-gray-500 hover:bg-gray-100 rounded">Cancel</button>
+              <button onClick={handleAddToken} className="px-4 py-2 bg-[#E58941] text-white rounded hover:bg-[#d37d3a]">Add Tokens</button>
             </div>
           </div>
         </div>
       )}
+
+      {/* Membership Modal */}
+      <MembershipModal
+        isOpen={!!isMembershipModalOpen && !!selectedUser}
+        onClose={() => setIsMembershipModalOpen(false)}
+        user={selectedUser}
+        onSuccess={fetchUsers}
+      />
     </AdminDashboard>
+  );
+}
+
+function MembershipModal({ isOpen, onClose, user, onSuccess }: { isOpen: boolean, onClose: () => void, user: User | null, onSuccess: () => void }) {
+  const [days, setDays] = useState(30);
+  const [loading, setLoading] = useState(false);
+
+  if (!isOpen || !user) return null;
+
+  const handleActivate = async () => {
+    setLoading(true);
+    try {
+      await api.post('/lms/activate-manual', {
+        user_id: user.id,
+        days: days
+      });
+      toast.success(`Membership for ${user.name} activated for ${days} days!`);
+      onSuccess();
+      onClose();
+    } catch (error) {
+      console.error(error);
+      toast.error('Failed to activate membership');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+      <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-sm">
+        <Typography variant="h4" className="font-bold mb-2">Set Membership</Typography>
+        <p className="text-sm text-gray-500 mb-4">Grant or extend membership access for <b>{user.name}</b>.</p>
+
+        <div className="mb-4">
+          <label className="block text-xs font-bold text-gray-700 mb-1">Duration (Days)</label>
+          <div className="grid grid-cols-3 gap-2 mb-2">
+            {[30, 90, 365].map(d => (
+              <button
+                key={d}
+                onClick={() => setDays(d)}
+                className={`px-2 py-1 text-xs rounded border ${days === d ? 'bg-blue-50 border-blue-500 text-blue-600' : 'border-gray-200 text-gray-600'}`}
+              >
+                {d} Days
+              </button>
+            ))}
+          </div>
+          <input
+            type="number"
+            value={days}
+            onChange={(e) => setDays(Number(e.target.value))}
+            className="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none"
+            placeholder="Custom days..."
+          />
+        </div>
+
+        <div className="flex justify-end gap-2">
+          <button onClick={onClose} disabled={loading} className="px-4 py-2 text-gray-500 hover:bg-gray-100 rounded text-sm font-medium">Cancel</button>
+          <button
+            onClick={handleActivate}
+            disabled={loading}
+            className="px-4 py-2 bg-blue-600 text-white rounded text-sm font-medium hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
+          >
+            {loading ? 'Processing...' : 'Activate Access'}
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }

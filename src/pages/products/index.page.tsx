@@ -72,7 +72,7 @@ const checkAuthentication = (): boolean => {
 // Hardcoded product catalog matching the image
 const PRODUCT_CATALOG = [
   {
-    id: 'b02758b1-925f-4522-8385-79e69e3c8d86',
+    id: '102287d5-03ea-4e3f-b84c-a88973104e13',
     nama: 'BISA Basic',
     harga: 49000,
     deskripsi: 'Akses Seluruh Tutorial Beasiswa Dalam Negeri dan Luar Negeri',

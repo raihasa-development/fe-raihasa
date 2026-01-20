@@ -20,7 +20,7 @@ type ProductData = {
 
 const PRODUCT_CATALOG_FALLBACK = [
   {
-    id: 'b02758b1-925f-4522-8385-79e69e3c8d86',
+    id: '102287d5-03ea-4e3f-b84c-a88973104e13',
     nama: 'BISA Basic',
     harga: 49000,
     deskripsi: 'Akses Seluruh Tutorial Beasiswa Dalam Negeri dan Luar Negeri',
@@ -29,7 +29,7 @@ const PRODUCT_CATALOG_FALLBACK = [
     features: ['Exclusive E-Book', '5x Consultation']
   },
   {
-    id: 'a5edc065-212f-4ee7-afb3-8481ad577479',
+    id: '2b25852f-762c-4db3-8767-cd564f96c303',
     nama: 'BISA Plus+',
     harga: 169000,
     deskripsi: 'Akses Seluruh Tutorial Beasiswa & Mentoring',
