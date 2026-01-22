@@ -289,10 +289,10 @@ function BISALearningPage() {
 										/>
 									</div>
 									<div className='mt-4 flex gap-2'>
-										<span className='text-xs text-gray-500'>Populer:</span>
+										{/* <span className='text-xs text-gray-500'>Populer:</span> */}
 										<div className='flex flex-wrap gap-2'>
-											<button onClick={() => setSearchQuery('Essay')} className='text-xs bg-gray-100 px-2 py-1 rounded hover:bg-gray-200 transition-colors'>Essay</button>
-											<button onClick={() => setSearchQuery('Interview')} className='text-xs bg-gray-100 px-2 py-1 rounded hover:bg-gray-200 transition-colors'>Interview</button>
+											{/* <button onClick={() => setSearchQuery('Essay')} className='text-xs bg-gray-100 px-2 py-1 rounded hover:bg-gray-200 transition-colors'>Essay</button>
+											<button onClick={() => setSearchQuery('Interview')} className='text-xs bg-gray-100 px-2 py-1 rounded hover:bg-gray-200 transition-colors'>Interview</button> */}
 										</div>
 									</div>
 								</div>

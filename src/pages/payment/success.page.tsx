@@ -99,7 +99,7 @@ export default function PaymentSuccessPage() {
           </div>
 
           <button
-            onClick={() => router.push('/dashboard')}
+            onClick={() => router.push('/bisa-learning')}
             className="w-full bg-gray-900 text-white rounded-xl py-3.5 font-medium text-sm hover:bg-black transition-colors shadow-lg shadow-gray-200"
           >
             Mulai Belajar
