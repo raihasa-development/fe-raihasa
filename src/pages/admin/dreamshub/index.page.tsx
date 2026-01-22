@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FiSearch, FiFolder, FiMessageSquare, FiCornerDownRight, FiSend, FiUser } from 'react-icons/fi';
+import { FiSearch, FiFolder, FiMessageSquare, FiCornerDownRight, FiSend, FiUser, FiTrash2 } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 
 import withAuth from '@/components/hoc/withAuth';
@@ -74,6 +74,47 @@ function AdminDreamshubPage() {
     }
   };
 
+  const handleCreateCategory = async (name: string) => {
+    try {
+      await api.post('/posts/categories', { name });
+      toast.success('Category created');
+      fetchCategories();
+    } catch {
+      toast.error('Failed to create category');
+    }
+  };
+
+  const handleUpdateCategory = async (id: string, name: string) => {
+    try {
+      await api.put(`/posts/categories/${id}`, { name });
+      toast.success('Category updated');
+      fetchCategories();
+    } catch {
+      toast.error('Failed to update category');
+    }
+  };
+
+  const handleDeleteCategory = async (id: string) => {
+    try {
+      await api.delete(`/posts/categories/${id}`);
+      toast.success('Category deleted');
+      fetchCategories();
+    } catch {
+      toast.error('Failed to delete category');
+    }
+  };
+
+  const handleDeletePost = async (id: string) => {
+    try {
+      await api.delete(`/posts/${id}`);
+      toast.success('Post deleted');
+      fetchPosts();
+      if (selectedPost?.id === id) setSelectedPost(null);
+    } catch {
+      toast.error('Failed to delete post');
+    }
+  };
+
   return (
     <AdminDashboard withSidebar>
       <div className='mb-6'>
@@ -86,15 +127,37 @@ function AdminDreamshubPage() {
         <div className="flex flex-col gap-6 overflow-hidden">
           {/* Categories */}
           <div className='bg-white border border-gray-100 rounded-xl shadow-sm p-6 shrink-0'>
-            <div className="flex items-center gap-2 mb-4">
-              <FiFolder className="text-[#1B7691]" />
-              <Typography variant="h6" className="font-bold">Categories</Typography>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <FiFolder className="text-[#1B7691]" />
+                <Typography variant="h6" className="font-bold">Categories</Typography>
+              </div>
+              <button
+                onClick={() => {
+                  const name = prompt('Enter new category name:');
+                  if (name) handleCreateCategory(name);
+                }}
+                className="text-xs bg-[#1B7691] text-white px-2 py-1 rounded hover:bg-[#155a6e]"
+              >
+                + Add
+              </button>
             </div>
             <div className="flex flex-wrap gap-2">
               {loadingCats ? <p className="text-gray-400 text-xs">Loading...</p> : categories.map(cat => (
-                <span key={cat.id} className="text-xs bg-gray-50 border border-gray-200 px-2 py-1 rounded-full text-gray-600">
-                  {cat.name} ({cat._count?.posts || 0})
-                </span>
+                <div key={cat.id} className="group relative flex items-center text-xs bg-gray-50 border border-gray-200 px-2 py-1 rounded-full text-gray-600 hover:border-[#1B7691] hover:text-[#1B7691]">
+                  <span className='cursor-pointer' onClick={() => {
+                    const newName = prompt('Edit category name:', cat.name);
+                    if (newName && newName !== cat.name) handleUpdateCategory(cat.id, newName);
+                  }}>
+                    {cat.name} ({cat._count?.posts || 0})
+                  </span>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); if (confirm('Delete category?')) handleDeleteCategory(cat.id); }}
+                    className="ml-1 hidden group-hover:block text-red-500 hover:text-red-700 font-bold"
+                  >
+                    ×
+                  </button>
+                </div>
               ))}
             </div>
           </div>
@@ -118,10 +181,19 @@ function AdminDreamshubPage() {
                   <div
                     key={post.id}
                     onClick={() => openPost(post)}
-                    className={`p-3 rounded-xl border transition-all cursor-pointer hover:shadow-md ${selectedPost?.id === post.id ? 'border-[#E58941] bg-orange-50' : 'border-gray-100 bg-white hover:border-gray-200'}`}
+                    className={`relative group p-3 rounded-xl border transition-all cursor-pointer hover:shadow-md ${selectedPost?.id === post.id ? 'border-[#E58941] bg-orange-50' : 'border-gray-100 bg-white hover:border-gray-200'}`}
                   >
-                    <p className="font-bold text-sm text-gray-900 line-clamp-1">{post.title}</p>
-                    <p className="text-xs text-gray-500 line-clamp-2 mt-1">{post.content}</p>
+                    <div className="pr-6">
+                      <p className="font-bold text-sm text-gray-900 line-clamp-1">{post.title}</p>
+                      <p className="text-xs text-gray-500 line-clamp-2 mt-1">{post.content}</p>
+                    </div>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); if (confirm('Are you sure you want to delete this post?')) handleDeletePost(post.id); }}
+                      className="absolute top-2 right-2 p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                      title="Delete Post"
+                    >
+                      <FiTrash2 size={14} />
+                    </button>
                     <div className="flex justify-between items-center mt-2">
                       <span className="text-[10px] text-gray-400 flex items-center gap-1">
                         <FiUser /> {post.author?.name || 'Unknown'}

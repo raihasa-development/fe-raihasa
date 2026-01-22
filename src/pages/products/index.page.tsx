@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { FiCheck, FiArrowRight } from 'react-icons/fi';
+import { FaWhatsapp } from 'react-icons/fa';
 import 'aos/dist/aos.css';
 import Aos from 'aos';
 
@@ -164,25 +165,13 @@ export default function ProductsPage() {
     };
   }, [isMounted]);
 
-  // Fetch products from backend (optional, use hardcoded as fallback)
+  // Fetch products from backend
   const { data: productsData } = useQuery({
     queryKey: ['products'],
     queryFn: async () => {
       try {
         const response = await api.get<{ data: any[] }>('/products/lms');
-        const transformed: ProductData[] = response.data.data.map((p: any) => ({
-          id: p.id,
-          nama: p.name,
-          harga: p.harga,
-          deskripsi: p.PaketLMS?.[0]?.deskripsi || p.deskripsi || '',
-          jenis: p.PaketLMS?.[0]?.name || p.name || '',
-          masa_aktif: p.PaketLMS?.[0]?.masa_aktif || p.masa_aktif || 0,
-          features: p.features || [],
-          tag: p.tag,
-          isPopular: p.isPopular,
-          isPremium: p.isPremium,
-        }));
-        return transformed;
+        return response.data.data;
       } catch (error) {
         return null;
       }
@@ -191,9 +180,40 @@ export default function ProductsPage() {
     staleTime: 5 * 60 * 1000,
   });
 
-  // Use API data if available, otherwise fallback to local catalog
-  // IMPORTANT: Check length > 0 to handle cases where API returns empty array []
-  const products = productsData && productsData.length > 0 ? productsData : PRODUCT_CATALOG;
+  // MERGE LOGIC: Use PRODUCT_CATALOG as base, and overwrite Price/ID from API if name matches
+  const products = React.useMemo(() => {
+    if (!productsData || productsData.length === 0) return PRODUCT_CATALOG;
+
+    return PRODUCT_CATALOG.map(catalogItem => {
+      // Find matching product from API (using loose name matching)
+      const apiProduct = productsData.find((p: any) =>
+        p.name.toLowerCase().includes(catalogItem.nama.toLowerCase().split(' ')[0]) || // Match 'BISA'
+        p.name.toLowerCase() === catalogItem.nama.toLowerCase()
+      );
+
+      // Specific match for Plus / Basic distinction
+      const exactApiProduct = productsData.find((p: any) => {
+        if (catalogItem.nama.includes('Plus')) return p.name.includes('Plus');
+        if (catalogItem.nama.includes('Basic')) return p.name.includes('Basic') || (!p.name.includes('Plus') && !p.name.includes('Enterprise'));
+        if (catalogItem.nama.includes('Enterprise')) return p.name.includes('Enterprise') || p.name.includes('Partner');
+        return false;
+      });
+
+      const match = exactApiProduct || apiProduct;
+
+      if (match) {
+        return {
+          ...catalogItem,
+          id: match.id,
+          harga: match.harga || catalogItem.harga,
+          // We keep the Catalog's Description, Features, and Styling flags!
+          // Only update ID and Price (and maybe masa_aktif if needed)
+          masa_aktif: match.PaketLMS?.[0]?.masa_aktif || match.masa_aktif || catalogItem.masa_aktif,
+        };
+      }
+      return catalogItem;
+    });
+  }, [productsData]);
 
   const handleSelectProduct = (productId: string, isPremium?: boolean) => {
     if (isPremium) {
@@ -246,79 +266,113 @@ Terima kasih!`);
 
         {/* Pricing Cards Section */}
         <section className="py-12 px-4 relative z-10">
-          <div className="max-w-7xl mx-auto">
-            <div className="grid lg:grid-cols-3 gap-8 items-start">
-              {products.map((product, index) => (
-                <div
-                  key={product.id}
-                  data-aos="fade-up"
-                  data-aos-delay={index * 100}
-                  className={`relative p-8 rounded-[2rem] transition-all duration-300 ${product.isPopular
-                    ? 'bg-white shadow-2xl border-2 border-[#FB991A] lg:-mt-8 lg:p-10 z-20'
-                    : 'bg-white/80 backdrop-blur-sm shadow-xl border border-gray-100 hover:shadow-2xl hover:bg-white'
-                    }`}
-                >
-                  {product.isPopular && (
-                    <div className="absolute top-0 right-0 bg-gradient-to-r from-[#FB991A] to-[#DB4B24] text-white text-xs font-bold px-4 py-1 rounded-bl-xl rounded-tr-[1.8rem] shadow-lg">
-                      MOST POPULAR
-                    </div>
-                  )}
+          <div className="max-w-6xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
+              {products.map((product, index) => {
+                const isPopular = product.isPopular;
+                const isEnterprise = product.isPremium;
+                const isBasic = !isPopular && !isEnterprise;
 
-                  {/* Header */}
-                  <div className="mb-6">
-                    <Typography weight="bold" className={`text-lg mb-2 ${product.isPopular ? 'text-[#FB991A]' : 'text-gray-500'}`}>
-                      {product.nama}
-                    </Typography>
+                // Match specific subtitles from Popup
+                let subtitle = product.deskripsi;
+                if (product.nama.includes('Basic')) subtitle = 'Start your journey';
+                if (product.nama.includes('Plus')) subtitle = 'Best value for serious learners';
+                if (isEnterprise) subtitle = 'Untuk Sekolah, Yayasan, & Komunitas';
 
-                    {product.isPremium ? (
-                      <Typography variant="h2" weight="bold" className="text-3xl md:text-4xl text-gray-900 mb-2">
-                        Hubungi Kami
-                      </Typography>
-                    ) : (
-                      <div className="flex items-baseline gap-1">
-                        <Typography variant="h2" weight="bold" className="text-4xl md:text-5xl text-gray-900">
-                          Rp{product.harga.toLocaleString('id-ID').replace(',', '.')}
-                        </Typography>
-                        <span className="text-gray-400 font-medium">/{product.masa_aktif}bln</span>
+                return (
+                  <div
+                    key={product.id}
+                    data-aos="fade-up"
+                    data-aos-delay={index * 100}
+                    className={`flex flex-col p-6 rounded-2xl transition-all duration-300 relative group h-full ${isPopular
+                      ? 'border-2 border-[#FB991A] bg-[#FFFBF5] shadow-xl scale-[1.02] z-20'
+                      : isEnterprise
+                        ? 'border border-gray-100 bg-white hover:border-[#1B7691]/30 hover:shadow-xl hover:shadow-blue-500/5'
+                        : 'border border-gray-100 bg-white hover:border-[#FB991A]/30 hover:shadow-xl hover:shadow-orange-500/5'
+                      }`}
+                  >
+                    {isPopular && (
+                      <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#FB991A] to-[#DB4B24] text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider shadow-md whitespace-nowrap">
+                        Most Popular
                       </div>
                     )}
 
-                    <Typography className="text-gray-500 mt-3 text-sm leading-relaxed">
-                      {product.deskripsi}
-                    </Typography>
+                    <div className={`mb-4 ${isPopular ? 'mt-2' : ''}`}>
+                      <Typography
+                        weight="bold"
+                        className={`text-xl font-bold ${isPopular ? 'text-[#DB4B24]' : 'text-gray-900'
+                          } ${isBasic ? 'group-hover:text-[#FB991A] transition-colors' : ''}`}
+                      >
+                        {product.nama}
+                      </Typography>
+                      <p className={`text-xs mt-1 ${isPopular ? 'text-[#d97706]/80' : 'text-gray-500'}`}>
+                        {subtitle}
+                      </p>
+                    </div>
+
+                    <div className="mb-6">
+                      <div className="flex items-baseline gap-1">
+                        {isEnterprise ? (
+                          <span className="text-2xl font-bold text-gray-900">Custom</span>
+                        ) : (
+                          <>
+                            <span className={`font-bold text-gray-900 ${isPopular ? 'text-4xl' : 'text-3xl'}`}>
+                              {Math.floor(product.harga / 1000)}k
+                            </span>
+                            <span className="text-gray-400 text-sm font-medium"> / {product.masa_aktif} bulan</span>
+                          </>
+                        )}
+                      </div>
+                      {isEnterprise && <p className="text-xs text-gray-400 mt-1">Harga menyesuaikan kebutuhan</p>}
+                    </div>
+
+                    {isEnterprise ? (
+                      <div className="flex-1 mb-6 space-y-4">
+                        <p className="text-sm text-gray-600 leading-relaxed">
+                          Berikan akses pendidikan beasiswa terbaik untuk seluruh siswa atau anak didik Anda secara terintegrasi. Solusi tepat untuk sekolah dan komunitas yang ingin mencetak lebih banyak peraih beasiswa dengan pemantauan terukur.
+                        </p>
+                      </div>
+                    ) : (
+                      <ul className="space-y-3 mb-8 flex-1">
+                        {product.features?.map((feature, i) => (
+                          <li key={i} className={`flex gap-3 text-sm ${isPopular ? 'text-gray-800' : 'text-gray-600'}`}>
+                            <div className={`mt-0.5 shrink-0 ${isPopular
+                              ? 'w-4 h-4 rounded-full bg-[#FB991A] flex items-center justify-center'
+                              : ''
+                              }`}>
+                              {isPopular ? (
+                                <FiCheck className="w-3 h-3 text-white" />
+                              ) : (
+                                <FiCheck className="w-4 h-4 text-[#FB991A]" />
+                              )}
+                            </div>
+                            <span className={isPopular ? 'font-medium' : ''}>{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+
+                    <button
+                      onClick={() => handleSelectProduct(product.id, isEnterprise)}
+                      className={`w-full py-3 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${isPopular
+                        ? 'text-white bg-gradient-to-r from-[#FB991A] to-[#DB4B24] hover:shadow-lg hover:shadow-orange-500/30'
+                        : isEnterprise
+                          ? 'text-[#1B7691] border border-[#1B7691]/20 bg-[#1B7691]/5 hover:bg-[#1B7691] hover:text-white'
+                          : 'text-[#FB991A] bg-[#FB991A]/10 hover:bg-[#FB991A] hover:text-white'
+                        }`}
+                    >
+                      {isEnterprise ? (
+                        <>
+                          <FaWhatsapp className="w-5 h-5" />
+                          Hubungi Kami
+                        </>
+                      ) : (
+                        `Pilih ${product.nama}`
+                      )}
+                    </button>
                   </div>
-
-                  {/* Divider */}
-                  <div className="h-px w-full bg-gray-100 mb-6" />
-
-                  {/* Features */}
-                  <ul className="space-y-4 mb-8">
-                    {product.features?.map((feature, idx) => (
-                      <li key={idx} className="flex items-start gap-3">
-                        <div className={`mt-0.5 w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 ${product.isPopular ? 'bg-orange-100 text-[#FB991A]' : 'bg-gray-100 text-gray-600'
-                          }`}>
-                          <FiCheck className="w-3 h-3" />
-                        </div>
-                        <span className="text-gray-700 text-sm font-medium leading-snug">
-                          {feature}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-
-                  {/* Action Button */}
-                  <button
-                    onClick={() => handleSelectProduct(product.id, product.isPremium)}
-                    className={`w-full py-4 rounded-xl font-bold text-sm transition-all duration-300 flex items-center justify-center gap-2 ${product.isPopular
-                      ? 'bg-gradient-to-r from-[#FB991A] to-[#DB4B24] text-white shadow-lg hover:shadow-orange-500/30 hover:scale-[1.02]'
-                      : 'bg-white border-2 border-gray-100 text-gray-700 hover:border-[#FB991A] hover:text-[#FB991A] hover:bg-orange-50'
-                      }`}
-                  >
-                    {isAuthenticated || product.isPremium ? 'Pilih Paket Ini' : 'Login untuk Membeli'}
-                    <FiArrowRight className="w-4 h-4" />
-                  </button>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </section>
