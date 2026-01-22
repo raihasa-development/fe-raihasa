@@ -135,7 +135,7 @@ export default function RegisterPage() {
                   <Input
                     id='name'
                     label='Username'
-                    placeholder='Cth: Budi Santoso'
+                    placeholder='Cth: Jerome Makarim'
                     validation={{ required: 'Username harus diisi' }}
                   />
                   <Input
