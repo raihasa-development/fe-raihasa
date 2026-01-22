@@ -241,22 +241,7 @@ export default function Navbar() {
                       </li>
                     )}
 
-                    {isLogin && user?.role === 'USER' && (
-                      <li>
-                        <UnstyledLink
-                          href='/dashboard'
-                          className='flex rounded-lg hover:bg-gray-100 hover:text-primary-bluegreen'
-                        >
-                          <Typography
-                            color='inline'
-                            variant='bt'
-                            className='py-4 pl-4 '
-                          >
-                            Dashboard
-                          </Typography>
-                        </UnstyledLink>
-                      </li>
-                    )}
+
 
                     <Menu.Item
                       as='button'
@@ -410,23 +395,7 @@ export default function Navbar() {
                 </UnstyledLink>
               </li>
             )}
-            {isLogin && user?.role === 'USER' && (
-              <li>
-                <UnstyledLink
-                  href='/dashboard'
-                  className='flex rounded-xl hover:bg-[#1B7691]/5 hover:text-[#1B7691] transition-colors'
-                  onClick={toggleShowNav}
-                >
-                  <Typography
-                    color='inline'
-                    variant='bt'
-                    className='py-4 pl-4'
-                  >
-                    Dashboard
-                  </Typography>
-                </UnstyledLink>
-              </li>
-            )}
+
           </ul>
           <div className='flex flex-col gap-4'>
             {!isLogin ? (
