@@ -35,11 +35,11 @@ const PRODUCT_CATALOG: ProductData[] = [
     masa_aktif: 3,
   },
   {
-    id: 'ideal-plan',
+    id: 'ideal-plan', // Maps to PRO Plan
     nama: 'Ideal Plan',
     harga: 169000,
     harga_diskon: undefined,
-    deskripsi: 'Paket lengkap untuk persiapan beasiswa yang serius',
+    deskripsi: 'Paket lengkap untuk pendaftaran beasiswa (12 Bulan)',
     jenis: 'ideal',
     masa_aktif: 12,
   },
@@ -51,18 +51,18 @@ export default function PaymentPage() {
 
   useEffect(() => {
     Aos.init({ once: true });
-    
+
     // Load Midtrans Snap script
     const snapScript = 'https://app.sandbox.midtrans.com/snap/snap.js';
     const clientKey = process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY || 'Mid-client-_ChFuuaZr9CUeQbO';
-    
+
     const script = document.createElement('script');
     script.src = snapScript;
     script.setAttribute('data-client-key', clientKey);
     script.async = true;
-    
+
     document.body.appendChild(script);
-    
+
     return () => {
       document.body.removeChild(script);
     };
@@ -73,14 +73,14 @@ export default function PaymentPage() {
     queryKey: ['product-detail', productId],
     queryFn: async () => {
       if (!productId) return null;
-      
+
       try {
         // Use /products/lms endpoint (note: plural 'products')
         const response = await api.get<{ data: any[] }>('/products/lms');
         const products = response.data.data;
-        
+
         // console.log('📦 Raw API response from /products/lms:', products);
-        
+
         // Transform backend data to match our ProductData type
         // Backend returns ProductProgram with PaketLMS array
         const transformedProducts: ProductData[] = products.map((p: any) => ({
@@ -92,58 +92,58 @@ export default function PaymentPage() {
           jenis: p.PaketLMS?.[0]?.jenis || p.name?.toLowerCase() || 'standard',
           masa_aktif: p.PaketLMS?.[0]?.masa_aktif || p.masa_aktif || 0,
         }));
-        
+
         // console.log('📦 Transformed products:', transformedProducts);
         const productIdLower = productId.toString().toLowerCase();
-        
+
         // Try matching by jenis (basic, ideal)
-        let found = transformedProducts.find(p => 
+        let found = transformedProducts.find(p =>
           p.jenis?.toLowerCase() === productIdLower
         );
-        
+
         if (found) {
           // console.log('✅ Found by jenis:', found);
           return found;
         }
 
         // Try matching by id
-        found = transformedProducts.find(p => 
+        found = transformedProducts.find(p =>
           p.id?.toLowerCase() === productIdLower
         );
-        
+
         if (found) {
           // console.log('✅ Found by id:', found);
           return found;
         }
 
         // Try matching by nama/name
-        found = transformedProducts.find(p => 
+        found = transformedProducts.find(p =>
           p.nama?.toLowerCase().includes(productIdLower) ||
           p.nama?.toLowerCase().replace(/\s+/g, '-') === productIdLower
         );
-        
+
         if (found) {
           // console.log('✅ Found by nama:', found);
           return found;
         }
-        
+
         // console.warn('⚠️ Product not found in API, using fallback');
         const fallbackProduct = PRODUCT_CATALOG.find(p =>
           p.jenis?.toLowerCase() === productIdLower ||
           p.id?.toLowerCase() === productIdLower
         );
-        
+
         return fallbackProduct || null;
       } catch (err) {
         // console.error('❌ Error fetching product:', err);
-        
+
         // Use hardcoded fallback on error
         const productIdLower = productId.toString().toLowerCase();
         const fallback = PRODUCT_CATALOG.find(p =>
           p.jenis?.toLowerCase() === productIdLower ||
           p.id?.toLowerCase() === productIdLower
         );
-        
+
         // console.log('✅ Using hardcoded fallback:', fallback);
         return fallback || null;
       }
@@ -227,7 +227,7 @@ export default function PaymentPage() {
 
   // Display price (use discounted price if available)
   const displayPrice = selectedProduct.harga_diskon || selectedProduct.harga;
-  const hasDiscount = selectedProduct.harga_diskon && 
+  const hasDiscount = selectedProduct.harga_diskon &&
     selectedProduct.harga_diskon < selectedProduct.harga;
 
   return (
@@ -257,14 +257,14 @@ export default function PaymentPage() {
         <section className='pb-8'>
           <div className='layout'>
             <nav className="flex items-center space-x-2 text-sm text-gray-500" data-aos="fade-right">
-              <button 
+              <button
                 onClick={() => router.push('/')}
                 className="hover:text-[#FB991A] transition-colors"
               >
                 Home
               </button>
               <span>/</span>
-              <button 
+              <button
                 onClick={() => router.push('/products')}
                 className="hover:text-[#FB991A] transition-colors"
               >
@@ -286,7 +286,7 @@ export default function PaymentPage() {
                   <Typography variant="h3" weight="semibold" className="text-lg mb-6 pb-4 border-b border-gray-200">
                     Detail Pembayaran
                   </Typography>
-                  
+
                   <PaymentComponent
                     productId={selectedProduct.id}
                     productName={selectedProduct.nama ?? selectedProduct.name ?? selectedProduct.id}
@@ -304,7 +304,7 @@ export default function PaymentPage() {
                     <Typography variant="h4" weight="semibold" className="text-lg mb-4 pb-4 border-b border-gray-200">
                       Ringkasan Pesanan
                     </Typography>
-                    
+
                     {/* Product Details */}
                     <div className="space-y-3 mb-6 pb-6 border-b border-gray-200">
                       <div className="flex justify-between items-start gap-4">
@@ -359,7 +359,7 @@ export default function PaymentPage() {
                           <Typography className="text-xs text-gray-500 mt-0.5">Terenkripsi SSL</Typography>
                         </div>
                       </div>
-                      
+
                       <div className="flex items-start gap-3">
                         <div className="flex-shrink-0 w-9 h-9 bg-blue-50 rounded-lg flex items-center justify-center">
                           <FiClock className="w-4 h-4 text-blue-600" />
@@ -369,7 +369,7 @@ export default function PaymentPage() {
                           <Typography className="text-xs text-gray-500 mt-0.5">Langsung aktif setelah bayar</Typography>
                         </div>
                       </div>
-                      
+
                       <div className="flex items-start gap-3">
                         <div className="flex-shrink-0 w-9 h-9 bg-orange-50 rounded-lg flex items-center justify-center">
                           <FiRefreshCw className="w-4 h-4 text-[#FB991A]" />
@@ -401,7 +401,7 @@ export default function PaymentPage() {
                     <Typography weight="semibold" className="text-gray-900 text-sm">Midtrans Payment Gateway</Typography>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center gap-2 flex-wrap justify-center lg:justify-end">
                   <span className="px-3 py-1.5 bg-gray-50 rounded-md text-xs font-medium text-gray-700 border border-gray-200">Credit Card</span>
                   <span className="px-3 py-1.5 bg-gray-50 rounded-md text-xs font-medium text-gray-700 border border-gray-200">Bank Transfer</span>

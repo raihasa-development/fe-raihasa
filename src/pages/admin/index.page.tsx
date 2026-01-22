@@ -1,128 +1,102 @@
 import React from 'react';
+import {
+  FiBookOpen, FiUsers, FiAward, FiCpu, FiArrowRight, FiDollarSign, FiUserCheck
+} from 'react-icons/fi';
 
 import withAuth from '@/components/hoc/withAuth';
-import ButtonLink from '@/components/links/ButtonLink';
-import NextImage from '@/components/NextImage';
+import UnstyledLink from '@/components/links/UnstyledLink';
 import Typography from '@/components/Typography';
 import AdminDashboard from '@/layouts/AdminDashboard';
+import useAuthStore from '@/store/useAuthStore';
+
+// Module Data used to generate the dashboard grid
+const modules = [
+  {
+    title: 'User Management',
+    description: 'Monitor users, verify emails, check expiry dates, and manage access.',
+    icon: FiUserCheck,
+    href: '/admin/users',
+    color: 'bg-blue-50 text-blue-600',
+  },
+  {
+    title: 'Payment Monitoring',
+    description: 'Track transactions, verify payments, and handle manual overrides.',
+    icon: FiDollarSign,
+    href: '/admin/payments',
+    color: 'bg-emerald-50 text-emerald-600',
+  },
+  {
+    title: 'BISA Learning (LMS)',
+    description: 'Manage courses, video content, and learning materials.',
+    icon: FiBookOpen,
+    href: '/admin/lms',
+    color: 'bg-indigo-50 text-indigo-600',
+  },
+  {
+    title: 'Manajemen Beasiswa',
+    description: 'Update scholarship database, deadlines, and details.',
+    icon: FiAward,
+    href: '/admin/manajemen-beasiswa',
+    color: 'bg-yellow-50 text-yellow-600',
+  },
+  {
+    title: 'Dreamshub',
+    description: 'Manage community features, events, and networking.',
+    icon: FiUsers,
+    href: '/admin/dreamshub',
+    color: 'bg-pink-50 text-pink-600',
+  },
+  {
+    title: 'Prompt Analysis',
+    description: 'Analyze and manage AI prompts and responses.',
+    icon: FiCpu,
+    href: '/admin/prompt-analysis',
+    color: 'bg-gray-50 text-gray-600',
+  },
+];
 
 export default withAuth(DashboardAdminPage, 'admin');
+
 function DashboardAdminPage() {
+  const user = useAuthStore((state) => state.user);
+
   return (
-    <AdminDashboard
-      withSidebar
-      className='relative flex flex-col overflow-hidden'
-    >
-      <div className='h-[550px]'>
-        <NextImage
-          src='/images/dashboard/texture.png'
-          width={1080}
-          height={405}
-          alt='background'
-          className='absolute top-[20.2%] 2xl:top-[-2.9%] w-full h-auto object-cover'
-        />
-        <NextImage
-          src='/images/dashboard/haira.png'
-          width={583}
-          height={460}
-          alt='haira'
-          className='absolute top-[9.9%]'
-        />
-        <NextImage
-          src='/images/dashboard/leaf.png'
-          width={79}
-          height={151}
-          alt='leaf'
-          className='absolute top-[44.18%]'
-        />
-        <NextImage
-          src='/images/dashboard/bulat.png'
-          width={158}
-          height={104}
-          alt='bulat'
-          className='absolute top-[44%] right-[5%]'
-        />
-        <NextImage
-          src='/images/logo.png'
-          width={50}
-          height={35}
-          alt='logo'
-          className='absolute top-[5%] left-[5%]'
-        />
-        <Typography className='absolute top-[20%] text-3xl text-[#1b7691] left-[50%]'>
-          Gapai Cita-Citamu <br className='mt-2' />{' '}
-          <span className='font-bold text-5xl'>Untuk Raih Beasiswa!</span>
+    <AdminDashboard withSidebar>
+      <div className='mb-8'>
+        <Typography variant='h4' className='font-bold text-gray-900'>
+          Dashboard Overview
+        </Typography>
+        <Typography className='text-gray-500 mt-1'>
+          Welcome back, <span className='font-semibold text-gray-700'>{user?.name || 'Admin'}</span>! You have full control here.
         </Typography>
       </div>
-      <div className='px-5 md:px-14 py-8 grid grid-cols-4 gap-4'>
-        <div className='py-6 px-6 border rounded-lg border-black flex flex-col gap-10 justify-center items-center'>
-          <Typography className='text-center'>CV Boost</Typography>
-          <NextImage
-            src='/images/dashboard/cv-boost.png'
-            width={140}
-            height={93}
-            alt='cv'
-            className=''
-          />
-          <ButtonLink
-            variant='primary'
-            href='/admin/cv-boost'
-            className='px-4 py-2 flex'
+
+      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6'>
+        {modules.map((module) => (
+          <UnstyledLink
+            key={module.title}
+            href={module.href}
+            className='group bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg hover:border-gray-200 transition-all duration-300 flex flex-col h-full'
           >
-            Lihat Rincian
-          </ButtonLink>
-        </div>
-        <div className='py-6 px-6 border rounded-lg border-black flex flex-col gap-10 justify-center items-center'>
-          <Typography className='text-center'>Essay Boost</Typography>
-          <NextImage
-            src='/images/dashboard/essay-boost.png'
-            width={140}
-            height={93}
-            alt='essay'
-            className=''
-          />
-          <ButtonLink
-            variant='primary'
-            href='/admin/essay-boost'
-            className='px-4 py-2 flex'
-          >
-            Lihat Rincian
-          </ButtonLink>
-        </div>
-        <div className='py-6 px-6 border rounded-lg border-black flex flex-col gap-10 justify-center items-center'>
-          <Typography className='text-center'>Interview Boost</Typography>
-          <NextImage
-            src='/images/dashboard/interview-boost.png'
-            width={140}
-            height={93}
-            alt='interview'
-            className=''
-          />
-          <ButtonLink
-            variant='primary'
-            href='/admin/interview-boost'
-            className='px-4 py-2 flex'
-          >
-            Lihat Rincian
-          </ButtonLink>
-        </div>
-        <div className='py-6 px-6 border rounded-lg border-black flex flex-col gap-10 justify-center items-center'>
-          <Typography>LMS</Typography>
-          <NextImage
-            src='/images/dashboard/lms.png'
-            width={140}
-            height={93}
-            alt='lms'
-            className=''
-          />
-          <ButtonLink
-            variant='primary'
-            href='/admin/lms'
-            className='px-4 py-2 flex'
-          >
-            Lihat Rincian
-          </ButtonLink>
-        </div>
+            <div className='flex items-start justify-between mb-5'>
+              <div className={`p-3.5 rounded-2xl ${module.color} transition-colors group-hover:scale-110 duration-300`}>
+                <module.icon className='w-6 h-6' />
+              </div>
+              <div className='p-2 rounded-full hover:bg-gray-50 text-gray-300 group-hover:text-primary-blue transition-colors'>
+                <FiArrowRight className='w-5 h-5 -rotate-45 group-hover:rotate-0 transition-transform duration-300' />
+              </div>
+            </div>
+
+            <div className='mt-auto'>
+              <Typography variant='h6' className='font-bold text-gray-800 mb-2 group-hover:text-primary-blue transition-colors'>
+                {module.title}
+              </Typography>
+              <Typography variant='c1' className='text-gray-500 leading-relaxed'>
+                {module.description}
+              </Typography>
+            </div>
+          </UnstyledLink>
+        ))}
       </div>
     </AdminDashboard>
   );

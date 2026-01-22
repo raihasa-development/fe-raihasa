@@ -34,27 +34,27 @@ export const parseJWT = (token: string): any | null => {
 export const getUserIdFromToken = (): string | null => {
   const token = getToken();
   if (!token) {
-    console.log('❌ No token found in cookies');
+    // console.log('❌ No token found in cookies');
     return null;
   }
 
   const payload = parseJWT(token);
   if (!payload) {
-    console.log('❌ Failed to parse token payload');
+    // console.log('❌ Failed to parse token payload');
     return null;
   }
 
-  console.log('🔍 JWT Payload:', payload);
+  // console.log('🔍 JWT Payload:', payload);
 
   // Try different possible field names for user_id in JWT
   const userId = payload.id || payload.user_id || payload.userId || payload.sub;
 
   if (userId) {
-    console.log('✅ Extracted user_id from token:', userId);
+    // console.log('✅ Extracted user_id from token:', userId);
     return userId;
   }
 
-  console.log('❌ user_id not found in token payload');
+  // console.log('❌ user_id not found in token payload');
   return null;
 };
 

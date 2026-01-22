@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import { Fragment, useEffect, useState } from 'react';
 import React from 'react';
 import { FaArrowLeftLong } from 'react-icons/fa6';
+import { FiMenu, FiSearch, FiX, FiChevronDown } from 'react-icons/fi';
 import {
   HiChevronDown,
   HiChevronRight,
@@ -79,57 +80,142 @@ export default function Navbar() {
     // }
   };
 
+  const isBluePage = router.pathname.startsWith('/bisa-learning') || router.pathname.startsWith('/dreamshub');
+
   return (
-    <header className='fixed top-0 z-[100] w-full bg-primary-white shadow-xl font-primary'>
-      <div className='flex flex-row items-center justify-between h-24 md:h-20 layout'>
-        <UnstyledLink
-          href='/'
-          className='flex flex-row items-center gap-2 md:gap-4'
-        >
-          <NextImage
-            src='/images/logo.png'
-            alt='logo'
-            width='254'
-            height='177'
-            className='w-16'
-          />
-        </UnstyledLink>
+    <header className='fixed top-0 z-[100] w-full py-4 px-4 md:px-8 font-primary'>
+      {/* Glass Pill Navbar - Solid White on Blue Pages, Glassy on others */}
+      <div className={clsxm(
+        'max-w-6xl mx-auto rounded-full border shadow-lg transition-all duration-500',
+        isBluePage
+          ? 'bg-white/90 backdrop-blur-md border-white/60 shadow-blue-900/10' // High Opacity Glass for Blue Pages (Frosted)
+          : 'bg-white/70 backdrop-blur-xl border-white/50 shadow-black/5' // Default Glassy
+      )}>
+        <div className='flex flex-row items-center justify-between h-16 px-6'>
+          <UnstyledLink
+            href='/'
+            className='flex flex-row items-center gap-2 md:gap-4'
+          >
+            <NextImage
+              src='/images/logo.png'
+              alt='logo'
+              width='254'
+              height='177'
+              className='w-14'
+            />
+          </UnstyledLink>
 
-        {/* Desktop Navbar */}
-        <nav className='hidden md:block'>
-          <ul className='flex flex-row items-center justify-between gap-6 text-base'>
-            <li>
-              <UnstyledLink
-                href='/'
-                className='flex p-2.5 hover:text-primary-bluegreen hover:bg-gray-100 rounded-lg'
-              >
-                <Typography color='inline' variant='bt' className={clsxm()}>
-                  Home
-                </Typography>
-              </UnstyledLink>
-            </li>
-            <li>
-              <Menu className='static z-50 flex ' as='div'>
-                <Menu.Button>
-                  {({ open }) => (
-                    <Typography
-                      color='inline'
-                      variant='bt'
-                      className='text-neutral-80 p-2.5  hover:bg-gray-100 rounded-lg  flex flex-row gap-1.5 items-center hover:text-primary-bluegreen'
-                    >
-                      Programs
-                      <HiChevronDown
-                        className={clsxm(
-                          'text-base text-neutral-80 transition ease-in-out duration-200',
-                          open && 'rotate-180'
-                        )}
-                      />
-                    </Typography>
+          {/* Desktop Navbar */}
+          <nav className='hidden md:block'>
+            <ul className='flex flex-row items-center gap-1'>
+              <li>
+                <UnstyledLink
+                  href='/'
+                  className={clsxm(
+                    'relative px-4 py-2 text-sm font-medium rounded-full transition-all duration-300',
+                    router.pathname === '/'
+                      ? 'text-[#1B7691] bg-[#1B7691]/10 font-bold shadow-sm ring-1 ring-[#1B7691]/20'
+                      : 'text-gray-700 hover:text-[#1B7691] hover:bg-[#1B7691]/5'
                   )}
-                </Menu.Button>
+                >
+                  Home
+                </UnstyledLink>
+              </li>
+              <li>
+                <UnstyledLink
+                  href='/scholarship-calendar'
+                  className={clsxm(
+                    'relative px-4 py-2 text-sm font-medium rounded-full transition-all duration-300',
+                    router.pathname.startsWith('/scholarship-calendar')
+                      ? 'text-[#1B7691] bg-[#1B7691]/10 font-bold shadow-sm ring-1 ring-[#1B7691]/20'
+                      : 'text-gray-700 hover:text-[#1B7691] hover:bg-[#1B7691]/5'
+                  )}
+                >
+                  Calendar
+                </UnstyledLink>
+              </li>
+              <li>
+                <UnstyledLink
+                  href='/scholarship-recommendation/maintenance'
+                  className={clsxm(
+                    'flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-full transition-all duration-300',
+                    router.pathname.startsWith('/scholarship-recommendation')
+                      ? 'text-[#1B7691] bg-[#1B7691]/10 font-bold shadow-sm ring-1 ring-[#1B7691]/20'
+                      : 'text-gray-700 hover:text-[#1B7691] hover:bg-[#1B7691]/5'
+                  )}
+                >
+                  Scholra
+                  <span className='px-1.5 py-0.5 text-[10px] font-bold bg-gradient-to-r from-[#1B7691] to-[#0d5a6e] text-white rounded'>AI</span>
+                </UnstyledLink>
+              </li>
+              <li>
+                <UnstyledLink
+                  href='/bisa-learning'
+                  className={clsxm(
+                    'relative px-4 py-2 text-sm font-medium rounded-full transition-all duration-300',
+                    (router.pathname.startsWith('/bisa-learning') || router.pathname.startsWith('/dashboard/bisa-learning'))
+                      ? 'text-[#1B7691] bg-[#1B7691]/10 font-bold shadow-sm ring-1 ring-[#1B7691]/20'
+                      : 'text-gray-700 hover:text-[#1B7691] hover:bg-[#1B7691]/5'
+                  )}
+                >
+                  BISA Learning
+                </UnstyledLink>
+              </li>
+              <li>
+                <UnstyledLink
+                  href='/dreamshub'
+                  className={clsxm(
+                    'relative px-4 py-2 text-sm font-medium rounded-full transition-all duration-300',
+                    router.pathname.startsWith('/dreamshub')
+                      ? 'text-[#1B7691] bg-[#1B7691]/10 font-bold shadow-sm ring-1 ring-[#1B7691]/20'
+                      : 'text-gray-700 hover:text-[#1B7691] hover:bg-[#1B7691]/5'
+                  )}
+                >
+                  Dreamshub
+                </UnstyledLink>
+              </li>
+            </ul>
+          </nav>
 
+          {/* CTA Buttons */}
+          <div className='hidden md:flex flex-row gap-2'>
+            {!isLogin ? (
+              <>
+                <ButtonLink
+                  href='/login'
+                  size='base'
+                  variant='unstyled'
+                  className='px-5 py-2 text-sm font-medium text-gray-700 hover:text-[#1B7691] transition-colors'
+                >
+                  Masuk
+                </ButtonLink>
+                <ButtonLink
+                  href='/register'
+                  size='base'
+                  variant='unstyled'
+                  className='px-5 py-2 text-sm font-bold text-white bg-gradient-to-r from-[#1B7691] to-[#0d5a6e] rounded-full hover:shadow-lg hover:shadow-[#1B7691]/25 transition-all duration-300'
+                >
+                  Daftar Gratis
+                </ButtonLink>
+              </>
+            ) : (
+              <Menu as='div' className='relative z-20 w-fit'>
+                <Menu.Button className='outline-none focus:outline-none'>
+                  <div className='flex items-center gap-3 pl-1 pr-4 py-1 bg-white border border-gray-100 rounded-full shadow-sm hover:shadow-md hover:border-gray-200 transition-all duration-300 cursor-pointer group'>
+                    <div className='w-9 h-9 rounded-full bg-gradient-to-br from-[#1B7691] to-[#0d5a6e] flex items-center justify-center text-white font-bold text-sm shadow-inner'>
+                      {user?.name?.charAt(0).toUpperCase()}
+                    </div>
+                    <div className='flex flex-col items-start'>
+                      <span className='text-sm font-bold text-gray-700 group-hover:text-[#1B7691] transition-colors max-w-[100px] truncate text-left leading-tight'>
+                        {user?.name?.split(' ')[0]}
+                      </span>
+                      <span className='text-[10px] text-gray-400 font-medium leading-tight'>Member</span>
+                    </div>
+                    <FiChevronDown className='w-4 h-4 text-gray-400 group-hover:text-[#1B7691] transition-transform group-hover:rotate-180 duration-300' />
+                  </div>
+                </Menu.Button>
                 <Transition
-                  as={Fragment}
+                  as={React.Fragment}
                   enter='transition ease-out duration-100'
                   enterFrom='transform opacity-0 scale-95'
                   enterTo='transform opacity-100 scale-100'
@@ -137,246 +223,56 @@ export default function Navbar() {
                   leaveFrom='transform opacity-100 scale-100'
                   leaveTo='transform opacity-0 scale-95'
                 >
-                  <Menu.Items
-                    className={clsxm(
-                      'absolute w-screen h-auto left-0 mt-12 z-50 bg-white shadow-xl focus:outline-none'
-                    )}
-                  >
-                    <div className='flex flex-row gap-6 py-6 layout'>
-                      <div className='flex flex-col gap-1.5 w-fit text-start'>
-                        {programs.map(({ name }, index) => (
-                          <Button
-                            key={index}
-                            onClick={() => togglePrograms(index)}
-                            variant='unstyled'
-                            className={clsxm(
-                              // (scholarshipOpen && index === 0) ||
-                              boosterOpen && index === 0
-                                ? 'bg-gray-100  text-primary-orange hover:text-primary-orange'
-                                : 'bg-white   text-black-100 hover:text-black-100',
-                              'text-start !p-0 active:text-black-100 justify-start text-sm md:w-[240px] hover:bg-gray-100  '
-                            )}
-                          >
-                            <div className=' w-fit flex items-center gap-1.5 p-2 hover:rounded-md'>
-                              <Typography color='inline' variant='bt' as='p'>
-                                {name}
-                              </Typography>
-
-                              <HiChevronRight
-                                className={clsxm(
-                                  // (scholarshipOpen && index === 0) ||
-                                  boosterOpen && index === 0
-                                    ? 'rotate-180 '
-                                    : 'rotate-0',
-                                  'h-4 w-4 transition ease-in-out duration-200'
-                                )}
-                              />
-                            </div>
-                          </Button>
-                        ))}
-                        <ButtonLink
-                          href='https://raihasa.myr.id/bundling'
-                          className='bg-white  text-black-100 hover:text-black-100 text-start !p-0 active:text-black-100 justify-start text-sm md:w-[240px] hover:bg-gray-100'
+                  <Menu.Items className='absolute w-full flex flex-col py-2 px-2 mt-[14px] gap-1  bg-white rounded-md md:rounded-lg'>
+                    {isLogin && user?.role === 'ADMIN' && (
+                      <li>
+                        <UnstyledLink
+                          href='/admin'
+                          className='flex rounded-lg hover:bg-gray-100 hover:text-primary-bluegreen'
                         >
-                          <div className='w-fit flex items-center gap-1.5 p-2 hover:rounded-md'>
-                            <Typography color='inline' variant='bt' as='p'>
-                              BISA Membership
-                            </Typography>
-                          </div>
-                        </ButtonLink>
-                      </div>
+                          <Typography
+                            color='inline'
+                            variant='bt'
+                            className='py-4 pl-4 '
+                          >
+                            Dashboard
+                          </Typography>
+                        </UnstyledLink>
+                      </li>
+                    )}
 
-                      <span className='w-0.5 h-auto bg-gray-200'></span>
 
-                      <div className='w-auto h-auto overflow-x-auto rounded-xl'>
-                        <div className='grid grid-flow-col gap-4'>
-                          {/* {scholarshipOpen &&
-                            SCHOLARSHIP_FAIR_CARD_DATA.map((e, index) => (
-                              <ProgramCard
-                                key={index}
-                                title={e.title}
-                                desc={e.desc}
-                                href={e.href}
-                                img={e.img}
-                                gradientColor='from-[#C0172AB5] to-[#12121280]'
-                                buttonClassName='bg-[#E94759] hover:bg-[#ff99a5]'
-                              />
-                            ))} */}
 
-                          {boosterOpen &&
-                            BOOSTER_SERIES_CARD_DATA.map((f, index) => (
-                              <ProgramCard
-                                key={index}
-                                title={f.title}
-                                desc={f.desc}
-                                href={f.href}
-                                img={f.img}
-                                gradientColor='from-[#E47F1A] to-[#12121280]'
-                                buttonClassName='bg-[#FB991A] hover:bg-[#ffc77d]'
-                              />
-                            ))}
-                        </div>
-                      </div>
-                    </div>
+                    <Menu.Item
+                      as='button'
+                      className='flex rounded-lg hover:bg-gray-100 hover:text-primary-bluegreen'
+                      onClick={handleLogout}
+                    >
+                      <Typography
+                        color='inline'
+                        variant='bt'
+                        className='py-4 pl-4 '
+                      >
+                        Log Out
+                      </Typography>
+                    </Menu.Item>
                   </Menu.Items>
                 </Transition>
               </Menu>
-            </li>
-            {/* <li>
-              <UnstyledLink href='/product' className='flex p-2.5'>
-                <Typography
-                  color='inline'
-                  variant='bt'
-                  className='hover:text-primary-bluegreen'
-                >
-                  Product
-                </Typography>
-              </UnstyledLink>
-            </li> */}
-            <li>
-              <UnstyledLink
-                href='/coming-soon'
-                className='flex p-2.5 hover:text-primary-bluegreen hover:bg-gray-100 rounded-lg'
-              >
-                <Typography
-                  color='inline'
-                  variant='bt'
-                  className='hover:text-primary-bluegreen'
-                >
-                  Mentors
-                </Typography>
-              </UnstyledLink>
-            </li>
-          {isLogin && (
-              <li>
-                <UnstyledLink
-                  href='/scholarship-info'
-                  className='flex rounded-lg hover:bg-gray-100 hover:text-primary-bluegreen'
-                >
-                  <Typography
-                    color='inline'
-                    variant='bt'
-                    className='py-4 pl-4'
-                  >
-                    Info Beasiswa
-                  </Typography>
-                </UnstyledLink>
-              </li>
             )}
+          </div>
 
-            <div className='flex flex-row gap-4'>
-              {!isLogin ? (
-                <>
-                  <ButtonLink
-                    href='/register'
-                    size='base'
-                    variant='primary'
-                    isOutline={false}
-                    className='hover:bg-transparent hover:text-primary-bluegreen'
-                  >
-                    <Typography color='inline' variant='bt'>
-                      Daftar
-                    </Typography>
-                  </ButtonLink>
-                  <ButtonLink
-                    href='/login'
-                    size='base'
-                    variant='primary'
-                    isOutline={true}
-                    className='hover:bg-primary-bluegreen hover:text-white'
-                  >
-                    <Typography color='inline' variant='bt'>
-                      Masuk
-                    </Typography>
-                  </ButtonLink>
-                </>
-              ) : (
-                <Menu as='div' className='relative z-20 w-fit'>
-                  <Menu.Button className='ring ring-primary-bluegreen w-full font-semibold rounded-md md:rounded-lg py-1.5 px-[14px]'>
-                    {() => (
-                      
-                      <div className='flex w-full h-[42px] py-2 px-4 justify-center items-center gap-2 text-primary-bluegreen cursor-pointer'>
-                        <HiUserCircle className='w-6 h-6' />
-                        <span className='text-lg font-semibold'>
-                          Hai, {user?.name}!
-                        </span>
-                      </div>
-                    )}
-                  </Menu.Button>
-                  <Transition
-                    as={React.Fragment}
-                    enter='transition ease-out duration-100'
-                    enterFrom='transform opacity-0 scale-95'
-                    enterTo='transform opacity-100 scale-100'
-                    leave='transition ease-in duration-75'
-                    leaveFrom='transform opacity-100 scale-100'
-                    leaveTo='transform opacity-0 scale-95'
-                  >
-                    <Menu.Items className='absolute w-full flex flex-col py-2 px-2 mt-[14px] gap-1  bg-white rounded-md md:rounded-lg'>
-                      {isLogin && user?.role === 'ADMIN' && (
-                        <li>
-                          <UnstyledLink
-                            href='/admin'
-                            className='flex rounded-lg hover:bg-gray-100 hover:text-primary-bluegreen'
-                          >
-                            <Typography
-                              color='inline'
-                              variant='bt'
-                              className='py-4 pl-4 '
-                            >
-                              Dashboard
-                            </Typography>
-                          </UnstyledLink>
-                        </li>
-                      )}
-
-                      {isLogin && user?.role === 'USER' && (
-                        <li>
-                          <UnstyledLink
-                            href='/dashboard'
-                            className='flex rounded-lg hover:bg-gray-100 hover:text-primary-bluegreen'
-                          >
-                            <Typography
-                              color='inline'
-                              variant='bt'
-                              className='py-4 pl-4 '
-                            >
-                              Dashboard
-                            </Typography>
-                          </UnstyledLink>
-                        </li>
-                      )}
-
-                      <Menu.Item
-                        as='button'
-                        className='flex rounded-lg hover:bg-gray-100 hover:text-primary-bluegreen'
-                        onClick={handleLogout}
-                      >
-                        <Typography
-                          color='inline'
-                          variant='bt'
-                          className='py-4 pl-4 '
-                        >
-                          Log Out
-                        </Typography>
-                      </Menu.Item>
-                    </Menu.Items>
-                  </Transition>
-                </Menu>
-              )}
-            </div>
-          </ul>
-        </nav>
-
-        {!isOpen && (
-          <IconButton
-            variant='unstyled'
-            icon={HiOutlineMenuAlt3}
-            className='md:hidden'
-            iconClassName='text-primary-bluegreen'
-            onClick={toggleShowNav}
-          />
-        )}
+          {/* Mobile Menu Button */}
+          {!isOpen && (
+            <IconButton
+              variant='unstyled'
+              icon={HiOutlineMenuAlt3}
+              className='md:hidden'
+              iconClassName='text-[#1B7691]'
+              onClick={toggleShowNav}
+            />
+          )}
+        </div>
       </div>
 
       {/* Mobile Nav */}
@@ -402,274 +298,144 @@ export default function Navbar() {
         </UnstyledLink>
 
         <nav className='flex-1 w-full'>
-          <ul className='space-y-8'>
-            <div className='w-full space-y-2 text-base '>
+          <ul className='space-y-2'>
+            <li>
+              <UnstyledLink
+                href='/'
+                className='flex rounded-xl hover:bg-[#1B7691]/5 hover:text-[#1B7691] transition-colors'
+                onClick={toggleShowNav}
+              >
+                <Typography
+                  color='inline'
+                  variant='bt'
+                  className='py-4 pl-4'
+                >
+                  Home
+                </Typography>
+              </UnstyledLink>
+            </li>
+            <li>
+              <UnstyledLink
+                href='/scholarship-calendar'
+                className='flex rounded-xl hover:bg-[#1B7691]/5 hover:text-[#1B7691] transition-colors'
+                onClick={toggleShowNav}
+              >
+                <Typography
+                  color='inline'
+                  variant='bt'
+                  className='py-4 pl-4'
+                >
+                  Calendar
+                </Typography>
+              </UnstyledLink>
+            </li>
+            <li>
+              <UnstyledLink
+                href='/scholarship-recommendation/maintenance'
+                className='flex items-center gap-2 rounded-xl hover:bg-[#1B7691]/5 hover:text-[#1B7691] transition-colors'
+                onClick={toggleShowNav}
+              >
+                <Typography
+                  color='inline'
+                  variant='bt'
+                  className='py-4 pl-4'
+                >
+                  Scholra
+                </Typography>
+                <span className='px-1.5 py-0.5 text-[10px] font-bold bg-gradient-to-r from-[#1B7691] to-[#0d5a6e] text-white rounded'>AI</span>
+              </UnstyledLink>
+            </li>
+            <li>
+              <UnstyledLink
+                href='/dreamshub'
+                className='flex rounded-xl hover:bg-[#1B7691]/5 hover:text-[#1B7691] transition-colors'
+                onClick={toggleShowNav}
+              >
+                <Typography
+                  color='inline'
+                  variant='bt'
+                  className='py-4 pl-4'
+                >
+                  Dreamshub
+                </Typography>
+              </UnstyledLink>
+            </li>
+            <li>
+              <UnstyledLink
+                href='/bisa-learning'
+                className='flex rounded-xl hover:bg-[#1B7691]/5 hover:text-[#1B7691] transition-colors'
+                onClick={toggleShowNav}
+              >
+                <Typography
+                  color='inline'
+                  variant='bt'
+                  className='py-4 pl-4'
+                >
+                  BISA Learning
+                </Typography>
+              </UnstyledLink>
+            </li>
+
+            {/* User-specific items */}
+            {isLogin && user?.role === 'ADMIN' && (
               <li>
                 <UnstyledLink
-                  href='/'
+                  href='/admin'
+                  className='flex rounded-xl hover:bg-[#1B7691]/5 hover:text-[#1B7691] transition-colors'
+                  onClick={toggleShowNav}
+                >
+                  <Typography
+                    color='inline'
+                    variant='bt'
+                    className='py-4 pl-4'
+                  >
+                    Dashboard
+                  </Typography>
+                </UnstyledLink>
+              </li>
+            )}
+
+          </ul>
+          <div className='flex flex-col gap-4'>
+            {!isLogin ? (
+              <>
+                <ButtonLink
+                  href='/register'
+                  size='base'
+                  variant='primary'
+                  isOutline={false}
+                  className='py-4 hover:bg-transparent hover:text-primary-bluegreen'
+                >
+                  <Typography color='inline' variant='bt'>
+                    Daftar
+                  </Typography>
+                </ButtonLink>
+                <ButtonLink
+                  href='/login'
+                  size='base'
+                  variant='primary'
+                  isOutline={true}
+                  className='py-4 hover:bg-primary-bluegreen hover:text-white'
+                >
+                  <Typography color='inline' variant='bt'>
+                    Masuk
+                  </Typography>
+                </ButtonLink>
+              </>
+            ) : (
+              <>
+                <UnstyledLink
+                  href='/scholarship-info'
                   className='flex rounded-lg hover:bg-gray-100 hover:text-primary-bluegreen'
                 >
                   <Typography
                     color='inline'
                     variant='bt'
-                    className='py-4 pl-4 '
+                    className='px-4 py-4'
                   >
-                    Home
+                    Info Beasiswa
                   </Typography>
                 </UnstyledLink>
-              </li>
-              <li>
-                <Menu className='static z-10 flex' as='div'>
-                  <Menu.Button
-                    className={clsxm(
-                      `py-4 pl-4 w-full hover:bg-gray-100 rounded-lg hover:text-primary-bluegreen`
-                    )}
-                    onClick={toggleNavPrograms}
-                  >
-                    {/* {({ open }) => (
-                      <Typography
-                        color='inline'
-                        variant='bt'
-                        className='text-neutral-80 flex flex-row gap-1.5 items-center w-full '
-                      >
-                        Programs
-                        <HiChevronDown
-                          className={clsxm(
-                            'text-base text-neutral-80 transition ease-in-out duration-200',
-                            open && 'rotate-180'
-                          )}
-                        />
-                      </Typography>
-                    )} */}
-
-                    <Typography
-                      color='inline'
-                      variant='bt'
-                      className='text-neutral-80 flex flex-row gap-1.5 items-center w-full'
-                    >
-                      Programs
-                      <HiChevronDown
-                        className={`text-base text-neutral-80 transition ease-in-out duration-200`}
-                        // ${openPrograms ? 'rotate-180' : ''}
-                      />
-                    </Typography>
-                  </Menu.Button>
-
-                  {openPrograms && (
-                    <Transition
-                      as={Fragment}
-                      enter='transition ease-out duration-100'
-                      enterFrom='transform opacity-0 scale-95'
-                      enterTo='transform opacity-100 scale-100'
-                      leave='transition ease-in duration-75'
-                      leaveFrom='transform opacity-100 scale-100'
-                      leaveTo='transform opacity-0 scale-95'
-                    >
-                      <Menu.Items
-                        className={clsxm(
-                          openPrograms
-                            ? `absolute w-screen h-screen top-0 left-0 z-60 bg-white focus:outline-none`
-                            : `hidden`
-                        )}
-                      >
-                        <div className='z-40 flex flex-col w-full h-auto gap-6 px-4 py-6 bg-white'>
-                          <Button
-                            onClick={toggleNavPrograms}
-                            leftIcon={FaArrowLeftLong}
-                            className='w-fit'
-                          >
-                            Programs
-                          </Button>
-
-                          <div className='flex flex-col gap-1.5 w-full text-start'>
-                            {programs.map(({ name }, index) => (
-                              <Button
-                                key={index}
-                                onClick={() => togglePrograms(index)}
-                                variant='unstyled'
-                                className={clsxm(
-                                  // (scholarshipOpen && index === 0) ||
-                                  boosterOpen && index === 0
-                                    ? 'bg-gray-100  text-primary-orange hover:text-primary-orange '
-                                    : 'bg-white  text-black-100 hover:text-black-100 ',
-                                  'text-start flex !p-0 active:text-black-100 justify-start text-sm md:w-full border-2 hover:bg-gray-100  '
-                                )}
-                              >
-                                <div className=' w-full flex items-center gap-1.5 p-2 hover:rounded-md'>
-                                  <Typography
-                                    color='inline'
-                                    variant='bt'
-                                    as='p'
-                                  >
-                                    {name}
-                                  </Typography>
-                                  <HiChevronDown
-                                    className={clsxm(
-                                      // (scholarshipOpen && index === 0) ||
-                                      boosterOpen && index === 0
-                                        ? 'rotate-180 text-primary-orange'
-                                        : 'rotate-0 text-black-100',
-                                      'h-4 w-4 transition ease-in-out duration-200'
-                                    )}
-                                  />
-                                </div>
-                              </Button>
-                            ))}
-                          </div>
-
-                          <div className='flex flex-col items-center w-full h-auto pb-8 rounded-xl'>
-                            <div className='grid grid-flow-row gap-4'>
-                              {/* {scholarshipOpen &&
-                                SCHOLARSHIP_FAIR_CARD_DATA.map((e, index) => (
-                                  <ProgramCard
-                                    key={index}
-                                    title={e.title}
-                                    desc={e.desc}
-                                    href={e.href}
-                                    img={e.img}
-                                    gradientColor='from-[#C0172AB5] to-[#12121280]'
-                                    buttonClassName='bg-[#E94759] hover:bg-[#ff99a5]'
-                                  />
-                                ))} */}
-
-                              {boosterOpen &&
-                                BOOSTER_SERIES_CARD_DATA.map((f, index) => (
-                                  <ProgramCard
-                                    key={index}
-                                    title={f.title}
-                                    desc={f.desc}
-                                    href={f.href}
-                                    img={f.img}
-                                    gradientColor='from-[#E47F1A] to-[#12121280]'
-                                    buttonClassName='bg-[#FB991A] hover:bg-[#ffc77d]'
-                                  />
-                                ))}
-                            </div>
-                          </div>
-                        </div>
-                      </Menu.Items>
-                    </Transition>
-                  )}
-                </Menu>
-              </li>
-              {/* <li>
-                <UnstyledLink
-                  href='/product'
-                  className='flex rounded-lg hover:bg-gray-100 hover:text-primary-bluegreen'
-                >
-                  <Typography
-                    color='inline'
-                    variant='bt'
-                    className='py-4 pl-4 '
-                  >
-                    Produk Kami
-                  </Typography>
-                </UnstyledLink>
-              </li> */}
-              <li>
-                <UnstyledLink
-                  href='/mentors'
-                  className='flex rounded-lg hover:bg-gray-100 hover:text-primary-bluegreen'
-                >
-                  <Typography
-                    color='inline'
-                    variant='bt'
-                    className='py-4 pl-4 '
-                  >
-                    Mentors
-                  </Typography>
-                </UnstyledLink>
-              </li>
-               {isLogin && (
-                <li>
-                  <UnstyledLink
-                    href='/scholarship-info'
-                    className='flex rounded-lg hover:bg-gray-100 hover:text-primary-bluegreen'
-                  >
-                    <Typography
-                      color='inline'
-                      variant='bt'
-                      className='px-4 py-4'
-                    >
-                      Info Beasiswa
-                    </Typography>
-                  </UnstyledLink>
-                </li>
-              )}
-              {isLogin && user?.role === 'ADMIN' ? (
-                <li>
-                  <UnstyledLink
-                    href='/admin'
-                    className='flex rounded-lg hover:bg-gray-100 hover:text-primary-bluegreen'
-                  >
-                    <Typography
-                      color='inline'
-                      variant='bt'
-                      className='py-4 pl-4 '
-                    >
-                      Dashboard
-                    </Typography>
-                  </UnstyledLink>
-                </li>
-              ) : isLogin && user?.role === 'USER' ? (
-                <li>
-                  <UnstyledLink
-                    href='/dashboard'
-                    className='flex rounded-lg hover:bg-gray-100 hover:text-primary-bluegreen'
-                  >
-                    <Typography
-                      color='inline'
-                      variant='bt'
-                      className='py-4 pl-4 '
-                    >
-                      Dashboard
-                    </Typography>
-                  </UnstyledLink>
-                </li>
-              ) : (
-                ' '
-              )}
-            </div>
-            <div className='flex flex-col gap-4'>
-              {!isLogin ? (
-                <>
-                  <ButtonLink
-                    href='/register'
-                    size='base'
-                    variant='primary'
-                    isOutline={false}
-                    className='py-4 hover:bg-transparent hover:text-primary-bluegreen'
-                  >
-                    <Typography color='inline' variant='bt'>
-                      Daftar
-                    </Typography>
-                  </ButtonLink>
-                  <ButtonLink
-                    href='/login'
-                    size='base'
-                    variant='primary'
-                    isOutline={true}
-                    className='py-4 hover:bg-primary-bluegreen hover:text-white'
-                  >
-                    <Typography color='inline' variant='bt'>
-                      Masuk
-                    </Typography>
-                  </ButtonLink>
-                </>
-              ) : (
-                  <>
-                  <UnstyledLink
-                    href='/scholarship-info'
-                    className='flex rounded-lg hover:bg-gray-100 hover:text-primary-bluegreen'
-                  >
-                    <Typography
-                      color='inline'
-                      variant='bt'
-                      className='px-4 py-4'
-                    >
-                      Info Beasiswa
-                    </Typography>
-                  </UnstyledLink>
                 <Menu as='div' className='w-full '>
                   <Menu.Button className='ring ring-primary-bluegreen w-full font-semibold rounded-md md:rounded-lg py-1.5 px-[14px]'>
                     {() => (
@@ -708,18 +474,17 @@ export default function Navbar() {
                     </Menu.Items>
                   </Transition>
                 </Menu>
-                </>
-              )}
-            </div>
-          </ul>
+              </>
+            )}
+          </div>
         </nav>
 
         <IconButton
           variant='unstyled'
           icon={MdClose}
           size='lg'
-          className='bg-transparent border-2 rounded-full border-primary-bluegreen'
-          iconClassName='text-primary-bluegreen'
+          className='bg-transparent border-2 rounded-full border-[#1B7691]'
+          iconClassName='text-[#1B7691]'
           onClick={toggleShowNav}
         />
       </div>

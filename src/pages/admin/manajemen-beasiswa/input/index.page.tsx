@@ -39,36 +39,36 @@ export default withAuth(InputBeasiswaPage, 'admin');
 function InputBeasiswaPage() {
   const methods = useForm({
     defaultValues: {
-        nama: "",
-        jenis: "",
-        penyelenggara: "",
-        benefit: "",
-        open_registration: null,
-        close_registration: null,
-        khusus_daerah_tertentu: false,
-        asal_daerah: "",
-        status_batas_usia: false,
-        min_umur: null,
-        max_umur: null,
-        status_gender_khusus: false,
-        gender: "",
-        jenjang: "",
-        status_semester_khusus: false,
-        semester_khusus: "",
-        status_fakultas_khusus: false,
-        status_jurusan_khusus: false,
-        status_kebutuhan_ipk: false,
-        min_ipk: null,
-        status_beasiswa_double: false,
-        status_keluarga_tidak_mampu: false,
-        status_disabilitas: false,
-        img_path: "",
-        kampus_bisa_daftar: "",
-        link_guidebook: "",
-        link_pendaftaran: "",
-        persyaratan: "",
-        lainnya: "",
-        deskripsi: "",
+      nama: "",
+      jenis: "",
+      penyelenggara: "",
+      benefit: "",
+      open_registration: null,
+      close_registration: null,
+      khusus_daerah_tertentu: false,
+      asal_daerah: "",
+      status_batas_usia: false,
+      min_umur: null,
+      max_umur: null,
+      status_gender_khusus: false,
+      gender: "",
+      jenjang: "",
+      status_semester_khusus: false,
+      semester_khusus: "",
+      status_fakultas_khusus: false,
+      status_jurusan_khusus: false,
+      status_kebutuhan_ipk: false,
+      min_ipk: null,
+      status_beasiswa_double: false,
+      status_keluarga_tidak_mampu: false,
+      status_disabilitas: false,
+      img_path: "",
+      kampus_bisa_daftar: "",
+      link_guidebook: "",
+      link_pendaftaran: "",
+      persyaratan: "",
+      lainnya: "",
+      deskripsi: "",
     },
   });
 
@@ -147,7 +147,7 @@ function InputBeasiswaPage() {
         deskripsi: formData.deskripsi || '',
       };
 
-      console.log('Payload to be sent:', payload);
+      // console.log('Payload to be sent:', payload);
 
       const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/scholarship`, {
         method: 'POST',
@@ -170,10 +170,10 @@ function InputBeasiswaPage() {
     } finally {
       setLoading(false);
     }
-    
+
   };
 
-  
+
 
   return (
     <FormProvider {...methods}>
@@ -265,75 +265,75 @@ function InputBeasiswaPage() {
           />
         </section>
 
-       <section className="flex flex-col gap-4 mt-4">
-        <Typography
-          variant="h5"
-          weight="semibold"
-          className="text-primary-blue"
-        >
-          Kondisi Tambahan
-        </Typography>
+        <section className="flex flex-col gap-4 mt-4">
+          <Typography
+            variant="h5"
+            weight="semibold"
+            className="text-primary-blue"
+          >
+            Kondisi Tambahan
+          </Typography>
 
-        <label>
-          <input type="checkbox" {...register("status_semester_khusus")} /> Semester
-          khusus?
-        </label>
+          <label>
+            <input type="checkbox" {...register("status_semester_khusus")} /> Semester
+            khusus?
+          </label>
 
-        {watch("status_semester_khusus") && (
-          <Input
-            id="semester_khusus"
-            label="Semester (jika ada)"
-            type="number"
-            {...register("semester_khusus")}
-          />
-        )}
+          {watch("status_semester_khusus") && (
+            <Input
+              id="semester_khusus"
+              label="Semester (jika ada)"
+              type="number"
+              {...register("semester_khusus")}
+            />
+          )}
 
-        <label>
-          <input type="checkbox" {...register("status_fakultas_khusus")} /> Fakultas
-          khusus?
-        </label>
+          <label>
+            <input type="checkbox" {...register("status_fakultas_khusus")} /> Fakultas
+            khusus?
+          </label>
 
-        {watch("status_fakultas_khusus") && (
-          <Input
-            id="fakultas_khusus"
-            label="Nama Fakultas"
-            type="text"
-            {...register("status_fakultas_khusus")}
-          />
-        )}
+          {watch("status_fakultas_khusus") && (
+            <Input
+              id="fakultas_khusus"
+              label="Nama Fakultas"
+              type="text"
+              {...register("status_fakultas_khusus")}
+            />
+          )}
 
-        <label>
-          <input type="checkbox" {...register("status_jurusan_khusus")} /> Jurusan
-          khusus?
-        </label>
+          <label>
+            <input type="checkbox" {...register("status_jurusan_khusus")} /> Jurusan
+            khusus?
+          </label>
 
-        {watch("status_jurusan_khusus") && (
-          <Input
-            id="jurusan_khusus"
-            label="Nama Jurusan"
-            type="text"
-            {...register("status_jurusan_khusus")}
-          />
-        )}
+          {watch("status_jurusan_khusus") && (
+            <Input
+              id="jurusan_khusus"
+              label="Nama Jurusan"
+              type="text"
+              {...register("status_jurusan_khusus")}
+            />
+          )}
 
-        <label>
-          <input type="checkbox" {...register("status_beasiswa_double")} /> Izinkan
-          double beasiswa?
-        </label>
+          <label>
+            <input type="checkbox" {...register("status_beasiswa_double")} /> Izinkan
+            double beasiswa?
+          </label>
 
-        <label>
-          <input
-            type="checkbox"
-            {...register("status_keluarga_tidak_mampu")}
-          />{" "}
-          Khusus keluarga tidak mampu?
-        </label>
+          <label>
+            <input
+              type="checkbox"
+              {...register("status_keluarga_tidak_mampu")}
+            />{" "}
+            Khusus keluarga tidak mampu?
+          </label>
 
-        <label>
-          <input type="checkbox" {...register("status_disabilitas")} /> Khusus
-          penyandang disabilitas?
-        </label>
-      </section>
+          <label>
+            <input type="checkbox" {...register("status_disabilitas")} /> Khusus
+            penyandang disabilitas?
+          </label>
+        </section>
         {/* Link & Deskripsi */}
         <section className="flex flex-col gap-4 mt-4">
           <Input id="img_path" label="Path Gambar (opsional)" />

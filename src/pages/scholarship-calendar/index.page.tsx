@@ -2,10 +2,14 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 
 import { useQuery } from '@tanstack/react-query';
 import moment from 'moment';
+import 'moment/locale/id'; // Import Indonesian locale
 import { useRouter } from 'next/router';
 import React, { useMemo, useState } from 'react';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
-import { FiCalendar, FiChevronLeft, FiChevronRight, FiFilter, FiDownload, FiSearch, FiX, FiAlertCircle, FiClock } from 'react-icons/fi';
+import {
+  FiCalendar, FiChevronLeft, FiChevronRight, FiFilter, FiDownload,
+  FiSearch, FiX, FiInfo, FiClock, FiMapPin, FiLayers, FiFlag
+} from 'react-icons/fi';
 
 import SEO from '@/components/SEO';
 import Typography from '@/components/Typography';
@@ -13,6 +17,7 @@ import api from '@/lib/api';
 import Layout from '@/layouts/Layout';
 import { ApiReturn } from '@/types/api';
 
+moment.locale('id'); // Set locale to Indonesian
 const localizer = momentLocalizer(moment);
 
 type ScholarshipData = {
@@ -37,11 +42,12 @@ type CalendarEvent = {
   start: Date;
   end: Date;
   resource: ScholarshipData;
+  isClosingSoon?: boolean;
 };
 
 const months = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December'
+  'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+  'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
 ];
 
 const currentYear = new Date().getFullYear();
@@ -49,7 +55,7 @@ const years = Array.from({ length: 5 }, (_, i) => currentYear - 1 + i);
 
 export default function ScholarshipCalendarPage() {
   const router = useRouter();
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage] = useState(1);
   const [showPinnedOnly, setShowPinnedOnly] = useState(false);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
@@ -91,37 +97,43 @@ export default function ScholarshipCalendarPage() {
 
   const events: CalendarEvent[] = useMemo(() => {
     if (!scholarshipData?.data) return [];
-    
+
     let filtered = scholarshipData.data;
 
-    // Filter by jenjang
     if (selectedJenjang.length > 0) {
-      filtered = filtered.filter(s => 
+      filtered = filtered.filter(s =>
         s.jenjang.some(j => selectedJenjang.includes(j))
       );
     }
 
-    // Filter by jenis
     if (selectedJenis.length > 0) {
       filtered = filtered.filter(s => selectedJenis.includes(s.jenis));
     }
 
-    // Filter by search query
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(s => 
+      filtered = filtered.filter(s =>
         s.nama.toLowerCase().includes(query) ||
         s.penyelenggara.toLowerCase().includes(query)
       );
     }
 
-    return filtered.map((scholarship) => ({
-      id: scholarship.id,
-      title: scholarship.nama,
-      start: new Date(scholarship.open_registration),
-      end: new Date(scholarship.close_registration),
-      resource: scholarship,
-    }));
+    const now = new Date();
+
+    return filtered.map((scholarship) => {
+      const end = new Date(scholarship.close_registration);
+      const daysUntilClose = Math.ceil((end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+      const isClosingSoon = daysUntilClose > 0 && daysUntilClose <= 7;
+
+      return {
+        id: scholarship.id,
+        title: scholarship.nama,
+        start: new Date(scholarship.open_registration),
+        end: end,
+        resource: scholarship,
+        isClosingSoon
+      };
+    });
   }, [scholarshipData, selectedJenjang, selectedJenis, searchQuery]);
 
   const monthlyStats = useMemo(() => {
@@ -156,39 +168,45 @@ export default function ScholarshipCalendarPage() {
     const start = new Date(event.resource.open_registration);
     const end = new Date(event.resource.close_registration);
     const daysUntilClose = Math.ceil((end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-    
-    let backgroundColor = '#1B7691';
-    
+
+    let backgroundColor = '#3b82f6'; // Blue-500 default
+    let borderColor = '#2563eb';
+
     if (now < start) {
       // UPCOMING
-      backgroundColor = '#1B7691';
+      backgroundColor = '#0ea5e9'; // Sky-500
+      borderColor = '#0284c7';
     } else if (now >= start && now <= end) {
-      // Closing soon - orange/red gradient
       if (daysUntilClose <= 3) {
-        backgroundColor = '#ef4444'; // red
+        backgroundColor = '#ef4444'; // Red-500
+        borderColor = '#dc2626';
       } else if (daysUntilClose <= 7) {
-        backgroundColor = '#f59e0b'; // amber
+        backgroundColor = '#f59e0b'; // Amber-500
+        borderColor = '#d97706';
       } else {
-        backgroundColor = '#10b981'; // green
+        backgroundColor = '#10b981'; // Emerald-500
+        borderColor = '#059669';
       }
     } else {
       // CLOSED
-      backgroundColor = '#9ca3af';
+      backgroundColor = '#64748b'; // Slate-500
+      borderColor = '#475569';
     }
 
     return {
       style: {
         backgroundColor,
-        borderRadius: '6px',
+        borderLeft: `3px solid ${borderColor}`,
+        borderRadius: '4px',
         opacity: 0.95,
         color: 'white',
-        border: '0px',
         display: 'block',
-        fontSize: '0.8125rem',
-        fontWeight: '600',
+        fontSize: '0.75rem',
+        fontWeight: '500',
         padding: '2px 6px',
         cursor: 'pointer',
         transition: 'all 0.2s ease',
+        boxShadow: '0 1px 2px rgba(0,0,0,0.1)'
       },
     };
   };
@@ -233,30 +251,30 @@ export default function ScholarshipCalendarPage() {
   const handleExportCalendar = () => {
     const now = new Date();
     const futureEvents = events.filter(e => e.end >= now);
-    
-    let icsContent = 'BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Raihasa//Scholarship Calendar//EN\n';
-    
+
+    let icsContent = 'BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Scholra//Scholarship Calendar//EN\n';
+
     futureEvents.forEach(event => {
       const formatDate = (date: Date) => {
         return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
       };
-      
+
       icsContent += 'BEGIN:VEVENT\n';
-      icsContent += `UID:${event.id}@raihasa.com\n`;
+      icsContent += `UID:${event.id}@scholra.com\n`;
       icsContent += `DTSTART:${formatDate(event.start)}\n`;
       icsContent += `DTEND:${formatDate(event.end)}\n`;
       icsContent += `SUMMARY:${event.title}\n`;
-      icsContent += `DESCRIPTION:${event.resource.penyelenggara}\\nJenjang: ${event.resource.jenjang.join(', ')}\n`;
+      icsContent += `DESCRIPTION:${event.resource.penyelenggara}\\nLevels: ${event.resource.jenjang.join(', ')}\n`;
       icsContent += 'END:VEVENT\n';
     });
-    
+
     icsContent += 'END:VCALENDAR';
-    
+
     const blob = new Blob([icsContent], { type: 'text/calendar' });
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = 'raihasa-scholarships.ics';
+    link.download = 'scholra-scholarships.ics';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -282,6 +300,7 @@ export default function ScholarshipCalendarPage() {
             setHoveredEvent(null);
           }, 150);
         }}
+        className="relative h-full"
       >
         {children}
       </div>
@@ -323,125 +342,179 @@ export default function ScholarshipCalendarPage() {
 
   return (
     <Layout withNavbar={true} withFooter={true}>
-      <SEO title="Scholarship Calendar | Raihasa" />
-      <main className="bg-gradient-to-br from-gray-50 to-blue-50/30 py-12 px-4 sm:px-6 lg:px-8 pt-24">
-        <div className="max-w-7xl mx-auto">
-          {/* Header */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between flex-wrap gap-6">
-              <div className="flex items-center gap-4">
-                <div className="p-4 bg-gradient-to-br from-primary-blue to-primary-orange rounded-2xl shadow-lg">
-                  <FiCalendar className="text-white text-2xl" />
-                </div>
-                <div>
-                  <Typography variant="h3" weight="bold" className="text-gray-900">
-                    Scholarship Calendar
-                  </Typography>
-                  <Typography className="text-gray-600 mt-1">
-                    Track all scholarship deadlines in one place
-                  </Typography>
-                </div>
-              </div>
+      <SEO title="Kalender Beasiswa | Scholra" />
+      <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
+        
+        .animate-fadeIn {
+          animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(8px) scale(0.98); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
+        }
 
-              <div className="flex items-center gap-3">
+        /* Calendar Updates */
+        .rbc-calendar {
+            font-family: 'Poppins', sans-serif;
+        }
+        .rbc-header {
+            padding: 16px 8px;
+            font-weight: 600;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+            color: #64748b;
+            text-transform: uppercase;
+            border-bottom: 1px solid #e2e8f0;
+            background: #f8fafc;
+        }
+        .rbc-month-view {
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            background: white;
+        }
+        .rbc-day-bg + .rbc-day-bg {
+            border-left: 1px solid #f1f5f9;
+        }
+        .rbc-month-row + .rbc-month-row {
+            border-top: 1px solid #f1f5f9;
+        }
+        .rbc-today {
+            background-color: #f0f9ff !important;
+        }
+        .rbc-off-range-bg {
+            background-color: #fcfcfc;
+        }
+        .rbc-event {
+            padding: 2px 4px !important;
+            margin: 1px 0;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        .rbc-event:focus {
+            outline: none;
+        }
+        .rbc-current-time-indicator {
+            background-color: #1B7691;
+        }
+        
+        /* Modern Scrollbar */
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+          height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: #f1f1f1;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: #cbd5e1;
+          border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: #94a3b8;
+        }
+      `}</style>
+
+      <main className="min-h-screen bg-[#F8FAFC] pb-20 pt-24">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+
+          {/* Header Section */}
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <div className="h-1 w-8 bg-[#1B7691] rounded-full"></div>
+                <span className="text-sm font-bold text-[#1B7691] uppercase tracking-wider">Jadwal & Perencanaan</span>
+              </div>
+              <Typography className="text-3xl md:text-4xl font-bold text-gray-900 leading-tight">
+                Kalender Beasiswa
+              </Typography>
+              <Typography className="text-gray-500 mt-2 max-w-xl">
+                Pantau tenggat waktu beasiswa impianmu. Visualisasikan perjalanan beasiswamu dan jangan pernah lewatkan kesempatan lagi.
+              </Typography>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleExportCalendar}
+                className="flex items-center gap-2 px-6 py-2.5 rounded-xl font-medium text-sm transition-all duration-300 bg-white text-gray-700 border border-gray-200 hover:border-[#1B7691] hover:text-[#1B7691] shadow-sm hover:shadow-md"
+              >
+                <FiDownload />
+                Ekspor Kalender
+              </button>
+              <div className="h-8 w-[1px] bg-gray-300 mx-1 hidden md:block"></div>
+              <div className="bg-white p-1 rounded-xl border border-gray-200 shadow-sm flex items-center">
                 <button
-                  onClick={handleExportCalendar}
-                  className="flex items-center gap-2 px-5 py-3 rounded-full font-medium transition-all duration-300 bg-white text-gray-700 border border-gray-200 hover:border-primary-blue hover:bg-gray-50 shadow-sm"
-                  title="Export to Calendar"
+                  onClick={() => setShowPinnedOnly(false)}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${!showPinnedOnly ? 'bg-gray-100 text-gray-900' : 'text-gray-500 hover:bg-gray-50'}`}
                 >
-                  <FiDownload />
-                  Export
+                  Semua
                 </button>
-                
                 <button
-                  onClick={() => setShowPinnedOnly(!showPinnedOnly)}
-                  className={`flex items-center gap-2 px-5 py-3 rounded-full font-medium transition-all duration-300 ${
-                    showPinnedOnly
-                      ? 'bg-gradient-to-r from-primary-blue to-primary-orange text-white shadow-lg scale-105'
-                      : 'bg-white text-gray-700 border border-gray-200 hover:border-primary-blue hover:bg-gray-50 shadow-sm'
-                  }`}
+                  onClick={() => setShowPinnedOnly(true)}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${showPinnedOnly ? 'bg-[#1B7691] text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'}`}
                 >
-                  <FiFilter className={showPinnedOnly ? 'animate-pulse' : ''} />
-                  {showPinnedOnly ? 'Pinned' : 'All'}
+                  <FiFilter className="w-4 h-4" /> Disimpan
                 </button>
               </div>
             </div>
           </div>
 
-          {/* Search & Filters */}
-          <div className="mb-6 bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
-            <div className="space-y-4">
-              {/* Search Bar */}
-              <div className="relative">
-                <FiSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl" />
-                <input
-                  type="text"
-                  placeholder="Search scholarships by name or organizer..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-12 pr-12 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-blue focus:border-transparent transition-all"
-                />
-                {searchQuery && (
-                  <button
-                    onClick={() => setSearchQuery('')}
-                    className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  >
-                    <FiX />
-                  </button>
-                )}
+          {/* Controls & Filters Bar */}
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-8">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+              {/* Search - Col Span 4 */}
+              <div className="lg:col-span-4">
+                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 block">Cari Beasiswa</label>
+                <div className="relative group">
+                  <FiSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-[#1B7691] transition-colors" />
+                  <input
+                    type="text"
+                    placeholder="Ketik nama beasiswa..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#1B7691] focus:bg-white transition-all"
+                  />
+                  {searchQuery && (
+                    <button onClick={() => setSearchQuery('')} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                      <FiX />
+                    </button>
+                  )}
+                </div>
               </div>
 
-              {/* Filter Pills */}
-              <div className="flex flex-wrap gap-3">
-                {/* Jenjang Filter */}
-                <div className="flex-1 min-w-[200px]">
-                  <label className="text-sm font-semibold text-gray-600 mb-2 block">
-                    Education Level
-                  </label>
-                  <div className="flex flex-wrap gap-2">
+              {/* Filters - Col Span 8 */}
+              <div className="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 block">Jenjang</label>
+                  <div className="flex flex-nowrap overflow-x-auto pb-2 gap-2 custom-scrollbar">
                     {allJenjang.map(jenjang => (
                       <button
                         key={jenjang}
-                        onClick={() => {
-                          setSelectedJenjang(prev =>
-                            prev.includes(jenjang)
-                              ? prev.filter(j => j !== jenjang)
-                              : [...prev, jenjang]
-                          );
-                        }}
-                        className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                          selectedJenjang.includes(jenjang)
-                            ? 'bg-gradient-to-r from-primary-blue to-primary-orange text-white shadow-md'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                        }`}
+                        onClick={() => setSelectedJenjang(prev => prev.includes(jenjang) ? prev.filter(j => j !== jenjang) : [...prev, jenjang])}
+                        className={`whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${selectedJenjang.includes(jenjang)
+                            ? 'bg-[#1B7691] border-[#1B7691] text-white'
+                            : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300'
+                          }`}
                       >
                         {jenjang}
                       </button>
                     ))}
                   </div>
                 </div>
-
-                {/* Jenis Filter */}
-                <div className="flex-1 min-w-[200px]">
-                  <label className="text-sm font-semibold text-gray-600 mb-2 block">
-                    Scholarship Type
-                  </label>
-                  <div className="flex flex-wrap gap-2">
+                <div>
+                  <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 block">Jenis</label>
+                  <div className="flex flex-nowrap overflow-x-auto pb-2 gap-2 custom-scrollbar">
                     {allJenis.map(jenis => (
                       <button
                         key={jenis}
-                        onClick={() => {
-                          setSelectedJenis(prev =>
-                            prev.includes(jenis)
-                              ? prev.filter(j => j !== jenis)
-                              : [...prev, jenis]
-                          );
-                        }}
-                        className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                          selectedJenis.includes(jenis)
-                            ? 'bg-gradient-to-r from-primary-blue to-primary-orange text-white shadow-md'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                        }`}
+                        onClick={() => setSelectedJenis(prev => prev.includes(jenis) ? prev.filter(j => j !== jenis) : [...prev, jenis])}
+                        className={`whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${selectedJenis.includes(jenis)
+                            ? 'bg-[#1B7691] border-[#1B7691] text-white'
+                            : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300'
+                          }`}
                       >
                         {jenis}
                       </button>
@@ -450,374 +523,204 @@ export default function ScholarshipCalendarPage() {
                 </div>
               </div>
 
-              {/* Clear Filters */}
-              {(selectedJenjang.length > 0 || selectedJenis.length > 0 || searchQuery) && (
-                <button
-                  onClick={() => {
-                    setSelectedJenjang([]);
-                    setSelectedJenis([]);
-                    setSearchQuery('');
-                  }}
-                  className="text-sm text-primary-blue hover:text-primary-orange font-medium transition-colors flex items-center gap-1"
-                >
-                  <FiX className="text-xs" />
-                  Clear all filters
-                </button>
-              )}
             </div>
           </div>
 
-          {/* Monthly Stats Alert */}
-          {monthlyStats.closingSoon > 0 && (
-            <div className="mb-6 bg-gradient-to-r from-amber-50 to-orange-50 border-l-4 border-amber-500 rounded-lg p-4 shadow-sm">
-              <div className="flex items-center gap-3">
-                <FiAlertCircle className="text-amber-600 text-2xl flex-shrink-0" />
-                <div>
-                  <Typography className="font-bold text-amber-900">
-                    {monthlyStats.closingSoon} scholarship{monthlyStats.closingSoon > 1 ? 's' : ''} closing soon!
-                  </Typography>
-                  <Typography className="text-sm text-amber-700">
-                    Deadline within 7 days for {months[selectedMonth]} {selectedYear}
-                  </Typography>
-                </div>
-              </div>
-            </div>
-          )}
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
 
-          {/* Navigation & Filter Controls */}
-          <div className="mb-6 bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
-            <div className="flex items-center justify-between flex-wrap gap-4">
-              {/* Month/Year Navigation */}
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => handleNavigate('prev')}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                >
-                  <FiChevronLeft className="text-gray-600 text-xl" />
-                </button>
+            {/* LEFT SIDEBAR: Calendar Controls & Legend */}
+            <div className="lg:col-span-1 space-y-6">
 
-                <div className="flex items-center gap-3">
-                  <select
-                    value={selectedMonth}
-                    onChange={(e) => handleMonthChange(parseInt(e.target.value))}
-                    className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-700 font-medium focus:outline-none focus:ring-2 focus:ring-primary-blue focus:border-transparent transition-all cursor-pointer"
+              {/* Navigation Card */}
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="font-bold text-gray-900">Navigasi</h3>
+                  <button
+                    onClick={() => {
+                      const today = new Date();
+                      setSelectedMonth(today.getMonth());
+                      setSelectedYear(today.getFullYear());
+                      setCurrentDate(today);
+                    }}
+                    className="text-xs font-bold text-[#1B7691] hover:underline"
                   >
-                    {months.map((month, index) => (
-                      <option key={month} value={index}>
-                        {month}
-                      </option>
-                    ))}
-                  </select>
-
-                  <select
-                    value={selectedYear}
-                    onChange={(e) => handleYearChange(parseInt(e.target.value))}
-                    className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-700 font-medium focus:outline-none focus:ring-2 focus:ring-primary-blue focus:border-transparent transition-all cursor-pointer"
-                  >
-                    {years.map((year) => (
-                      <option key={year} value={year}>
-                        {year}
-                      </option>
-                    ))}
-                  </select>
+                    Hari Ini
+                  </button>
                 </div>
 
-                <button
-                  onClick={() => handleNavigate('next')}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                >
-                  <FiChevronRight className="text-gray-600 text-xl" />
-                </button>
+                <div className="flex items-center justify-between bg-gray-50 p-2 rounded-xl mb-4">
+                  <button onClick={() => handleNavigate('prev')} className="p-2 hover:bg-white hover:shadow-sm rounded-lg transition-all text-gray-600">
+                    <FiChevronLeft />
+                  </button>
+                  <div className="flex flex-col items-center">
+                    <select
+                      value={selectedMonth}
+                      onChange={(e) => handleMonthChange(parseInt(e.target.value))}
+                      className="bg-transparent font-bold text-gray-900 text-sm focus:outline-none cursor-pointer text-center"
+                    >
+                      {months.map((m, i) => <option key={m} value={i}>{m}</option>)}
+                    </select>
+                    <select
+                      value={selectedYear}
+                      onChange={(e) => handleYearChange(parseInt(e.target.value))}
+                      className="bg-transparent text-xs text-gray-500 focus:outline-none cursor-pointer text-center"
+                    >
+                      {years.map(y => <option key={y} value={y}>{y}</option>)}
+                    </select>
+                  </div>
+                  <button onClick={() => handleNavigate('next')} className="p-2 hover:bg-white hover:shadow-sm rounded-lg transition-all text-gray-600">
+                    <FiChevronRight />
+                  </button>
+                </div>
 
-                <button
-                  onClick={() => {
-                    const today = new Date();
-                    setSelectedMonth(today.getMonth());
-                    setSelectedYear(today.getFullYear());
-                    setCurrentDate(today);
-                  }}
-                  className="ml-2 px-4 py-2 bg-gradient-to-r from-primary-blue to-primary-orange text-white rounded-lg hover:shadow-lg transition-all duration-300 font-medium text-sm"
-                >
-                  Today
-                </button>
+                {/* Stats for selected month */}
+                <div className="grid grid-cols-2 gap-3 mt-4">
+                  <div className="bg-blue-50 p-3 rounded-xl border border-blue-100">
+                    <p className="text-xs text-blue-600 font-medium mb-1">Akan Datang</p>
+                    <p className="text-2xl font-bold text-blue-800">{monthlyStats.upcoming}</p>
+                  </div>
+                  <div className="bg-amber-50 p-3 rounded-xl border border-amber-100">
+                    <p className="text-xs text-amber-600 font-medium mb-1">Segera Tutup</p>
+                    <p className="text-2xl font-bold text-amber-800">{monthlyStats.closingSoon}</p>
+                  </div>
+                </div>
               </div>
 
               {/* Legend */}
-              <div className="flex items-center gap-5 flex-wrap">
-                <Typography className="text-sm font-semibold text-gray-500">
-                  Status:
-                </Typography>
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-green-500 rounded-full shadow-sm"></div>
-                  <Typography className="text-sm text-gray-700 font-medium">
-                    Ongoing
-                  </Typography>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-amber-500 rounded-full shadow-sm"></div>
-                  <Typography className="text-sm text-gray-700 font-medium">
-                    Closing Soon
-                  </Typography>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-red-500 rounded-full shadow-sm"></div>
-                  <Typography className="text-sm text-gray-700 font-medium">
-                    Last Days
-                  </Typography>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-primary-blue rounded-full shadow-sm"></div>
-                  <Typography className="text-sm text-gray-700 font-medium">
-                    Upcoming
-                  </Typography>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-gray-400 rounded-full shadow-sm"></div>
-                  <Typography className="text-sm text-gray-700 font-medium">
-                    Closed
-                  </Typography>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* This Month Stats */}
-          <div className="mb-6 grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-              <Typography className="text-xs text-gray-500 font-medium mb-1">
-                This Month
-              </Typography>
-              <Typography className="text-2xl font-bold text-gray-900">
-                {monthlyStats.total}
-              </Typography>
-            </div>
-            <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-              <Typography className="text-xs text-gray-500 font-medium mb-1">
-                Ongoing
-              </Typography>
-              <Typography className="text-2xl font-bold text-green-600">
-                {monthlyStats.ongoing}
-              </Typography>
-            </div>
-            <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-              <Typography className="text-xs text-gray-500 font-medium mb-1">
-                Upcoming
-              </Typography>
-              <Typography className="text-2xl font-bold text-blue-600">
-                {monthlyStats.upcoming}
-              </Typography>
-            </div>
-            <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-              <div className="flex items-center gap-2 mb-1">
-                <Typography className="text-xs text-gray-500 font-medium">
-                  Closing Soon
-                </Typography>
-                {monthlyStats.closingSoon > 0 && (
-                  <FiClock className="text-amber-500 text-sm animate-pulse" />
-                )}
-              </div>
-              <Typography className="text-2xl font-bold text-amber-600">
-                {monthlyStats.closingSoon}
-              </Typography>
-            </div>
-          </div>
-
-          {/* Calendar */}
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 overflow-hidden">
-            {isLoading ? (
-              <div className="flex items-center justify-center h-96">
-                <div className="flex flex-col items-center gap-4">
-                  <div className="relative">
-                    <div className="animate-spin rounded-full h-14 w-14 border-4 border-gray-200"></div>
-                    <div className="animate-spin rounded-full h-14 w-14 border-4 border-primary-blue border-t-transparent absolute top-0 left-0"></div>
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+                <h3 className="font-bold text-gray-900 mb-4">Keterangan</h3>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-3 h-3 rounded-full bg-[#10b981]"></div>
+                    <span className="text-sm text-gray-600">Masa Aktif</span>
                   </div>
-                  <Typography className="text-gray-600 font-medium">
-                    Loading scholarships...
-                  </Typography>
+                  <div className="flex items-center gap-3">
+                    <div className="w-3 h-3 rounded-full bg-[#f59e0b]"></div>
+                    <span className="text-sm text-gray-600">Segera Tutup (≤ 7 hari)</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-3 h-3 rounded-full bg-[#ef4444]"></div>
+                    <span className="text-sm text-gray-600">Mendesak (≤ 3 hari)</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-3 h-3 rounded-full bg-[#0ea5e9]"></div>
+                    <span className="text-sm text-gray-600">Akan Dibuka</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-3 h-3 rounded-full bg-[#64748b]"></div>
+                    <span className="text-sm text-gray-600 opacity-60">Ditutup</span>
+                  </div>
                 </div>
               </div>
-            ) : (
-              <Calendar
-                localizer={localizer}
-                events={events}
-                startAccessor="start"
-                endAccessor="end"
-                style={{ height: 700 }}
-                onSelectEvent={handleSelectEvent}
-                eventPropGetter={eventStyleGetter}
-                view="month"
-                date={currentDate}
-                onNavigate={setCurrentDate}
-                views={['month']}
-                popup
-                showMultiDayTimes
-                toolbar={false}
-                components={{
-                  eventWrapper: EventWrapper,
-                }}
-                tooltipAccessor={(event: CalendarEvent) => {
-                  const now = new Date();
-                  const daysUntilClose = Math.ceil((event.end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-                  let urgency = '';
-                  if (daysUntilClose > 0 && daysUntilClose <= 7) {
-                    urgency = ` ⚠️ Closes in ${daysUntilClose} day${daysUntilClose > 1 ? 's' : ''}!`;
-                  }
-                  return `${event.title}\n${event.resource.penyelenggara}\nJenjang: ${event.resource.jenjang.join(', ')}${urgency}`;
-                }}
-              />
-            )}
+
+            </div>
+
+            {/* RIGHT CONTENT: Calendar */}
+            <div className="lg:col-span-3">
+              <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-200 p-8 h-[800px] relative">
+                {isLoading ? (
+                  <div className="absolute inset-0 flex items-center justify-center bg-white/80 z-10 rounded-3xl">
+                    <div className="flex flex-col items-center">
+                      <div className="animate-spin rounded-full h-12 w-12 border-4 border-gray-200 border-t-[#1B7691]"></div>
+                      <p className="mt-4 text-gray-500 font-medium text-sm">Memuat data kalender...</p>
+                    </div>
+                  </div>
+                ) : null}
+
+                <Calendar
+                  localizer={localizer}
+                  events={events}
+                  startAccessor="start"
+                  endAccessor="end"
+                  style={{ height: '100%' }}
+                  onSelectEvent={handleSelectEvent}
+                  eventPropGetter={eventStyleGetter}
+                  view="month"
+                  date={currentDate}
+                  onNavigate={setCurrentDate}
+                  views={['month']}
+                  popup
+                  showMultiDayTimes
+                  toolbar={false}
+                  components={{
+                    eventWrapper: EventWrapper,
+                  }}
+                />
+              </div>
+            </div>
           </div>
 
-          {/* Hover Tooltip */}
+          {/* Hover Tooltip (Portal Lookalike) */}
           {hoveredEvent && (
             <div
-              className="fixed z-50 bg-white rounded-xl shadow-2xl border border-gray-200 p-4 max-w-sm pointer-events-none animate-fadeIn"
+              className="fixed z-[999] bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.2)] border border-[#e2e8f0] p-5 w-[320px] pointer-events-none animate-fadeIn"
               style={{
-                left: `${Math.min(mousePosition.x + 20, window.innerWidth - 350)}px`,
-                top: `${Math.max(mousePosition.y - 100, 10)}px`,
+                left: `${Math.min(mousePosition.x + 20, window.innerWidth - 340)}px`,
+                top: `${Math.min(Math.max(mousePosition.y - 100, 20), window.innerHeight - 300)}px`,
               }}
             >
-              <Typography className="font-bold text-gray-900 mb-2">
-                {hoveredEvent.title}
-              </Typography>
-              <div className="space-y-1 text-sm">
-                <Typography className="text-gray-600">
-                  <span className="font-semibold">Organizer:</span> {hoveredEvent.resource.penyelenggara}
-                </Typography>
-                <Typography className="text-gray-600">
-                  <span className="font-semibold">Level:</span> {hoveredEvent.resource.jenjang.join(', ')}
-                </Typography>
-                <Typography className="text-gray-600">
-                  <span className="font-semibold">Type:</span> {hoveredEvent.resource.jenis}
-                </Typography>
-                <Typography className="text-gray-600">
-                  <span className="font-semibold">Period:</span> {moment(hoveredEvent.start).format('MMM DD')} - {moment(hoveredEvent.end).format('MMM DD, YYYY')}
-                </Typography>
-                {(() => {
-                  const now = new Date();
-                  const daysUntilClose = Math.ceil((hoveredEvent.end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-                  if (daysUntilClose > 0 && daysUntilClose <= 7) {
-                    return (
-                      <div className="flex items-center gap-1 text-amber-600 font-semibold pt-1">
-                        <FiAlertCircle />
-                        <span>Closes in {daysUntilClose} day{daysUntilClose > 1 ? 's' : ''}!</span>
+              {/* Header Accents based on status */}
+              <div className={`absolute top-0 left-0 right-0 h-1.5 rounded-t-2xl ${hoveredEvent.isClosingSoon ? 'bg-[#f59e0b]' : 'bg-[#1B7691]'
+                }`}></div>
+
+              <div className="mt-2">
+                <div className="flex items-start justify-between">
+                  <Typography className="font-bold text-gray-900 leading-tight pr-4">
+                    {hoveredEvent.title}
+                  </Typography>
+                  {hoveredEvent.isClosingSoon && (
+                    <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded font-bold whitespace-nowrap">Segera Berakhir</span>
+                  )}
+                </div>
+
+                <div className="mt-3 space-y-2.5">
+                  <div className="flex items-start gap-2.5">
+                    <FiFlag className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
+                    <div>
+                      <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Penyelenggara</p>
+                      <p className="text-sm font-medium text-gray-800">{hoveredEvent.resource.penyelenggara}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-2.5">
+                    <FiLayers className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
+                    <div>
+                      <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Detail</p>
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        <span className="text-[10px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded border border-gray-200">
+                          {hoveredEvent.resource.jenis}
+                        </span>
+                        {hoveredEvent.resource.jenjang.slice(0, 2).map(j => (
+                          <span key={j} className="text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded border border-blue-100">
+                            {j}
+                          </span>
+                        ))}
                       </div>
-                    );
-                  }
-                  return null;
-                })()}
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-2.5 pt-2 border-t border-gray-100">
+                    <FiClock className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
+                    <div>
+                      <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Waktu</p>
+                      <p className="text-sm text-gray-700">
+                        {moment(hoveredEvent.start).format('DD MMM')} — {moment(hoveredEvent.end).format('DD MMM YYYY')}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-4 pt-3 border-t border-gray-100 flex justify-end">
+                  <span className="text-xs font-bold text-[#1B7691] flex items-center gap-1">
+                    Lihat Detail <FiChevronRight />
+                  </span>
+                </div>
               </div>
-              <Typography className="text-xs text-gray-400 mt-2 italic">
-                Click to view details
-              </Typography>
             </div>
           )}
 
-          
         </div>
       </main>
-
-      <style jsx global>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(-5px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        .animate-fadeIn {
-          animation: fadeIn 0.15s ease-out;
-        }
-        .rbc-calendar {
-          font-family: inherit;
-        }
-        .rbc-header {
-          padding: 12px 8px;
-          font-weight: 700;
-          color: #1f2937;
-          background: linear-gradient(to bottom, #f9fafb, #ffffff);
-          border-bottom: 2px solid #e5e7eb;
-          text-transform: uppercase;
-          font-size: 0.75rem;
-          letter-spacing: 0.05em;
-        }
-        .rbc-today {
-          background-color: #dbeafe !important;
-        }
-        .rbc-date-cell {
-          padding: 8px;
-          text-align: center;
-        }
-        .rbc-date-cell.rbc-now {
-          font-weight: 700;
-          color: #1b7691;
-        }
-        .rbc-event {
-          padding: 3px 8px;
-          cursor: pointer;
-          transition: all 0.2s ease;
-          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-        }
-        .rbc-event:hover {
-          transform: translateY(-1px);
-          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
-          opacity: 1 !important;
-        }
-        .rbc-event-content {
-          font-weight: 600;
-          font-size: 0.8125rem;
-        }
-        .rbc-month-view {
-          border: 1px solid #e5e7eb;
-          border-radius: 12px;
-          overflow: hidden;
-        }
-        .rbc-month-row {
-          border-color: #f3f4f6;
-          min-height: 100px;
-        }
-        .rbc-day-bg {
-          border-color: #f3f4f6;
-          transition: background-color 0.2s ease;
-        }
-        .rbc-day-bg:hover {
-          background-color: #f9fafb;
-        }
-        .rbc-off-range {
-          color: #d1d5db;
-        }
-        .rbc-off-range-bg {
-          background: #fafafa;
-        }
-        .rbc-show-more {
-          background-color: transparent;
-          color: #1b7691;
-          font-weight: 600;
-          font-size: 0.75rem;
-          padding: 2px 6px;
-          border-radius: 4px;
-          transition: all 0.2s ease;
-        }
-        .rbc-show-more:hover {
-          background-color: #dbeafe;
-          text-decoration: none;
-        }
-        .rbc-overlay {
-          border-radius: 12px;
-          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-          border: 1px solid #e5e7eb;
-        }
-        .rbc-overlay-header {
-          background: linear-gradient(135deg, #1b7691 0%, #f58220 100%);
-          color: white;
-          padding: 12px 16px;
-          font-weight: 700;
-          border-radius: 12px 12px 0 0;
-        }
-      `}</style>
     </Layout>
   );
 }

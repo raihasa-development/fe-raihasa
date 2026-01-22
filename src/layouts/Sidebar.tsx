@@ -1,9 +1,8 @@
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
-import { FaChevronDown, FaUsers, FaGraduationCap, FaBookReader } from 'react-icons/fa';
-import { HiBookOpen, HiDocumentSearch, HiDocumentText, HiLogout, HiHome } from 'react-icons/hi';
-import { IoSparkles, IoBulbOutline } from 'react-icons/io5';
-import { MdDashboard, MdManageAccounts } from 'react-icons/md';
+import { FaChevronDown, FaUsers, FaBookReader } from 'react-icons/fa';
+import { HiHome, HiLogout, HiUserGroup, HiCurrencyDollar } from 'react-icons/hi';
+import { IoSparkles, IoBulbOutline, IoSettingsOutline } from 'react-icons/io5';
 
 import UnstyledLink from '@/components/links/UnstyledLink';
 import NextImage from '@/components/NextImage';
@@ -16,9 +15,8 @@ export default function Sidebar() {
   const logout = useAuthStore().logout;
   const router = useRouter();
 
-  const [isBoosterOpen, setIsBoosterOpen] = useState(false);
-  const [isLmsOpen, setIsLmsOpen] = useState(false);
-  const [isBeasiswaOpen, setIsBeasiswaOpen] = useState(false);
+  const [isServicesOpen, setIsServicesOpen] = useState(false);
+  const [isManagementOpen, setIsManagementOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<string>('');
 
   const pathName = router.pathname;
@@ -26,15 +24,12 @@ export default function Sidebar() {
 
   // Auto-expand sections based on current path
   useEffect(() => {
-    if (pathName.includes('cv-boost') || pathName.includes('essay-boost') || pathName.includes('interview-boost')) {
-      setIsBoosterOpen(true);
-      setActiveSection('booster');
-    } else if (pathName.includes('lms')) {
-      setIsLmsOpen(true);
-      setActiveSection('lms');
-    } else if (pathName.includes('beasiswa')) {
-      setIsBeasiswaOpen(true);
-      setActiveSection('beasiswa');
+    if (pathName.includes('scholra') || pathName.includes('dreamshub') || pathName.includes('bisa-learning')) {
+      setIsServicesOpen(true);
+      setActiveSection('services');
+    } else if (pathName.includes('users') || pathName.includes('payments') || pathName.includes('manajemen-beasiswa')) {
+      setIsManagementOpen(true);
+      setActiveSection('management');
     }
   }, [pathName]);
 
@@ -43,13 +38,49 @@ export default function Sidebar() {
     router.push('/auth/login');
   };
 
-  const menuSections = [
+  const adminMenu = [
+    {
+      id: 'management',
+      title: 'Admin Controls',
+      icon: IoSettingsOutline,
+      isOpen: isManagementOpen,
+      setIsOpen: setIsManagementOpen,
+      items: [
+        {
+          title: 'User Management',
+          href: '/admin/users',
+          icon: HiUserGroup,
+          paths: ['/admin/users']
+        },
+        {
+          title: 'Payment Monitor',
+          href: '/admin/payments',
+          icon: HiCurrencyDollar,
+          paths: ['/admin/payments']
+        },
+        {
+          title: 'LMS Content',
+          href: '/admin/lms',
+          icon: FaBookReader,
+          paths: ['/admin/lms']
+        },
+        {
+          title: 'Manajemen Beasiswa',
+          href: '/admin/manajemen-beasiswa',
+          icon: IoBulbOutline,
+          paths: ['/admin/manajemen-beasiswa']
+        }
+      ]
+    }
+  ];
+
+  const userMenu = [
     {
       id: 'services',
       title: 'Services',
       icon: IoSparkles,
-      isOpen: isBoosterOpen,
-      setIsOpen: setIsBoosterOpen,
+      isOpen: isServicesOpen,
+      setIsOpen: setIsServicesOpen,
       items: [
         {
           title: 'Scholra',
@@ -73,6 +104,8 @@ export default function Sidebar() {
     }
   ];
 
+  const menuSections = isAdmin ? [...adminMenu, ...userMenu] : userMenu;
+
   return (
     <div className='hidden xl:block fixed left-0 top-0 h-screen w-72 bg-white border-r border-gray-200 shadow-sm flex flex-col z-40 overflow-hidden'>
       {/* Header */}
@@ -92,7 +125,7 @@ export default function Sidebar() {
             Dashboard
           </Typography>
         </div>
-        
+
         {/* User Profile */}
         <div className='flex items-center gap-3 p-4 bg-gradient-to-br from-blue-50 via-white to-orange-50 rounded-xl border border-gray-100'>
           <div className='relative flex-shrink-0'>
@@ -172,8 +205,8 @@ export default function Sidebar() {
               >
                 <div className={clsxm(
                   'p-2 rounded-lg transition-all duration-300 flex-shrink-0',
-                  activeSection === section.id 
-                    ? 'bg-primary-blue/10' 
+                  activeSection === section.id
+                    ? 'bg-primary-blue/10'
                     : 'bg-gray-100 group-hover:bg-primary-blue/10'
                 )}>
                   <section.icon className={clsxm(
@@ -213,8 +246,8 @@ export default function Sidebar() {
                         href={item.href}
                         className={clsxm(
                           'group flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-300 relative overflow-hidden',
-                          isActive 
-                            ? 'bg-gradient-to-r from-primary-blue to-primary-orange text-white shadow-md transform scale-[1.02]' 
+                          isActive
+                            ? 'bg-gradient-to-r from-primary-blue to-primary-orange text-white shadow-md transform scale-[1.02]'
                             : 'hover:bg-gray-50 text-gray-600 hover:text-gray-900 hover:shadow-sm'
                         )}
                       >
@@ -222,16 +255,16 @@ export default function Sidebar() {
                         {isActive && (
                           <div className='absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-50' />
                         )}
-                        
+
                         {/* Active indicator */}
                         {isActive && (
                           <div className='absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-white rounded-r-full shadow-sm' />
                         )}
-                        
+
                         <div className={clsxm(
                           'p-1.5 rounded-lg transition-all duration-300 relative z-10 flex-shrink-0',
-                          isActive 
-                            ? 'bg-white/20' 
+                          isActive
+                            ? 'bg-white/20'
                             : 'bg-gray-100 group-hover:bg-primary-blue/10'
                         )}>
                           <item.icon className={clsxm(

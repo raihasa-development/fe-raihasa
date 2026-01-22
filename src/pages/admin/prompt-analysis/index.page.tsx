@@ -57,19 +57,19 @@ export default function PromptAnalysisPage() {
     queryKey: ['prompt-logs', page, size],
     queryFn: async () => {
       const apiUrl = process.env.NEXT_PUBLIC_BACKEND_API_URL;
-      
+
       // Try multiple possible token key names in cookies
       const cookieKeys = [
-        'token', 
-        'accessToken', 
-        'authToken', 
-        'access_token', 
-        'jwt', 
-        'bearerToken', 
+        'token',
+        'accessToken',
+        'authToken',
+        'access_token',
+        'jwt',
+        'bearerToken',
         'auth_token',
         '@raihasa/token'
       ];
-      
+
       let token = null;
       for (const key of cookieKeys) {
         const value = getCookie(key);
@@ -79,7 +79,7 @@ export default function PromptAnalysisPage() {
           break;
         }
       }
-      
+
       const response = await fetch(
         `${apiUrl}/scholarship/logs?page=${page}&size=${size}`,
         {
@@ -89,17 +89,17 @@ export default function PromptAnalysisPage() {
           },
         }
       );
-      
+
       if (!response.ok) {
         // console.error('❌ API Error:', response.status, response.statusText);
         throw new Error('Failed to fetch logs');
       }
-      
+
       const result = await response.json();
       // console.log('📊 API Response:', result);
       // console.log('📊 Data array:', result?.data?.data);
       // console.log('📊 Pagination:', result?.data?.pagination);
-      
+
       return result;
     },
   });
