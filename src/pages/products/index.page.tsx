@@ -76,6 +76,7 @@ const PRODUCT_CATALOG = [
     id: '102287d5-03ea-4e3f-b84c-a88973104e13',
     nama: 'BISA Basic',
     harga: 49000,
+    originalPrice: 79000,
     deskripsi: 'Akses Seluruh Tutorial Beasiswa Dalam Negeri dan Luar Negeri',
     jenis: 'basic',
     masa_aktif: 3,
@@ -90,6 +91,7 @@ const PRODUCT_CATALOG = [
     id: 'a5edc065-212f-4ee7-afb3-8481ad577479',
     nama: 'BISA Plus+',
     harga: 169000,
+    originalPrice: 249000,
     deskripsi: 'Akses Seluruh Tutorial Beasiswa & Mentoring',
     jenis: 'ideal',
     masa_aktif: 12,
@@ -106,6 +108,7 @@ const PRODUCT_CATALOG = [
     id: 'private',
     nama: 'For Enterprise & Partners',
     harga: 0,
+    originalPrice: 0,
     deskripsi: 'Untuk Sekolah, Yayasan, & Komunitas. Solusi tepat untuk mencetak peraih beasiswa.',
     jenis: 'private',
     masa_aktif: 0,
@@ -119,10 +122,47 @@ const PRODUCT_CATALOG = [
   }
 ];
 
+
+// Countdown Timer Component
+const CountdownTimer = () => {
+  const [timeLeft, setTimeLeft] = useState({ h: 0, m: 0, s: 0 });
+
+  useEffect(() => {
+    const endOfDay = new Date();
+    endOfDay.setHours(23, 59, 59, 999);
+
+    const calculateTimeLeft = () => {
+      const difference = endOfDay.getTime() - new Date().getTime();
+      if (difference > 0) {
+        return {
+          h: Math.floor((difference / (1000 * 60 * 60)) % 24),
+          m: Math.floor((difference / 1000 / 60) % 60),
+          s: Math.floor((difference / 1000) % 60)
+        };
+      }
+      return { h: 0, m: 0, s: 0 };
+    };
+
+    setTimeLeft(calculateTimeLeft());
+    const timer = setInterval(() => {
+      setTimeLeft(calculateTimeLeft());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <span className="tabular-nums font-mono font-bold">
+      {String(timeLeft.h).padStart(2, '0')}:{String(timeLeft.m).padStart(2, '0')}:{String(timeLeft.s).padStart(2, '0')}
+    </span>
+  );
+};
+
 type ProductData = {
   id: string;
   nama: string;
   harga: number;
+  originalPrice?: number;
   deskripsi: string;
   jenis: string;
   masa_aktif: number;
@@ -239,7 +279,11 @@ Terima kasih!`);
 
   return (
     <Layout withNavbar={true} withFooter={true}>
-      <SEO title="Membership Plans | Raihasa" />
+      <SEO
+        title="Paket Mentoring Beasiswa | Raih Asa"
+        description="Pilih paket mentoring beasiswa terbaik. Dapatkan bimbingan intensif persiapan kuliah ke luar negeri, review essay, dan simulasi interview."
+        keywords={['paket mentoring beasiswa', 'biaya mentoring beasiswa', 'bimbingan kuliah luar negeri', 'kursus beasiswa']}
+      />
       <main className="min-h-screen bg-[#FAFAFA] relative overflow-hidden font-poppins">
 
         {/* Background Decorative Elements */}
@@ -249,6 +293,16 @@ Terima kasih!`);
         {/* Hero Section */}
         <section className="pt-32 pb-12 px-4 relative z-10">
           <div className="max-w-4xl mx-auto text-center" data-aos="fade-up">
+            <div className="flex justify-center mb-6" data-aos="fade-down" data-aos-delay="50">
+              <div className="inline-flex items-center gap-2 bg-red-50 border border-red-100 px-4 py-2 rounded-full shadow-sm animate-pulse">
+                <span className="relative flex h-2.5 w-2.5 mr-1">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+                </span>
+                <span className="text-sm font-medium text-red-700">Promo berakhir dalam:</span>
+                <span className="text-red-600 font-bold"><CountdownTimer /></span>
+              </div>
+            </div>
             <span className="inline-block py-1 px-3 rounded-full bg-orange-100 text-[#FB991A] text-sm font-semibold tracking-wide mb-4 border border-orange-200">
               MEMBERSHIP PLANS
             </span>
@@ -316,6 +370,11 @@ Terima kasih!`);
                           <span className="text-2xl font-bold text-gray-900">Custom</span>
                         ) : (
                           <>
+                            {product.originalPrice && product.originalPrice > product.harga && (
+                              <span className="text-sm text-gray-400 line-through mr-1">
+                                {Math.floor(product.originalPrice / 1000)}k
+                              </span>
+                            )}
                             <span className={`font-bold text-gray-900 ${isPopular ? 'text-4xl' : 'text-3xl'}`}>
                               {Math.floor(product.harga / 1000)}k
                             </span>
@@ -323,6 +382,13 @@ Terima kasih!`);
                           </>
                         )}
                       </div>
+                      {!isEnterprise && product.originalPrice && product.originalPrice > product.harga && (
+                        <div className="mt-2 text-left">
+                          <span className={`inline-block text-[10px] font-bold px-2 py-0.5 rounded-full ${isPopular ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-700'}`}>
+                            Hemat {Math.round(((product.originalPrice - product.harga) / product.originalPrice) * 100)}% {isPopular && "• Offer Ends Soon!"}
+                          </span>
+                        </div>
+                      )}
                       {isEnterprise && <p className="text-xs text-gray-400 mt-1">Harga menyesuaikan kebutuhan</p>}
                     </div>
 

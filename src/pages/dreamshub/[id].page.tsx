@@ -146,6 +146,18 @@ export default function PostDetailPage() {
         }
     };
 
+    const handleDeletePost = async () => {
+        if (!post) return;
+        if (!confirm('Apakah Anda yakin ingin menghapus postingan ini? Tindakan ini tidak dapat dibatalkan.')) return;
+        try {
+            await forumApi.deletePost(post.id);
+            alert('Postingan berhasil dihapus');
+            router.push('/dreamshub');
+        } catch (error: any) {
+            alert(error.message || 'Gagal menghapus postingan');
+        }
+    };
+
     if (isLoading) {
         return (
             <Layout withNavbar={true} withFooter={true}>
@@ -230,9 +242,22 @@ export default function PostDetailPage() {
                                     <span className="font-medium">{post._count?.comments || comments.length} Balasan</span>
                                 </div>
                             </div>
-                            <button className="text-gray-400 hover:text-[#1B7691] transition-colors">
-                                <FiShare2 className="w-5 h-5" />
-                            </button>
+                            <div className="flex items-center gap-2">
+                                {/* Delete Post Button - Only for Post Owner */}
+                                {currentUser && (currentUser.id === post.author?.id || currentUser.id === (post as any).author_id) && (
+                                    <button
+                                        onClick={handleDeletePost}
+                                        className="flex items-center gap-2 px-4 py-2 rounded-full text-red-500 hover:bg-red-50 transition-all"
+                                        title="Hapus Postingan"
+                                    >
+                                        <FiTrash2 className="w-5 h-5" />
+                                        <span className="font-medium hidden sm:inline">Hapus</span>
+                                    </button>
+                                )}
+                                <button className="text-gray-400 hover:text-[#1B7691] transition-colors">
+                                    <FiShare2 className="w-5 h-5" />
+                                </button>
+                            </div>
                         </div>
                     </div>
 

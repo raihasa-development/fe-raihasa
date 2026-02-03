@@ -10,6 +10,51 @@ import { FaWhatsapp } from 'react-icons/fa';
 
 import api from '@/lib/api';
 
+
+const CountdownTimer = () => {
+  // Set end time to 24 hours from now (or end of day)
+  // For demo/engagement purposes, let's just make a countdown that always shows something urgent (e.g., ends in X hours)
+  // or use a fixed end time if stored.
+  // Here we'll simulate a "End of Day" or "Next 4 hours" timer for urgency
+  const [timeLeft, setTimeLeft] = useState({ h: 0, m: 0, s: 0 });
+
+  useEffect(() => {
+    // Target time: End of current day or +4 hours?
+    // Let's do a simple countdown from 4 hours to simulate urgency whenever the user visits
+    // Or, for consistency, end of day.
+    const now = new Date();
+    const endOfDay = new Date();
+    endOfDay.setHours(23, 59, 59, 999);
+
+    const calculateTimeLeft = () => {
+      const difference = endOfDay.getTime() - new Date().getTime();
+
+      if (difference > 0) {
+        return {
+          h: Math.floor((difference / (1000 * 60 * 60)) % 24),
+          m: Math.floor((difference / 1000 / 60) % 60),
+          s: Math.floor((difference / 1000) % 60)
+        };
+      }
+      return { h: 0, m: 0, s: 0 };
+    };
+
+    setTimeLeft(calculateTimeLeft());
+
+    const timer = setInterval(() => {
+      setTimeLeft(calculateTimeLeft());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <span className="tabular-nums font-mono">
+      {String(timeLeft.h).padStart(2, '0')}:{String(timeLeft.m).padStart(2, '0')}:{String(timeLeft.s).padStart(2, '0')}
+    </span>
+  );
+};
+
 const PromoPopup: React.FC = () => {
   const [showPopup, setShowPopup] = useState(false);
   const router = useRouter();
@@ -110,6 +155,15 @@ Terima kasih!`);
             <X size={24} />
           </button>
 
+
+          <div className="absolute top-4 right-12 z-10 hidden md:flex items-center gap-2 bg-red-50 px-3 py-1.5 rounded-full border border-red-100">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+            </span>
+            <span className="text-xs font-medium text-red-600">Promo ends in: <CountdownTimer /></span>
+          </div>
+
           <div className="text-center max-w-3xl mx-auto mb-8 md:mb-10 pt-4">
             <span className="inline-block py-1 px-3 rounded-full bg-gradient-to-r from-[#FB991A]/10 to-[#DB4B24]/10 text-[#DB4B24] text-xs font-bold tracking-wider uppercase mb-3 border border-[#FB991A]/20">
               Special Offer
@@ -117,8 +171,16 @@ Terima kasih!`);
             <h2 className="text-2xl md:text-4xl font-bold text-gray-900 mb-4 leading-tight">
               Awali langkah   <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FB991A] to-[#DB4B24]">#JadiBisa </span>
               bareng Raih Asa sekarang!
-
             </h2>
+            <div className="md:hidden flex justify-center mb-4">
+              <div className="flex items-center gap-2 bg-red-50 px-3 py-1.5 rounded-full border border-red-100 inline-flex">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                </span>
+                <span className="text-xs font-medium text-red-600">Promo ends in: <CountdownTimer /></span>
+              </div>
+            </div>
             <p className="text-gray-500 text-sm md:text-base">
               Pilih paket membership yang sesuai dengan target beasiswamu. Akses materi eksklusif dan mentoring langsung dari ahlinya.
             </p>
@@ -134,8 +196,12 @@ Terima kasih!`);
               </div>
               <div className="mb-6">
                 <div className="flex items-baseline gap-1">
+                  <span className="text-sm text-gray-400 line-through mr-1">79k</span>
                   <span className="text-3xl font-bold text-gray-900">49k</span>
                   <span className="text-gray-400 text-sm font-medium">/ 3 bulan</span>
+                </div>
+                <div className="mt-1">
+                  <span className="inline-block bg-green-100 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded-full">Save 38%</span>
                 </div>
               </div>
 
@@ -171,8 +237,12 @@ Terima kasih!`);
               </div>
               <div className="mb-6">
                 <div className="flex items-baseline gap-1">
+                  <span className="text-base text-gray-400 line-through mr-1">249k</span>
                   <span className="text-4xl font-bold text-gray-900">169k</span>
                   <span className="text-gray-500 text-sm font-medium">/ 12 bulan</span>
+                </div>
+                <div className="mt-1">
+                  <span className="inline-block bg-red-100 text-red-600 text-[10px] font-bold px-2 py-0.5 rounded-full animate-pulse">Save 32% • Limited Time</span>
                 </div>
               </div>
 

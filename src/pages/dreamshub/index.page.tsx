@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import {
   FiMessageCircle, FiHeart, FiUser, FiClock, FiSearch,
-  FiTrendingUp, FiTarget, FiEdit3, FiFilter
+  FiTrendingUp, FiTarget, FiEdit3, FiFilter, FiTrash2
 } from 'react-icons/fi';
 import { MdOutlinePushPin } from 'react-icons/md';
 
@@ -23,6 +23,7 @@ interface Manifestation {
   created_at: string;
   beasiswa_v3_id?: string;
   beasiswa?: { nama: string };
+  account_id?: string; // Owner ID for delete permission
 }
 
 export default function DreamshubPage() {
@@ -141,6 +142,16 @@ export default function DreamshubPage() {
     return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
   };
 
+  const handleDeleteManifestazione = async (id: string) => {
+    if (!confirm('Apakah Anda yakin ingin menghapus manifestasi ini?')) return;
+    try {
+      await forumApi.deleteManifestazione(id);
+      setManifestations(prev => prev.filter(m => m.id !== id));
+    } catch (error: any) {
+      alert(error.message || 'Gagal menghapus manifestasi');
+    }
+  };
+
   return (
     <Layout withNavbar={true} withFooter={true}>
       <SEO title="Dreamshub - Komunitas Beasiswa" />
@@ -192,26 +203,42 @@ export default function DreamshubPage() {
             <div className="pointer-events-auto w-full">
               {/* Duplicate list for seamless loop */}
               <div className="flex animate-scroll gap-6 px-4">
-                {[...manifestations, ...manifestations, ...manifestations].map((m, i) => (
-                  <div key={`${m.id}-${i}`} className="w-[300px] bg-white p-6 rounded-2xl shadow-lg border border-gray-100 flex flex-col justify-between h-[180px] shrink-0 hover:-translate-y-1 transition-transform cursor-default">
-                    <div>
-                      <p className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-3">
-                        To: {m?.beasiswa?.nama || 'Beasiswa Impian'}
-                      </p>
-                      <p className="text-gray-800 font-medium leading-relaxed text-lg line-clamp-3 italic">
-                        "{m?.manifestation}"
-                      </p>
-                    </div>
-                    <div className="flex justify-between items-end mt-4">
-                      <span className="text-xs text-gray-400">
-                        {new Date(m.created_at).toLocaleDateString()}
-                      </span>
-                      <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-[#1B7691]">
-                        <FiTarget />
+                {[...manifestations, ...manifestations, ...manifestations].map((m, i) => {
+                  const isOwner = isAuthenticated && user?.id === m.account_id;
+                  return (
+                    <div key={`${m.id}-${i}`} className="w-[300px] bg-white p-6 rounded-2xl shadow-lg border border-gray-100 flex flex-col justify-between h-[180px] shrink-0 hover:-translate-y-1 transition-transform cursor-default group relative">
+                      {/* Delete button - only for owner, show on hover */}
+                      {isOwner && i < manifestations.length && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteManifestazione(m.id);
+                          }}
+                          className="absolute top-3 right-3 w-7 h-7 bg-red-50 hover:bg-red-100 rounded-full flex items-center justify-center text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-all z-10"
+                          title="Hapus Manifestasi"
+                        >
+                          <FiTrash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                      <div>
+                        <p className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-3">
+                          To: {m?.beasiswa?.nama || 'Beasiswa Impian'}
+                        </p>
+                        <p className="text-gray-800 font-medium leading-relaxed text-lg line-clamp-3 italic">
+                          "{m?.manifestation}"
+                        </p>
+                      </div>
+                      <div className="flex justify-between items-end mt-4">
+                        <span className="text-xs text-gray-400">
+                          {new Date(m.created_at).toLocaleDateString()}
+                        </span>
+                        <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-[#1B7691]">
+                          <FiTarget />
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </div>
