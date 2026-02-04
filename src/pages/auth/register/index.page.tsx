@@ -32,36 +32,20 @@ export default function RegisterPage() {
   const router = useRouter();
   const login = useAuthStore.useLogin();
 
-  const {
-    mutate: registerMutation,
-    isPending,
-  } = useMutation<void, AxiosError<ApiError>, RegisterForm>({
+  /* eslint-disable no-console */
+  const mutation = useMutation<void, AxiosError<ApiError>, RegisterForm>({
     mutationFn: async (data: RegisterForm) => {
-      const res = await api.post('/auth/register', data);
-      // eslint-disable-next-line no-console
-      // console.log(res);
-      showToast('Berhasil mendaftar', SUCCESS_TOAST);
+      await api.post('/auth/register', data);
 
-      // Automatically log in the user after registration
-      const { data: loginRes } = await api.post('/auth/login', {
-        email: data.email,
-        password: data.password,
-      });
+      // Verification is required, so do not auto-login (it would fail).
+      // Instead, show instruction to check email.
+      showToast('Pendaftaran berhasil! Silakan cek email Anda untuk verifikasi akun sebelum login.', SUCCESS_TOAST);
 
-      const { token, ...user } = loginRes.data;
-      setToken(token);
-      login({ ...user, token });
-
-      // Redirect logic after registration and login
-      const redirectPath = sessionStorage.getItem('redirectAfterLogin');
-      if (redirectPath) {
-        sessionStorage.removeItem('redirectAfterLogin');
-        router.push(redirectPath);
-      } else {
-        router.push('/');
-      }
+      router.push('/login');
     },
   });
+
+  const { mutate: registerMutation, isPending } = useMutationToast<void, RegisterForm>(mutation);
 
   const onSubmit = (data: RegisterForm) => {
     registerMutation(data);
