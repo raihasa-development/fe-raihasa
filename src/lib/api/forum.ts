@@ -322,4 +322,18 @@ export const forumApi = {
       throw new Error(error.message || 'Failed to toggle lock');
     }
   },
+
+  // ============ MANIFESTATION APIs ============
+  // Delete manifestazione (owner only)
+  async deleteManifestazione(id: string): Promise<void> {
+    const response = await fetch(`${API_URL}/manifestations/${id}`, {
+      method: 'DELETE',
+      headers: getHeaders(),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to delete manifestazione');
+    }
+  },
 };

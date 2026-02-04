@@ -3,6 +3,7 @@
 import { useMutation } from '@tanstack/react-query';
 import NextImage from 'next/image';
 import { useRouter } from 'next/router';
+import * as React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
 import Button from '@/components/buttons/Button';
@@ -35,6 +36,13 @@ function LoginPage() {
   const router = useRouter();
   const login = useAuthStore.useLogin();
 
+  // Persist redirect param to session storage so it survives page navigation (e.g. to register)
+  React.useEffect(() => {
+    if (router.isReady && router.query.redirect) {
+      sessionStorage.setItem('redirectAfterLogin', router.query.redirect as string);
+    }
+  }, [router.isReady, router.query.redirect]);
+
   const mutation = useMutation<void, AxiosError<ApiError>, LoginForm>({
     mutationFn: async (data: LoginForm) => {
       removeToken();
@@ -49,17 +57,16 @@ function LoginPage() {
       login({ ...user, token });
       showToast('Berhasil login', SUCCESS_TOAST);
 
-      const redirectAfterLogin = sessionStorage.getItem('redirectAfterLogin');
+      // Prioritize query param, then session storage, then default
       const queryRedirect = router.query.redirect as string | undefined;
+      const sessionRedirect = sessionStorage.getItem('redirectAfterLogin');
 
-      if (redirectAfterLogin) {
-        sessionStorage.removeItem('redirectAfterLogin');
-        router.push(redirectAfterLogin);
-      } else if (queryRedirect) {
-        router.push(queryRedirect);
-      } else {
-        router.push('/');
-      }
+      const target = queryRedirect || sessionRedirect || '/';
+
+      // Clean up session storage if we used it
+      if (sessionRedirect) sessionStorage.removeItem('redirectAfterLogin');
+
+      router.push(target);
     },
   });
 
@@ -157,7 +164,7 @@ function LoginPage() {
                       <div className='flex justify-end'>
                         <ButtonLink
                           variant='unstyled'
-                          href='#'
+                          href='/forgot-password'
                           className='text-sm font-medium text-[#1B7691] hover:text-[#166076] transition-colors'
                         >
                           Lupa password?
