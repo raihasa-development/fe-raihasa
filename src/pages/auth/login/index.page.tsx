@@ -164,7 +164,7 @@ function LoginPage() {
                       <div className='flex justify-end'>
                         <ButtonLink
                           variant='unstyled'
-                          href='/forgot-password'
+                          href='/auth/forgot-password'
                           className='text-sm font-medium text-[#1B7691] hover:text-[#166076] transition-colors'
                         >
                           Lupa password?
