@@ -25,7 +25,7 @@ const config: DefaultSeoProps = {
   additionalLinkTags: [
     {
       rel: 'icon',
-      href: '/favicon.ico',
+      href: '/images/logo.png',
     },
   ],
   additionalMetaTags: [

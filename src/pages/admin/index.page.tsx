@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  FiBookOpen, FiUsers, FiAward, FiCpu, FiArrowRight, FiDollarSign, FiUserCheck
+  FiBookOpen, FiUsers, FiAward, FiCpu, FiArrowRight, FiDollarSign, FiUserCheck, FiActivity
 } from 'react-icons/fi';
 
 import withAuth from '@/components/hoc/withAuth';
@@ -52,6 +52,13 @@ const modules = [
     icon: FiCpu,
     href: '/admin/prompt-analysis',
     color: 'bg-gray-50 text-gray-600',
+  },
+  {
+    title: 'Google Analytics',
+    description: 'Monitor site traffic, user behavior, and performance metrics.',
+    icon: FiActivity,
+    href: 'https://analytics.google.com',
+    color: 'bg-orange-50 text-orange-600',
   },
 ];
 
