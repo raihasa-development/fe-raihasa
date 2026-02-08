@@ -232,7 +232,7 @@ export default function Chatbox({ onRecommendation }: ChatboxProps) {
 
       // Show error message with more helpful info
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      addMessage(`Terjadi kesalahan saat mencari rekomendasi: ${errorMessage}. Pastikan backend berjalan di ${process.env.NEXT_PUBLIC_BACKEND_API_URL || 'http://localhost:4000'}`, 'bot');
+      addMessage(`Terjadi kesalahan saat mencari rekomendasi: ${errorMessage}. Pastikan backend berjalan dengan benar.`, 'bot');
     } finally {
       setIsLoading(false);
     }
@@ -272,8 +272,8 @@ export default function Chatbox({ onRecommendation }: ChatboxProps) {
 
             <div
               className={`max-w-[75%] px-4 py-3 rounded-2xl ${message.type === 'user'
-                  ? 'bg-primary-blue text-white rounded-br-md'
-                  : 'bg-gray-50 text-gray-800 rounded-bl-md'
+                ? 'bg-primary-blue text-white rounded-br-md'
+                : 'bg-gray-50 text-gray-800 rounded-bl-md'
                 }`}
             >
               <Typography className={`text-sm leading-relaxed ${message.type === 'user' ? 'text-white' : 'text-gray-800'}`}>
