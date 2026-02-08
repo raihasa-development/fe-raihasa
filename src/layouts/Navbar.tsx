@@ -136,7 +136,7 @@ export default function Navbar() {
               </li>
               <li>
                 <UnstyledLink
-                  href='/scholarship-recommendation/maintenance'
+                  href='/scholarship-recommendation/'
                   className={clsxm(
                     'flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-full transition-all duration-300',
                     router.pathname.startsWith('/scholarship-recommendation')
@@ -331,7 +331,7 @@ export default function Navbar() {
             </li>
             <li>
               <UnstyledLink
-                href='/scholarship-recommendation/maintenance'
+                href='/scholarship-recommendation/'
                 className='flex items-center gap-2 rounded-xl hover:bg-[#1B7691]/5 hover:text-[#1B7691] transition-colors'
                 onClick={toggleShowNav}
               >
