@@ -1,30 +1,51 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
-import { FiSend, FiUser } from 'react-icons/fi';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { FiSend, FiUser, FiChevronDown } from 'react-icons/fi';
 import Typography from '@/components/Typography';
-import { ChatMessage, ScholarshipRecommendationDisplay, RekomendasiBeasiswaRequest, AIRecommendationResponse } from '../types/type';
+import { ChatMessage, ScholarshipRecommendationDisplay, RekomendasiBeasiswaRequest } from '../types/type';
 import { useRouter } from 'next/router';
 
 interface ChatboxProps {
   onRecommendation?: (recommendations: ScholarshipRecommendationDisplay[]) => void;
 }
 
+// All Indonesian provinces
+const PROVINCES = [
+  'Aceh', 'Sumatera Utara', 'Sumatera Barat', 'Riau', 'Jambi',
+  'Sumatera Selatan', 'Bengkulu', 'Lampung', 'Kepulauan Bangka Belitung',
+  'Kepulauan Riau', 'DKI Jakarta', 'Jawa Barat', 'Jawa Tengah',
+  'DI Yogyakarta', 'Jawa Timur', 'Banten', 'Bali', 'Nusa Tenggara Barat',
+  'Nusa Tenggara Timur', 'Kalimantan Barat', 'Kalimantan Tengah',
+  'Kalimantan Selatan', 'Kalimantan Timur', 'Kalimantan Utara',
+  'Sulawesi Utara', 'Sulawesi Tengah', 'Sulawesi Selatan', 'Sulawesi Tenggara',
+  'Gorontalo', 'Sulawesi Barat', 'Maluku', 'Maluku Utara', 'Papua Barat',
+  'Papua', 'Papua Selatan', 'Papua Tengah', 'Papua Pegunungan'
+];
+
+type QuestionId = 'gender' | 'age' | 'provinsi' | 'degree' | 'semester' | 'nilai' | 'scholarshipType' | 'statusBeasiswaAktif' | 'statusKeluargaTidakMampu' | 'statusDisabilitas' | 'custom';
+
 interface QuestionFlow {
-  id: string;
+  id: QuestionId;
   question: string;
-  type: 'options' | 'text';
+  type: 'options' | 'text' | 'dropdown' | 'number';
   options?: string[];
-  templates?: string[];
+  placeholder?: string;
+  validation?: (value: string, userData: UserData) => string | null;
+  condition?: (userData: UserData) => boolean;
 }
 
 interface UserData {
   gender?: string;
   age?: string;
-  region?: string;
+  provinsi?: string;
   degree?: string;
-  gpa?: string;
+  semester?: string;
+  nilai?: string;
   scholarshipType?: string;
+  statusBeasiswaAktif?: string;
+  statusKeluargaTidakMampu?: string;
+  statusDisabilitas?: string;
   custom?: string;
 }
 
@@ -34,45 +55,85 @@ export default function Chatbox({ onRecommendation }: ChatboxProps) {
     {
       id: '1',
       type: 'bot',
-      content: 'Halo! Saya akan membantu mencari beasiswa yang tepat untuk Anda. Mari mulai dengan jenis kelamin Anda?',
+      content: 'Selamat datang di Scholra AI. Saya akan membantu mencari beasiswa yang sesuai dengan profil Anda. Mari mulai dengan beberapa pertanyaan.',
       timestamp: new Date()
     }
   ]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [showTemplates, setShowTemplates] = useState(true);
   const [userData, setUserData] = useState<UserData>({});
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [isComplete, setIsComplete] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [dropdownSearch, setDropdownSearch] = useState('');
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
+  // Question flow with conditional logic
   const questionFlow: QuestionFlow[] = [
     {
       id: 'gender',
-      question: 'Jenis kelamin Anda?',
+      question: 'Apa jenis kelamin Anda?',
       type: 'options',
       options: ['Laki-laki', 'Perempuan']
     },
     {
       id: 'age',
-      question: 'Berapa usia Anda?',
-      type: 'text'
+      question: 'Berapa usia Anda saat ini?',
+      type: 'number',
+      placeholder: 'Contoh: 20',
+      validation: (value) => {
+        const age = parseInt(value);
+        if (isNaN(age) || age < 10 || age > 60) {
+          return 'Masukkan usia yang valid (10-60 tahun)';
+        }
+        return null;
+      }
     },
     {
-      id: 'region',
-      question: 'Asal daerah Anda?',
-      type: 'options',
-      options: ['Jakarta', 'Jawa Barat', 'Jawa Tengah', 'Jawa Timur', 'Sumatra', 'Kalimantan', 'Sulawesi', 'Papua', 'Lainnya']
+      id: 'provinsi',
+      question: 'Provinsi tempat tinggal Anda?',
+      type: 'dropdown',
+      options: PROVINCES
     },
     {
       id: 'degree',
-      question: 'Jenjang pendidikan yang sedang ditempuh?',
+      question: 'Jenjang pendidikan yang sedang Anda tempuh?',
       type: 'options',
       options: ['SMA/SMK', 'D3', 'S1', 'S2', 'S3']
     },
     {
-      id: 'gpa',
-      question: 'IPK atau nilai rata-rata Anda?',
-      type: 'text'
+      id: 'semester',
+      question: 'Semester berapa Anda saat ini?',
+      type: 'number',
+      placeholder: 'Contoh: 4',
+      condition: (data) => data.degree !== 'SMA/SMK',
+      validation: (value) => {
+        const sem = parseInt(value);
+        if (isNaN(sem) || sem < 1 || sem > 14) {
+          return 'Masukkan semester yang valid (1-14)';
+        }
+        return null;
+      }
+    },
+    {
+      id: 'nilai',
+      question: '', // Will be set dynamically based on degree
+      type: 'number',
+      placeholder: '',
+      validation: (value, data) => {
+        const num = parseFloat(value);
+        if (data.degree === 'SMA/SMK') {
+          if (isNaN(num) || num < 0 || num > 100) {
+            return 'Masukkan nilai rata-rata yang valid (0-100)';
+          }
+        } else {
+          if (isNaN(num) || num < 0 || num > 4) {
+            return 'Masukkan IPK yang valid (0.00-4.00)';
+          }
+        }
+        return null;
+      }
     },
     {
       id: 'scholarshipType',
@@ -81,17 +142,92 @@ export default function Chatbox({ onRecommendation }: ChatboxProps) {
       options: ['Dalam Negeri', 'Luar Negeri', 'Keduanya']
     },
     {
+      id: 'statusBeasiswaAktif',
+      question: 'Apakah Anda sedang menerima beasiswa aktif?',
+      type: 'options',
+      options: ['Ya', 'Tidak']
+    },
+    {
+      id: 'statusKeluargaTidakMampu',
+      question: 'Apakah Anda berasal dari keluarga kurang mampu?',
+      type: 'options',
+      options: ['Ya', 'Tidak']
+    },
+    {
+      id: 'statusDisabilitas',
+      question: 'Apakah Anda penyandang disabilitas?',
+      type: 'options',
+      options: ['Ya', 'Tidak']
+    },
+    {
       id: 'custom',
-      question: 'Ada detail spesifik lain? sesuaikan dengan preferensimu(universitas, jurusan, semester)',
+      question: 'Ceritakan lebih detail tentang beasiswa impian Anda. Semakin spesifik, semakin akurat rekomendasi yang kami berikan.',
       type: 'text',
-      templates: [
-        'Mahasiswa Universitas [Nama universitasmu] jurusan [Jurusanmu] semester [Semestermu]',
-        'Siswa SMA [Nama SMA mu] kelas [Kelasmu] jurusan [Jurusanmu]'
-      ]
+      placeholder: 'Contoh: Beasiswa full untuk S2 di Eropa, jurusan Computer Science, tanpa ikatan dinas'
     }
   ];
 
-  const addMessage = (content: string, type: 'user' | 'bot') => {
+  // Get dynamic question text for nilai
+  const getQuestionText = useCallback((question: QuestionFlow): string => {
+    if (question.id === 'nilai') {
+      return userData.degree === 'SMA/SMK'
+        ? 'Berapa nilai rata-rata rapor Anda?'
+        : 'Berapa IPK Anda saat ini?';
+    }
+    return question.question;
+  }, [userData.degree]);
+
+  // Get dynamic placeholder for nilai
+  const getPlaceholder = useCallback((question: QuestionFlow): string => {
+    if (question.id === 'nilai') {
+      return userData.degree === 'SMA/SMK'
+        ? 'Contoh: 85.5'
+        : 'Contoh: 3.50';
+    }
+    return question.placeholder || '';
+  }, [userData.degree]);
+
+  // Get current applicable questions (filtering by conditions)
+  const getApplicableQuestions = useCallback((): QuestionFlow[] => {
+    return questionFlow.filter(q => !q.condition || q.condition(userData));
+  }, [userData]);
+
+  // Auto-scroll to bottom (only within chatbox, not page)
+  const scrollToBottom = useCallback(() => {
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+    }
+  }, []);
+
+  useEffect(() => {
+    // Small delay to ensure DOM is updated
+    const timer = setTimeout(scrollToBottom, 50);
+    return () => clearTimeout(timer);
+  }, [messages, scrollToBottom]);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Ask first question on mount
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const applicableQuestions = getApplicableQuestions();
+      if (applicableQuestions.length > 0) {
+        addMessage(getQuestionText(applicableQuestions[0]), 'bot');
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const addMessage = useCallback((content: string, type: 'user' | 'bot') => {
     const message: ChatMessage = {
       id: Date.now().toString(),
       type,
@@ -99,50 +235,101 @@ export default function Chatbox({ onRecommendation }: ChatboxProps) {
       timestamp: new Date()
     };
     setMessages(prev => [...prev, message]);
-  };
+  }, []);
 
-  const handleOptionSelect = (option: string) => {
+  const moveToNextQuestion = useCallback(() => {
+    const applicableQuestions = getApplicableQuestions();
+    const currentApplicableIndex = applicableQuestions.findIndex(
+      q => q.id === questionFlow[currentQuestionIndex].id
+    );
+
+    if (currentApplicableIndex < applicableQuestions.length - 1) {
+      // Find the next applicable question
+      let nextIndex = currentQuestionIndex + 1;
+      while (nextIndex < questionFlow.length) {
+        const nextQ = questionFlow[nextIndex];
+        if (!nextQ.condition || nextQ.condition(userData)) {
+          setCurrentQuestionIndex(nextIndex);
+          setTimeout(() => {
+            addMessage(getQuestionText(nextQ), 'bot');
+          }, 300);
+          break;
+        }
+        nextIndex++;
+      }
+      if (nextIndex >= questionFlow.length) {
+        setIsComplete(true);
+        setTimeout(() => {
+          addMessage('Terima kasih atas informasinya. Saya sedang mencari beasiswa yang sesuai...', 'bot');
+          generateRecommendations();
+        }, 300);
+      }
+    } else {
+      setIsComplete(true);
+      setTimeout(() => {
+        addMessage('Terima kasih atas informasinya. Saya sedang mencari beasiswa yang sesuai...', 'bot');
+        generateRecommendations();
+      }, 300);
+    }
+  }, [currentQuestionIndex, userData, getApplicableQuestions, getQuestionText, addMessage]);
+
+  const handleOptionSelect = useCallback((option: string) => {
     const currentQuestion = questionFlow[currentQuestionIndex];
-    setUserData(prev => ({ ...prev, [currentQuestion.id as keyof UserData]: option }));
-
+    setUserData(prev => ({ ...prev, [currentQuestion.id]: option }));
     addMessage(option, 'user');
 
-    if (currentQuestionIndex < questionFlow.length - 1) {
-      const nextQuestion = questionFlow[currentQuestionIndex + 1];
-      addMessage(nextQuestion.question, 'bot');
-      setCurrentQuestionIndex(prev => prev + 1);
-      setShowTemplates(true);
-    } else {
-      setShowTemplates(false);
-      addMessage('Terima kasih! Saya akan mencari beasiswa yang sesuai untuk Anda...', 'bot');
-      generateRecommendations();
-    }
-  };
+    setTimeout(() => {
+      moveToNextQuestion();
+    }, 100);
+  }, [currentQuestionIndex, addMessage, moveToNextQuestion]);
 
-  const handleTextSubmit = (text: string) => {
-    if (!text.trim()) return;
+  const handleDropdownSelect = useCallback((value: string) => {
+    const currentQuestion = questionFlow[currentQuestionIndex];
+    setUserData(prev => ({ ...prev, [currentQuestion.id]: value }));
+    addMessage(value, 'user');
+    setDropdownOpen(false);
+    setDropdownSearch('');
+
+    setTimeout(() => {
+      moveToNextQuestion();
+    }, 100);
+  }, [currentQuestionIndex, addMessage, moveToNextQuestion]);
+
+  const handleTextSubmit = useCallback((text: string) => {
+    const trimmedText = text.trim();
+    if (!trimmedText) return;
 
     const currentQuestion = questionFlow[currentQuestionIndex];
-    setUserData(prev => ({ ...prev, [currentQuestion.id as keyof UserData]: text }));
 
-    addMessage(text, 'user');
+    // Handle skip for custom field
+    if (currentQuestion.id === 'custom' && trimmedText.toLowerCase() === 'lewati') {
+      addMessage('Lewati', 'user');
+      setInputValue('');
+      moveToNextQuestion();
+      return;
+    }
+
+    // Validation
+    if (currentQuestion.validation) {
+      const error = currentQuestion.validation(trimmedText, userData);
+      if (error) {
+        addMessage(trimmedText, 'user');
+        setTimeout(() => {
+          addMessage(error, 'bot');
+        }, 300);
+        setInputValue('');
+        return;
+      }
+    }
+
+    setUserData(prev => ({ ...prev, [currentQuestion.id]: trimmedText }));
+    addMessage(trimmedText, 'user');
     setInputValue('');
 
-    if (currentQuestionIndex < questionFlow.length - 1) {
-      const nextQuestion = questionFlow[currentQuestionIndex + 1];
-      addMessage(nextQuestion.question, 'bot');
-      setCurrentQuestionIndex(prev => prev + 1);
-      setShowTemplates(true);
-    } else {
-      setShowTemplates(false);
-      addMessage('Sempurna! Saya akan mencari beasiswa yang cocok untuk Anda...', 'bot');
-      generateRecommendations();
-    }
-  };
-
-  const handleTemplateClick = (template: string) => {
-    setInputValue(template);
-  };
+    setTimeout(() => {
+      moveToNextQuestion();
+    }, 100);
+  }, [currentQuestionIndex, userData, addMessage, moveToNextQuestion]);
 
   const generateRecommendations = async () => {
     setIsLoading(true);
@@ -152,24 +339,19 @@ export default function Chatbox({ onRecommendation }: ChatboxProps) {
       const requestData: RekomendasiBeasiswaRequest = {
         age: userData.age ? parseInt(userData.age) : undefined,
         gender: userData.gender === 'Laki-laki' ? 'LAKI_LAKI' : userData.gender === 'Perempuan' ? 'PEREMPUAN' : undefined,
-        provinsi: userData.region && ['Jakarta', 'Jawa Barat', 'Jawa Tengah', 'Jawa Timur'].includes(userData.region) ? userData.region : undefined,
-        kota_kabupaten: userData.region && !['Jakarta', 'Jawa Barat', 'Jawa Tengah', 'Jawa Timur'].includes(userData.region) ? userData.region : undefined,
+        provinsi: userData.provinsi || undefined,
         education_level: userData.degree === 'SMA/SMK' ? 'sma' : userData.degree?.toLowerCase(),
-        ipk: userData.gpa ? parseFloat(userData.gpa) : undefined,
-        status_beasiswa_aktif: false,
-        status_keluarga_tidak_mampu: false,
-        status_disabilitas: false,
-        semester: undefined,
-        user_prompt: `${userData.custom || ''} Saya mencari beasiswa ${userData.scholarshipType || 'yang sesuai dengan profil saya'}. Jenjang pendidikan: ${userData.degree || 'tidak disebutkan'}.`.trim(),
+        ipk: userData.nilai ? parseFloat(userData.nilai) : undefined,
+        semester: userData.semester ? parseInt(userData.semester) : undefined,
+        status_beasiswa_aktif: userData.statusBeasiswaAktif === 'Ya',
+        status_keluarga_tidak_mampu: userData.statusKeluargaTidakMampu === 'Ya',
+        status_disabilitas: userData.statusDisabilitas === 'Ya',
+        user_prompt: buildUserPrompt(),
         limit: 10
       };
 
       const apiUrl = process.env.NEXT_PUBLIC_BACKEND_API_URL;
       const fullUrl = `${apiUrl}/scholarship/recommend-guest`;
-
-      // Debug logging
-      // console.log('API URL:', fullUrl);
-      // console.log('Request Data:', requestData);
 
       const response = await fetch(fullUrl, {
         method: 'POST',
@@ -179,21 +361,16 @@ export default function Chatbox({ onRecommendation }: ChatboxProps) {
         body: JSON.stringify(requestData),
       });
 
-      // console.log('Response status:', response.status);
-      // console.log('Response headers:', Object.fromEntries(response.headers.entries()));
-
       if (!response.ok) {
         const errorText = await response.text();
-        // console.error('Error response body:', errorText);
-        throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`);
+        throw new Error(`Server error: ${response.status}`);
       }
 
       const responseData = await response.json();
-      // console.log('Full response:', responseData);
 
       // Handle backend API response structure
       if (responseData.code !== 200 || !responseData.status || !responseData.data) {
-        throw new Error(`API Error: ${responseData.message || 'Invalid response format'}`);
+        throw new Error(responseData.message || 'Gagal mendapatkan rekomendasi');
       }
 
       const data = responseData.data;
@@ -209,71 +386,97 @@ export default function Chatbox({ onRecommendation }: ChatboxProps) {
           year: 'numeric'
         }),
         amount: rec.jenis === 'PARTIAL' ? 'Partial Scholarship' : rec.jenis === 'FULL' ? 'Full Scholarship' : rec.jenis,
-        requirements: [`Jenis: ${rec.jenis}`, `Match Score: ${rec.match_score}%`],
+        requirements: [`Jenis: ${rec.jenis}`, `Kecocokan: ${rec.match_score}%`],
         description: `Beasiswa ${rec.jenis} dari ${rec.penyelenggara}`,
         eligibility: `Pendaftaran: ${new Date(rec.open_registration).toLocaleDateString('id-ID')} - ${new Date(rec.close_registration).toLocaleDateString('id-ID')}`,
         link: `/scholarship-recommendation/${rec.id}`,
-        match_score: rec.match_score / 100 // Convert to decimal for consistency
+        match_score: rec.match_score / 100
       }));
 
       // Save to localStorage and redirect to results page
       localStorage.setItem('scholarship_recommendations', JSON.stringify(transformedRecommendations));
       localStorage.setItem('scholarship_search_summary', data.search_summary);
 
-      addMessage(`${data.search_summary} Mengarahkan Anda ke halaman hasil...`, 'bot');
+      if (data.total_found > 0) {
+        addMessage(`Ditemukan ${data.total_found} beasiswa yang sesuai. ${data.search_summary}`, 'bot');
+      } else {
+        addMessage('Tidak ditemukan beasiswa yang sesuai dengan kriteria Anda. Coba ubah beberapa kriteria pencarian.', 'bot');
+      }
 
-      // Small delay for better UX
-      setTimeout(() => {
-        router.push('/scholarship-recommendation/results');
-      }, 2000);
+      // Redirect after delay
+      if (data.total_found > 0) {
+        setTimeout(() => {
+          router.push('/scholarship-recommendation/results');
+        }, 2000);
+      }
 
     } catch (error) {
-      // console.error('Error fetching recommendations:', error);
-
-      // Show error message with more helpful info
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      addMessage(`Terjadi kesalahan saat mencari rekomendasi: ${errorMessage}. Pastikan backend berjalan dengan benar.`, 'bot');
+      const errorMessage = error instanceof Error ? error.message : 'Terjadi kesalahan';
+      addMessage(`Maaf, terjadi kesalahan: ${errorMessage}. Silakan coba lagi.`, 'bot');
     } finally {
       setIsLoading(false);
     }
   };
 
+  const buildUserPrompt = (): string => {
+    const parts: string[] = [];
+
+    if (userData.scholarshipType) {
+      parts.push(`Mencari beasiswa ${userData.scholarshipType}`);
+    }
+    if (userData.degree) {
+      parts.push(`Jenjang: ${userData.degree}`);
+    }
+    if (userData.custom && userData.custom.toLowerCase() !== 'lewati') {
+      parts.push(userData.custom);
+    }
+
+    return parts.join('. ') || 'Mencari beasiswa yang sesuai dengan profil saya';
+  };
+
   const currentQuestion = questionFlow[currentQuestionIndex];
-  const showOptions = showTemplates && currentQuestion && !isLoading;
+  const isApplicable = !currentQuestion.condition || currentQuestion.condition(userData);
+  const showInput = !isComplete && isApplicable && !isLoading;
+
+  // Filter provinces for dropdown search
+  const filteredProvinces = PROVINCES.filter(p =>
+    p.toLowerCase().includes(dropdownSearch.toLowerCase())
+  );
 
   return (
     <div className="flex flex-col h-full max-h-[700px] bg-white rounded-lg shadow-sm border border-gray-100">
       {/* Header */}
-      <div className="flex items-center gap-3 p-6 border-b border-gray-100">
-        <div className="w-8 h-8 bg-primary-blue rounded-full flex items-center justify-center">
-          <Typography className="font-medium text-white text-sm">AI</Typography>
+      <div className="flex items-center gap-3 p-5 border-b border-gray-100">
+        <div className="w-9 h-9 bg-[#1B7691] rounded-full flex items-center justify-center">
+          <Typography className="font-semibold text-white text-sm">AI</Typography>
         </div>
         <div>
-          <Typography className="font-medium text-gray-900">Haira Assistant</Typography>
-          <Typography className="text-sm text-gray-500">Pencari Beasiswa AI</Typography>
+          <Typography className="font-semibold text-gray-900">Scholra Assistant</Typography>
+          <Typography className="text-xs text-gray-500">Rekomendasi Beasiswa</Typography>
         </div>
-        <div className="ml-auto">
-          <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+        <div className="ml-auto flex items-center gap-2">
+          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+          <Typography className="text-xs text-gray-500">Online</Typography>
         </div>
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-6">
+      <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-5 space-y-4">
         {messages.map((message) => (
           <div
             key={message.id}
             className={`flex gap-3 ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             {message.type === 'bot' && (
-              <div className="w-7 h-7 bg-primary-blue rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                <Typography className="text-white text-xs font-medium">AI</Typography>
+              <div className="w-7 h-7 bg-[#1B7691] rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                <Typography className="text-white text-xs font-semibold">AI</Typography>
               </div>
             )}
 
             <div
-              className={`max-w-[75%] px-4 py-3 rounded-2xl ${message.type === 'user'
-                ? 'bg-primary-blue text-white rounded-br-md'
-                : 'bg-gray-50 text-gray-800 rounded-bl-md'
+              className={`max-w-[80%] px-4 py-2.5 rounded-2xl ${message.type === 'user'
+                ? 'bg-[#1B7691] text-white rounded-br-sm'
+                : 'bg-gray-100 text-gray-800 rounded-bl-sm'
                 }`}
             >
               <Typography className={`text-sm leading-relaxed ${message.type === 'user' ? 'text-white' : 'text-gray-800'}`}>
@@ -282,8 +485,8 @@ export default function Chatbox({ onRecommendation }: ChatboxProps) {
             </div>
 
             {message.type === 'user' && (
-              <div className="w-7 h-7 bg-primary-orange rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                <FiUser className="w-3 h-3 text-white" />
+              <div className="w-7 h-7 bg-[#FB991A] rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                <FiUser className="w-3.5 h-3.5 text-white" />
               </div>
             )}
           </div>
@@ -291,82 +494,138 @@ export default function Chatbox({ onRecommendation }: ChatboxProps) {
 
         {isLoading && (
           <div className="flex gap-3">
-            <div className="w-7 h-7 bg-primary-blue rounded-full flex items-center justify-center">
+            <div className="w-7 h-7 bg-[#1B7691] rounded-full flex items-center justify-center">
               <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
             </div>
-            <div className="bg-gray-50 px-4 py-3 rounded-2xl rounded-bl-md">
-              <Typography className="text-sm text-gray-600">Mencari beasiswa...</Typography>
+            <div className="bg-gray-100 px-4 py-2.5 rounded-2xl rounded-bl-sm">
+              <Typography className="text-sm text-gray-600">Mencari rekomendasi beasiswa...</Typography>
             </div>
           </div>
         )}
 
-        <div ref={messagesEndRef} />
+        {/* End marker for scroll */}
+        <div />
       </div>
 
       {/* Input Section */}
-      <div className="p-6 border-t border-gray-100">
-        {/* Quick Options */}
-        {showOptions && currentQuestion?.type === 'options' && (
-          <div className="mb-4">
-            <div className="flex flex-wrap gap-2">
-              {currentQuestion.options?.map((option) => (
-                <button
-                  key={option}
-                  onClick={() => handleOptionSelect(option)}
-                  className="px-4 py-2 bg-white hover:bg-primary-blue hover:text-white text-gray-700 rounded-full border border-gray-200 hover:border-primary-blue transition-all duration-200 text-sm font-medium"
-                >
-                  {option}
-                </button>
-              ))}
-            </div>
+      <div className="p-5 border-t border-gray-100">
+        {/* Options */}
+        {showInput && currentQuestion?.type === 'options' && (
+          <div className="flex flex-wrap gap-2">
+            {currentQuestion.options?.map((option) => (
+              <button
+                key={option}
+                onClick={() => handleOptionSelect(option)}
+                className="px-4 py-2 bg-gray-50 hover:bg-[#1B7691] hover:text-white text-gray-700 rounded-full border border-gray-200 hover:border-[#1B7691] transition-all duration-200 text-sm font-medium"
+              >
+                {option}
+              </button>
+            ))}
           </div>
         )}
 
-        {/* Template Buttons */}
-        {showOptions && currentQuestion?.type === 'text' && currentQuestion.templates && (
-          <div className="mb-4">
-            <Typography className="text-xs text-gray-400 mb-3 font-medium tracking-wide">
-              Contoh
-            </Typography>
-            <div className="space-y-2">
-              {currentQuestion.templates.map((template) => (
-                <button
-                  key={template}
-                  onClick={() => handleTemplateClick(template)}
-                  className="w-full p-3 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-lg transition-colors text-left text-sm border-0"
-                >
-                  {template}
-                </button>
-              ))}
-            </div>
+        {/* Dropdown for provinces */}
+        {showInput && currentQuestion?.type === 'dropdown' && (
+          <div className="relative" ref={dropdownRef}>
+            <button
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+              className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-700 hover:border-[#1B7691] transition-colors"
+            >
+              <span className="text-gray-400">Pilih provinsi...</span>
+              <FiChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
+            </button>
+
+            {dropdownOpen && (
+              <div className="absolute bottom-full left-0 right-0 mb-2 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-hidden z-50">
+                <div className="p-2 border-b border-gray-100">
+                  <input
+                    type="text"
+                    value={dropdownSearch}
+                    onChange={(e) => setDropdownSearch(e.target.value)}
+                    placeholder="Cari provinsi..."
+                    className="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-[#1B7691]"
+                    autoFocus
+                  />
+                </div>
+                <div className="max-h-48 overflow-y-auto">
+                  {filteredProvinces.map((province) => (
+                    <button
+                      key={province}
+                      onClick={() => handleDropdownSelect(province)}
+                      className="w-full px-4 py-2.5 text-left text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                    >
+                      {province}
+                    </button>
+                  ))}
+                  {filteredProvinces.length === 0 && (
+                    <div className="px-4 py-3 text-sm text-gray-400 text-center">
+                      Tidak ditemukan
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
-        {/* Text Input */}
-        {currentQuestion?.type === 'text' && (
+        {/* Text/Number Input */}
+        {showInput && (currentQuestion?.type === 'text' || currentQuestion?.type === 'number') && (
           <form onSubmit={(e) => { e.preventDefault(); handleTextSubmit(inputValue); }} className="relative">
-            <div className="flex items-center bg-gray-50 rounded-full border border-gray-200 focus-within:border-primary-blue focus-within:bg-white transition-all">
+            <div className="flex items-center bg-gray-50 rounded-xl border border-gray-200 focus-within:border-[#1B7691] focus-within:bg-white transition-all">
               <input
                 type="text"
+                inputMode={currentQuestion.type === 'number' ? 'decimal' : 'text'}
                 value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                placeholder={
-                  currentQuestion.id === 'age' ? 'Masukkan usia Anda...' :
-                    currentQuestion.id === 'gpa' ? 'Masukkan IPK/nilai rata-rata...' :
-                      'Ketik detail tambahan...'
-                }
-                className="flex-1 px-5 py-4 bg-transparent focus:outline-none text-sm placeholder-gray-400"
+                onChange={(e) => {
+                  const value = e.target.value;
+                  // For number type, only allow digits and decimal point
+                  if (currentQuestion.type === 'number') {
+                    // Allow only numbers and one decimal point
+                    const sanitized = value.replace(/[^0-9.]/g, '');
+                    // Prevent multiple decimal points
+                    const parts = sanitized.split('.');
+                    if (parts.length > 2) {
+                      setInputValue(parts[0] + '.' + parts.slice(1).join(''));
+                    } else {
+                      setInputValue(sanitized);
+                    }
+                  } else {
+                    setInputValue(value);
+                  }
+                }}
+                onKeyDown={(e) => {
+                  // For number type, prevent non-numeric keys
+                  if (currentQuestion.type === 'number') {
+                    const allowed = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Enter', '.'];
+                    const isNumber = /^[0-9]$/.test(e.key);
+                    const isDecimal = e.key === '.' && !inputValue.includes('.');
+                    if (!isNumber && !allowed.includes(e.key) && !isDecimal) {
+                      e.preventDefault();
+                    }
+                  }
+                }}
+                placeholder={getPlaceholder(currentQuestion)}
+                className="flex-1 px-4 py-3 bg-transparent focus:outline-none text-sm placeholder-gray-400"
                 disabled={isLoading}
               />
               <button
                 type="submit"
                 disabled={!inputValue.trim() || isLoading}
-                className="mr-2 p-2 bg-primary-blue text-white rounded-full hover:bg-primary-orange transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                className="mr-2 p-2 bg-[#1B7691] text-white rounded-lg hover:bg-[#145a6e] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 <FiSend className="w-4 h-4" />
               </button>
             </div>
           </form>
+        )}
+
+        {/* Completed state */}
+        {isComplete && !isLoading && (
+          <div className="text-center py-2">
+            <Typography className="text-sm text-gray-500">
+              Pencarian selesai. Anda akan diarahkan ke halaman hasil.
+            </Typography>
+          </div>
         )}
       </div>
     </div>
