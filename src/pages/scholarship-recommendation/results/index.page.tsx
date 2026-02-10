@@ -24,6 +24,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import SEO from '@/components/SEO';
 import Typography from '@/components/Typography';
 import Layout from '@/layouts/Layout';
+import { getToken } from '@/lib/cookies';
 
 interface ScholarshipResult {
   id: string;
@@ -178,8 +179,10 @@ export default function ScholarshipResultsPage() {
   };
 
   const checkAuth = () => {
-    const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
-    return !!token;
+    if (typeof window === 'undefined') return false;
+    const token = getToken();
+    const lsToken = localStorage.getItem('accessToken') || localStorage.getItem('token');
+    return !!(token || lsToken);
   };
 
   const handleViewDetail = (id: string) => {
@@ -283,8 +286,8 @@ export default function ScholarshipResultsPage() {
                   key={status}
                   onClick={() => setFilterStatus(status)}
                   className={`px-4 py-2 rounded-md text-xs font-semibold transition-all whitespace-nowrap ${filterStatus === status
-                      ? 'bg-white text-gray-900 shadow-sm border border-gray-200'
-                      : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+                    ? 'bg-white text-gray-900 shadow-sm border border-gray-200'
+                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
                     }`}
                 >
                   {status === 'all' ? 'Semua' : status === 'open' ? 'Dibuka' : 'Ditutup'}
@@ -417,8 +420,8 @@ export default function ScholarshipResultsPage() {
                         <button
                           onClick={() => handleViewDetail(scholarship.id)}
                           className={`w-full py-3 px-5 rounded-xl font-semibold text-sm transition-all flex items-center justify-center gap-2 ${scholarshipOpen
-                              ? 'bg-[#1B7691] text-white hover:bg-[#15627a] shadow-sm hover:shadow-md'
-                              : 'bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-200'
+                            ? 'bg-[#1B7691] text-white hover:bg-[#15627a] shadow-sm hover:shadow-md'
+                            : 'bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-200'
                             }`}
                           disabled={!scholarshipOpen}
                         >
