@@ -1,9 +1,21 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 import { FiTarget, FiDatabase, FiZap, FiArrowRight } from 'react-icons/fi';
 
 import SEO from '@/components/SEO';
+import { GetServerSideProps } from 'next';
+import { useRouter } from 'next/router';
 import Layout from '@/layouts/Layout';
 import EnhancedChatbox from './components/enhanced-chatbox';
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  return {
+    redirect: {
+      destination: '/coming-soon',
+      permanent: false,
+    },
+  };
+};
 
 export default function ScholarshipRecommendationPage() {
   return (

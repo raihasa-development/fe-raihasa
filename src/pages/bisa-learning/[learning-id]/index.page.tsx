@@ -14,7 +14,7 @@ import SEO from '@/components/SEO';
 const courseData = {
   'pertamina-sobat-bumi': {
     id: 'pertamina-sobat-bumi',
-    title: 'Mastering Pertamina Sobat Bumi',
+    title: 'A-Z Pertamina Sobat Bumi',
     subtitle: 'Panduan lengkap dari Awardee untuk menaklukkan setiap tahapan seleksi.',
     description: `A-Z Scholarship Series Beasiswa Pertamina Sobat Bumi akan mengupas tuntas tips and tricks lolos bareng sama Awardee langsung! Bersama dengan Kak Hilmy, video akan membahas seputar:
 
@@ -46,7 +46,7 @@ const courseData = {
   },
   'tanoto-teladan': {
     id: 'tanoto-teladan',
-    title: 'Rahasia Lolos TANOTO TELADAN',
+    title: 'A-Z Tanoto Teladan Scholarship',
     subtitle: 'Persiapan komprehensif menuju pemimpin masa depan.',
     description: `A-Z Scholarship Series Beasiswa TANOTO Foundation akan mengupas tuntas tips and tricks lolos bareng sama Awardee langsung! Bersama dengan Kak Fazmi, video akan membahas seputar:
 
@@ -77,7 +77,7 @@ const courseData = {
   },
   'bright-scholarship': {
     id: 'bright-scholarship',
-    title: 'Bright Scholarship Bootcamp',
+    title: 'A-Z Bright Scholarship',
     subtitle: 'Langkah pasti menuju masa depan cerah.',
     description: 'Dapatkan insight eksklusif tentang personal statement dan prediksi pertanyaan interview langsung dari Dinar Annasta.',
     duration: '38 Menit',
@@ -99,7 +99,7 @@ const courseData = {
   },
   'bakti-bca': {
     id: 'bakti-bca',
-    title: 'Strategi Jitu Bakti BCA',
+    title: 'A-Z Bakti BCA Scholarship',
     subtitle: 'Siapkan dirimu untuk salah satu beasiswa paling bergengsi.',
     description: 'Panduan step-by-step dari Shabrina Yasmin, mulai dari pemberkasan hingga menaklukkan tes online dan interview.',
     duration: '48 Menit',
@@ -122,7 +122,7 @@ const courseData = {
   },
   'kse-scholarship': {
     id: 'kse-scholarship',
-    title: 'Sukses Beasiswa KSE',
+    title: 'A-Z Karya Salemba Empat Scholarship',
     subtitle: 'Karya Salemba Empat: Lebih dari sekadar bantuan biaya.',
     description: 'Tips administrasi dan essay, serta rahasia menghadapi dua tahap interview yang menantang bersama Prisilia Dita.',
     duration: '42 Menit',
@@ -144,7 +144,7 @@ const courseData = {
   },
   'beasiswa-unggulan': {
     id: 'beasiswa-unggulan',
-    title: 'Masterclass Beasiswa Unggulan',
+    title: 'A-Z Beasiswa Unggulan',
     subtitle: 'Wujudkan mimpi kuliah gratis dengan Beasiswa Unggulan Kemendikbud.',
     description: 'Bedah tuntas persyaratan, tips essay, persiapan UKBI, dan simulasi interview bersama Reza Nafi.',
     duration: '60 Menit',
@@ -167,7 +167,7 @@ const courseData = {
   },
   'indonesia-bangkit': {
     id: 'indonesia-bangkit',
-    title: 'Panduan Beasiswa Indonesia Bangkit',
+    title: 'A-Z Beasiswa Indonesia Bangkit',
     subtitle: 'Raih pendidikan terbaik dengan beasiswa kolaborasi Kemenag & LPDP.',
     description: 'Pelajari alur seleksi, tips tes skolastik, dan kunci sukses interview bersama Hasna Zahra.',
     duration: '55 Menit',
@@ -190,7 +190,7 @@ const courseData = {
   },
   'paragon-scholarship': {
     id: 'paragon-scholarship',
-    title: 'Paragon Scholarship Program',
+    title: 'A-Z Paragon Scholarship',
     subtitle: 'Beasiswa dari perusahaan kosmetik terbesar di Indonesia.',
     description: 'Persiapan CV, Essay, Online Test, hingga Interview korporat bersama Floren Aliza.',
     duration: '40 Menit',
@@ -277,7 +277,7 @@ function LearningDetailPage() {
       // enablejsapi=1: Allow us to control play/pause AND Receive Events
       if (typeof window !== 'undefined') {
         const origin = window.location.origin;
-        setSecureUrl(`https://www.youtube.com/embed/${course.videoId}?enablejsapi=1&rel=0&modestbranding=1&controls=0&showinfo=0&disablekb=1&fs=0&origin=${origin}`);
+        setSecureUrl(`https://www.youtube.com/embed/${course.videoId}?enablejsapi=1&rel=0&modestbranding=1&controls=1&showinfo=0&disablekb=0&fs=1&origin=${origin}`);
       }
     }
   }, [course, activeLesson]);
@@ -427,103 +427,15 @@ function LearningDetailPage() {
               {/* LEFT: Video Player & Content */}
               <div className='lg:col-span-2'>
                 {/* PROTECTED Video Player */}
-                <div
-                  ref={containerRef}
-                  className='bg-black rounded-2xl overflow-hidden shadow-2xl aspect-video relative group select-none'
-                  onContextMenu={(e) => e.preventDefault()}
-                >
-                  {/* 1. The IFrame */}
+                <div className='bg-black rounded-2xl overflow-hidden shadow-2xl aspect-video relative'>
                   <iframe
                     ref={iframeRef}
                     src={secureUrl}
                     title={course.title}
-                    className='w-full h-full pointer-events-none'
-                    allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
-                    allowFullScreen={false}
+                    className='w-full h-full'
+                    allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen'
+                    allowFullScreen
                   />
-
-                  {/* 2. Transparent Interaction Layer */}
-                  <div
-                    className="absolute inset-0 z-10 cursor-pointer"
-                    onClick={togglePlay}
-                    onContextMenu={(e) => e.preventDefault()}
-                  ></div>
-
-                  {/* 3. Custom Play/Pause Overlay */}
-                  <div className={`absolute inset-0 z-20 flex items-center justify-center pointer-events-none transition-opacity duration-300 ${isPlaying ? 'opacity-0' : 'opacity-100'}`}>
-                    <div className="bg-white/20 p-5 rounded-full backdrop-blur-md border border-white/30 shadow-2xl transform scale-100">
-                      <FiPlay className="w-12 h-12 text-white ml-1 filter drop-shadow-lg" />
-                    </div>
-                  </div>
-
-                  {/* 4. Custom Control Bar (Bottom) */}
-                  <div className="absolute bottom-0 left-0 right-0 z-30 bg-gradient-to-t from-black/90 via-black/50 to-transparent flex flex-col justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none p-4 pb-2">
-
-                    {/* Progress Bar Row */}
-                    <div className="w-full flex items-center gap-3 mb-2 pointer-events-auto">
-                      <input
-                        type="range"
-                        min={0}
-                        max={duration || 100}
-                        value={currentTime}
-                        onChange={handleSeek}
-                        className="w-full"
-                      />
-                    </div>
-
-                    {/* Controls Row */}
-                    <div className="flex items-center justify-between w-full pointer-events-auto">
-                      <div className="flex items-center gap-4">
-                        <button
-                          className="text-white hover:text-[#1B7691] transition-colors"
-                          onClick={(e) => { e.stopPropagation(); togglePlay(); }}
-                        >
-                          {isPlaying ? <FiPause className="w-6 h-6" /> : <FiPlay className="w-6 h-6" />}
-                        </button>
-
-                        {/* Skip Buttons */}
-                        <div className="flex items-center gap-2">
-                          <button
-                            className="text-white/80 hover:text-white transition-colors"
-                            onClick={(e) => { e.stopPropagation(); skip(-10); }}
-                            title="-10s"
-                          >
-                            <FiRewind className="w-5 h-5" />
-                          </button>
-                          <button
-                            className="text-white/80 hover:text-white transition-colors"
-                            onClick={(e) => { e.stopPropagation(); skip(10); }}
-                            title="+10s"
-                          >
-                            <FiFastForward className="w-5 h-5" />
-                          </button>
-                        </div>
-
-                        {/* Speed */}
-                        <button
-                          className="text-white hover:text-[#1B7691] transition-colors text-xs font-bold w-12 text-center bg-white/10 rounded py-1 ml-2"
-                          onClick={(e) => { e.stopPropagation(); changeSpeed(); }}
-                          title="Playback Speed"
-                        >
-                          {playbackRate}x
-                        </button>
-                      </div>
-
-                      <div className="flex items-center gap-3">
-                        <div className="text-white text-xs px-2 py-1 bg-white/20 rounded font-bold flex items-center gap-1 backdrop-blur-md">
-                          <FiLock className="w-3 h-3" /> Protected
-                        </div>
-
-                        <button
-                          className="text-white hover:text-[#1B7691] transition-colors"
-                          onClick={(e) => { e.stopPropagation(); toggleFullscreen(); }}
-                          title="Fullscreen"
-                        >
-                          <FiMaximize className="w-5 h-5" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
                 </div>
 
                 {/* Action Bar */}
@@ -647,7 +559,7 @@ function LearningDetailPage() {
             </div>
           </div>
         </main>
-      </div>
-    </Layout>
+      </div >
+    </Layout >
   );
 }

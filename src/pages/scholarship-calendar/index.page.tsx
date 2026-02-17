@@ -58,7 +58,7 @@ const years = Array.from({ length: 5 }, (_, i) => currentYear - 1 + i);
 export const getServerSideProps: GetServerSideProps = async () => {
   return {
     redirect: {
-      destination: '/list-scholarship',
+      destination: '/coming-soon',
       permanent: false,
     },
   };

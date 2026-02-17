@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/router';
+import { GetServerSideProps } from 'next';
 import {
   FiArrowLeft,
   FiCalendar,
@@ -47,6 +48,15 @@ interface ScholarshipResult {
 }
 
 type ViewMode = 'deck' | 'list';
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  return {
+    redirect: {
+      destination: '/coming-soon',
+      permanent: false,
+    },
+  };
+};
 
 // --- Main Page Component ---
 export default function ScholarshipResultsPage() {

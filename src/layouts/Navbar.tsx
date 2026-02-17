@@ -121,7 +121,7 @@ export default function Navbar() {
                   Home
                 </UnstyledLink>
               </li>
-              {/* <li>
+              <li>
                 <UnstyledLink
                   href='/scholarship-calendar'
                   className={clsxm(
@@ -133,8 +133,8 @@ export default function Navbar() {
                 >
                   Calendar
                 </UnstyledLink>
-              </li> */}
-              <li>
+              </li>
+              {/* <li>
                 <UnstyledLink
                   href='/list-scholarship'
                   className={clsxm(
@@ -146,7 +146,7 @@ export default function Navbar() {
                 >
                   Scholarship List
                 </UnstyledLink>
-              </li>
+              </li> */}
               <li>
                 <UnstyledLink
                   href='/scholarship-recommendation/'
