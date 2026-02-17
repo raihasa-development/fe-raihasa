@@ -1,3 +1,4 @@
+
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 
 import { useQuery } from '@tanstack/react-query';
@@ -16,6 +17,7 @@ import Typography from '@/components/Typography';
 import api from '@/lib/api';
 import Layout from '@/layouts/Layout';
 import { ApiReturn } from '@/types/api';
+import { GetServerSideProps } from 'next';
 
 moment.locale('id'); // Set locale to Indonesian
 const localizer = momentLocalizer(moment);
@@ -52,6 +54,15 @@ const months = [
 
 const currentYear = new Date().getFullYear();
 const years = Array.from({ length: 5 }, (_, i) => currentYear - 1 + i);
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  return {
+    redirect: {
+      destination: '/list-scholarship',
+      permanent: false,
+    },
+  };
+};
 
 export default function ScholarshipCalendarPage() {
   const router = useRouter();

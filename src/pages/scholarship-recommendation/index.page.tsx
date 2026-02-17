@@ -54,7 +54,7 @@ export default function ScholarshipRecommendationPage() {
               <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mb-3">
                 <FiDatabase className="w-5 h-5 text-green-600" />
               </div>
-              <h3 className="font-semibold text-gray-800 mb-1">2500+ Beasiswa</h3>
+              <h3 className="font-semibold text-gray-800 mb-1">1000+ Beasiswa</h3>
               <p className="text-sm text-gray-500">Database terlengkap di Indonesia</p>
             </div>
             <div className="bg-white/60 backdrop-blur-sm rounded-xl p-4 border border-white/80">

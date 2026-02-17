@@ -186,7 +186,7 @@ export default function DreamshubPage() {
               DreamsHub Forum
             </h1>
             <p className="text-xl text-blue-50 max-w-2xl mx-auto font-light leading-relaxed mb-8">
-              Ruang kolaborasi untuk berbagi pengalaman, tips beasiswa, dan saling mendukung mimpi satu sama lain.
+              Ruang kolaborasi untuk berbagi pengalaman, tips beasiswa, serta layanan proofreading dokumen untuk memaksimalkan peluangmu meraih mimpi.
             </p>
             <button
               onClick={() => router.push('/dreamshub/create')}

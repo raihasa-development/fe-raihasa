@@ -121,7 +121,7 @@ export default function Navbar() {
                   Home
                 </UnstyledLink>
               </li>
-              <li>
+              {/* <li>
                 <UnstyledLink
                   href='/scholarship-calendar'
                   className={clsxm(
@@ -132,6 +132,19 @@ export default function Navbar() {
                   )}
                 >
                   Calendar
+                </UnstyledLink>
+              </li> */}
+              <li>
+                <UnstyledLink
+                  href='/list-scholarship'
+                  className={clsxm(
+                    'relative px-4 py-2 text-sm font-medium rounded-full transition-all duration-300',
+                    router.pathname.startsWith('/list-scholarship')
+                      ? 'text-[#1B7691] bg-[#1B7691]/10 font-bold shadow-sm ring-1 ring-[#1B7691]/20'
+                      : 'text-gray-700 hover:text-[#1B7691] hover:bg-[#1B7691]/5'
+                  )}
+                >
+                  Scholarship List
                 </UnstyledLink>
               </li>
               <li>
@@ -314,7 +327,7 @@ export default function Navbar() {
                 </Typography>
               </UnstyledLink>
             </li>
-            <li>
+            {/* <li>
               <UnstyledLink
                 href='/scholarship-calendar'
                 className='flex rounded-xl hover:bg-[#1B7691]/5 hover:text-[#1B7691] transition-colors'
@@ -326,6 +339,21 @@ export default function Navbar() {
                   className='py-4 pl-4'
                 >
                   Calendar
+                </Typography>
+              </UnstyledLink>
+            </li> */}
+            <li>
+              <UnstyledLink
+                href='/list-scholarship'
+                className='flex rounded-xl hover:bg-[#1B7691]/5 hover:text-[#1B7691] transition-colors'
+                onClick={toggleShowNav}
+              >
+                <Typography
+                  color='inline'
+                  variant='bt'
+                  className='py-4 pl-4'
+                >
+                  Scholarship List
                 </Typography>
               </UnstyledLink>
             </li>
