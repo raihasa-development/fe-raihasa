@@ -98,7 +98,6 @@ const PRODUCT_CATALOG = [
     features: [
       'Akses Seluruh Tutorial Beasiswa Dalam Negeri dan Luar Negeri',
       'Exclusive E-Book',
-      'Monthly Live Class with Mentors',
       '10x Dreamshub Consultation',
     ],
     tag: 'Most Popular',

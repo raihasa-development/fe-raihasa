@@ -250,7 +250,6 @@ Terima kasih!`);
                 {[
                   "Akses Seluruh Tutorial Beasiswa Dalam Negeri dan Luar Negeri",
                   "Exclusive E-Book",
-                  "Monthly Live Class with Mentors",
                   "10x Dreamshub Consultation"
                 ].map((feat, i) => (
                   <li key={i} className="flex gap-3 text-sm text-gray-800">
