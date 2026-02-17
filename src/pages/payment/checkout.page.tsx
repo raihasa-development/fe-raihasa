@@ -35,7 +35,7 @@ const PRODUCT_CATALOG_FALLBACK = [
     deskripsi: 'Akses Seluruh Tutorial Beasiswa & Mentoring',
     jenis: 'ideal-plan', // Keep legacy slug for mapping
     masa_aktif: 12,
-    features: ['Monthly Live Class', '10x Consultation']
+    features: ['10x Consultation']
   }
 ];
 

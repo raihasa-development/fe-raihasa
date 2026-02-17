@@ -137,6 +137,41 @@ export default function EnhancedChatbox({ onRecommendation }: ChatboxProps) {
 
     const handleAcademicSubmit = () => {
         const isSchool = formData.education_level === 'sma';
+
+        // Validation
+        const semester = parseInt(formData.semester);
+        const ipk = parseFloat(formData.ipk);
+
+        if (!formData.semester || isNaN(semester)) {
+            addMessage(`Mohon isi ${isSchool ? 'Kelas' : 'Semester'} dengan angka valid.`, 'bot');
+            return;
+        }
+
+        if (!formData.ipk || isNaN(ipk)) {
+            addMessage(`Mohon isi ${isSchool ? 'Nilai Rata-rata' : 'IPK'} dengan angka valid.`, 'bot');
+            return;
+        }
+
+        if (isSchool) {
+            if (semester < 10 || semester > 12) {
+                addMessage('Kelas harus antara 10-12.', 'bot');
+                return;
+            }
+            if (ipk < 0 || ipk > 100) {
+                addMessage('Nilai rata-rata harus antara 0-100.', 'bot');
+                return;
+            }
+        } else {
+            if (semester < 1 || semester > 14) {
+                addMessage('Semester harus antara 1-14.', 'bot');
+                return;
+            }
+            if (ipk < 0 || ipk > 4.00) {
+                addMessage('IPK harus antara 0.00-4.00.', 'bot');
+                return;
+            }
+        }
+
         const academicText = [];
 
         if (formData.semester) {
@@ -170,12 +205,17 @@ export default function EnhancedChatbox({ onRecommendation }: ChatboxProps) {
     };
 
     const handlePromptSubmit = () => {
+        if (isLoading) return; // Prevent double submit
+
         if (!formData.user_prompt.trim()) {
             setFormData(prev => ({ ...prev, user_prompt: 'Cari beasiswa yang sesuai dengan profil saya' }));
         }
+
+        setIsLoading(true); // Set loading immediately
+
         addMessage(formData.user_prompt || 'Cari beasiswa yang sesuai dengan profil saya', 'user');
         setTimeout(() => {
-            addMessage('Baik, Scholra sedang mencari rekomendasi beasiswa terbaik untukmu.', 'bot');
+            addMessage('Baik, Scholra sedang mencari rekomendasi beasiswa terbaik untukmu...', 'bot');
             setCurrentStep('complete');
             generateRecommendations();
         }, 500);
@@ -233,9 +273,9 @@ export default function EnhancedChatbox({ onRecommendation }: ChatboxProps) {
                     month: 'long',
                     year: 'numeric'
                 }),
-                amount: rec.jenis === 'PARTIAL' ? 'Partial Scholarship' : rec.jenis === 'FULL' ? 'Full Scholarship' : rec.jenis,
-                requirements: [`Jenis: ${rec.jenis}`, `Match Score: ${rec.match_score}%`],
-                description: `Beasiswa ${rec.jenis} dari ${rec.penyelenggara}`,
+                amount: rec.jenis === 'PARTIAL' ? 'Beasiswa Parsial' : rec.jenis === 'FULL' ? 'Beasiswa Penuh' : rec.jenis,
+                requirements: [`Jenis: ${rec.jenis === 'PARTIAL' ? 'Parsial' : 'Penuh'}`, `Kecocokan: ${rec.match_score}%`],
+                description: `Beasiswa ${rec.jenis === 'PARTIAL' ? 'Parsial' : 'Penuh'} dari ${rec.penyelenggara}`,
                 eligibility: `Pendaftaran: ${new Date(rec.open_registration).toLocaleDateString('id-ID')} - ${new Date(rec.close_registration).toLocaleDateString('id-ID')}`,
                 link: `/scholarship-recommendation/${rec.id}`,
                 match_score: rec.match_score / 100
@@ -416,6 +456,12 @@ export default function EnhancedChatbox({ onRecommendation }: ChatboxProps) {
                                     placeholder="Contoh: 20"
                                     min="10"
                                     max="60"
+                                    onKeyDown={(e) => {
+                                        if (['e', 'E', '+', '-'].includes(e.key)) {
+                                            e.preventDefault();
+                                        }
+                                    }}
+                                    onWheel={(e) => (e.target as HTMLInputElement).blur()}
                                     className="flex-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#1B7691] focus:border-transparent transition-all"
                                 />
                                 <button
@@ -524,6 +570,12 @@ export default function EnhancedChatbox({ onRecommendation }: ChatboxProps) {
                                     placeholder={formData.education_level === 'sma' ? "Kelas (10-12)" : "Semester (1-14)"}
                                     min={formData.education_level === 'sma' ? "10" : "1"}
                                     max={formData.education_level === 'sma' ? "12" : "14"}
+                                    onKeyDown={(e) => {
+                                        if (['e', 'E', '+', '-'].includes(e.key)) {
+                                            e.preventDefault();
+                                        }
+                                    }}
+                                    onWheel={(e) => (e.target as HTMLInputElement).blur()}
                                     className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#1B7691] focus:border-transparent transition-all"
                                 />
                                 <input
@@ -534,6 +586,12 @@ export default function EnhancedChatbox({ onRecommendation }: ChatboxProps) {
                                     placeholder={formData.education_level === 'sma' ? "Rata-rata (0-100)" : "IPK (0.00 - 4.00)"}
                                     min="0"
                                     max={formData.education_level === 'sma' ? "100" : "4"}
+                                    onKeyDown={(e) => {
+                                        if (['e', 'E', '+', '-'].includes(e.key)) {
+                                            e.preventDefault();
+                                        }
+                                    }}
+                                    onWheel={(e) => (e.target as HTMLInputElement).blur()}
                                     className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#1B7691] focus:border-transparent transition-all"
                                 />
                             </div>

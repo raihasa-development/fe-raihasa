@@ -27,7 +27,7 @@ const courses = [
 	{
 		id: 'pertamina-sobat-bumi',
 		categoryId: 'pertamina',
-		title: 'Mastering Pertamina Sobat Bumi',
+		title: 'A-Z Pertamina Sobat Bumi',
 		subtitle: 'Panduan lengkap dari Awardee untuk menaklukkan setiap tahapan seleksi.',
 		description: 'Kupas tuntas strategi lolos Beasiswa Pertamina Sobat Bumi bersama Hilmy Fadel. Mulai dari administrasi, essay juara, hingga teknik interview yang memukau.',
 		duration: '45 Menit',
@@ -44,7 +44,7 @@ const courses = [
 	{
 		id: 'tanoto-teladan',
 		categoryId: 'tanoto',
-		title: 'Rahasia Lolos TANOTO TELADAN',
+		title: 'A-Z Tanoto Teladan Scholarship',
 		subtitle: 'Persiapan komprehensif menuju pemimpin masa depan.',
 		description: 'Pelajari cara menonjol dalam proses administrasi, menulis essay leadership yang kuat, dan menghadapi assessment LGD bersama Fazmi Rizki.',
 		duration: '52 Menit',
@@ -61,7 +61,7 @@ const courses = [
 	{
 		id: 'bright-scholarship',
 		categoryId: 'bright',
-		title: 'Bright Scholarship Bootcamp',
+		title: 'A-Z Bright Scholarship',
 		subtitle: 'Langkah pasti menuju masa depan cerah.',
 		description: 'Dapatkan insight eksklusif tentang personal statement dan prediksi pertanyaan interview langsung dari Dinar Annasta.',
 		duration: '38 Menit',
@@ -78,7 +78,7 @@ const courses = [
 	{
 		id: 'bakti-bca',
 		categoryId: 'bca',
-		title: 'Strategi Jitu Bakti BCA',
+		title: 'A-Z Bakti BCA Scholarship',
 		subtitle: 'Siapkan dirimu untuk salah satu beasiswa paling bergengsi.',
 		description: 'Panduan step-by-step dari Shabrina Yasmin, mulai dari pemberkasan hingga menaklukkan tes online dan interview.',
 		duration: '48 Menit',
@@ -95,7 +95,7 @@ const courses = [
 	{
 		id: 'kse-scholarship',
 		categoryId: 'kse',
-		title: 'Sukses Beasiswa KSE',
+		title: 'A-Z Karya Salemba Empat Scholarship',
 		subtitle: 'Karya Salemba Empat: Lebih dari sekadar bantuan biaya.',
 		description: 'Tips administrasi dan essay, serta rahasia menghadapi dua tahap interview yang menantang bersama Prisilia Dita.',
 		duration: '42 Menit',
@@ -112,7 +112,7 @@ const courses = [
 	{
 		id: 'beasiswa-unggulan',
 		categoryId: 'unggulan',
-		title: 'Masterclass Beasiswa Unggulan',
+		title: 'A-Z Beasiswa Unggulan',
 		subtitle: 'Wujudkan mimpi kuliah gratis dengan Beasiswa Unggulan Kemendikbud.',
 		description: 'Bedah tuntas persyaratan, tips essay, persiapan UKBI, dan simulasi interview bersama Reza Nafi.',
 		duration: '60 Menit',
@@ -129,7 +129,7 @@ const courses = [
 	{
 		id: 'indonesia-bangkit',
 		categoryId: 'bangkit',
-		title: 'Panduan Beasiswa Indonesia Bangkit',
+		title: 'A-Z Beasiswa Indonesia Bangkit',
 		subtitle: 'Raih pendidikan terbaik dengan beasiswa kolaborasi Kemenag & LPDP.',
 		description: 'Pelajari alur seleksi, tips tes skolastik, dan kunci sukses interview bersama Hasna Zahra.',
 		duration: '55 Menit',
@@ -146,7 +146,7 @@ const courses = [
 	{
 		id: 'paragon-scholarship',
 		categoryId: 'paragon',
-		title: 'Paragon Scholarship Program',
+		title: 'A-Z Paragon Scholarship',
 		subtitle: 'Beasiswa dari perusahaan kosmetik terbesar di Indonesia.',
 		description: 'Persiapan CV, Essay, Online Test, hingga Interview korporat bersama Floren Aliza.',
 		duration: '40 Menit',

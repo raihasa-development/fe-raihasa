@@ -1,3 +1,4 @@
+
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 
 import { useQuery } from '@tanstack/react-query';
@@ -16,6 +17,7 @@ import Typography from '@/components/Typography';
 import api from '@/lib/api';
 import Layout from '@/layouts/Layout';
 import { ApiReturn } from '@/types/api';
+import { GetServerSideProps } from 'next';
 
 moment.locale('id'); // Set locale to Indonesian
 const localizer = momentLocalizer(moment);
@@ -52,6 +54,15 @@ const months = [
 
 const currentYear = new Date().getFullYear();
 const years = Array.from({ length: 5 }, (_, i) => currentYear - 1 + i);
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  return {
+    redirect: {
+      destination: '/coming-soon',
+      permanent: false,
+    },
+  };
+};
 
 export default function ScholarshipCalendarPage() {
   const router = useRouter();
@@ -437,8 +448,15 @@ export default function ScholarshipCalendarPage() {
 
             <div className="flex items-center gap-3">
               <button
+                onClick={() => router.push('/list-scholarship')}
+                className="flex items-center gap-2 px-6 py-2.5 rounded-xl font-medium text-sm transition-all duration-300 bg-[#1B7691] text-white hover:bg-[#15627a] shadow-sm hover:shadow-md"
+              >
+                <FiLayers />
+                Lihat Daftar
+              </button>
+              <button
                 onClick={handleExportCalendar}
-                className="flex items-center gap-2 px-6 py-2.5 rounded-xl font-medium text-sm transition-all duration-300 bg-white text-gray-700 border border-gray-200 hover:border-[#1B7691] hover:text-[#1B7691] shadow-sm hover:shadow-md"
+                className="flex items-center gap-2 px-6 py-2.5 rounded-xl font-medium text-sm transition-all duration-300 bg-white text-gray-700 border border-gray-200 hover:border-[#1B7691] hover:text-[#1B7691] shadow-sm hover:shadow-md hidden md:flex"
               >
                 <FiDownload />
                 Ekspor Kalender
@@ -495,8 +513,8 @@ export default function ScholarshipCalendarPage() {
                         key={jenjang}
                         onClick={() => setSelectedJenjang(prev => prev.includes(jenjang) ? prev.filter(j => j !== jenjang) : [...prev, jenjang])}
                         className={`whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${selectedJenjang.includes(jenjang)
-                            ? 'bg-[#1B7691] border-[#1B7691] text-white'
-                            : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300'
+                          ? 'bg-[#1B7691] border-[#1B7691] text-white'
+                          : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300'
                           }`}
                       >
                         {jenjang}
@@ -512,8 +530,8 @@ export default function ScholarshipCalendarPage() {
                         key={jenis}
                         onClick={() => setSelectedJenis(prev => prev.includes(jenis) ? prev.filter(j => j !== jenis) : [...prev, jenis])}
                         className={`whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${selectedJenis.includes(jenis)
-                            ? 'bg-[#1B7691] border-[#1B7691] text-white'
-                            : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300'
+                          ? 'bg-[#1B7691] border-[#1B7691] text-white'
+                          : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300'
                           }`}
                       >
                         {jenis}

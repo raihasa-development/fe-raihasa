@@ -59,6 +59,9 @@ export const forumApi = {
       });
 
       if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
+          return [];
+        }
         const errorText = await response.text();
         console.error('Failed to fetch categories:', {
           status: response.status,

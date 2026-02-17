@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/router';
 import React, { useState, useEffect } from 'react';
+import { GetServerSideProps } from 'next';
 import {
   FiArrowLeft, FiCalendar, FiDollarSign, FiHeart, FiMapPin, FiSend,
   FiTrash2, FiClock, FiCheckCircle, FiFileText, FiAward, FiShare2
@@ -36,6 +37,15 @@ interface Manifestation {
   manifestation: string;
   created_at: string;
 }
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  return {
+    redirect: {
+      destination: '/coming-soon',
+      permanent: false,
+    },
+  };
+};
 
 export default function ScholarshipDetailPage() {
   const router = useRouter();

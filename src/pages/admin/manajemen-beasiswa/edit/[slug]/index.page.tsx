@@ -4,13 +4,18 @@ import { useEffect, useState } from 'react';
 import { useForm, FormProvider, Controller } from 'react-hook-form';
 import { useRouter } from 'next/router';
 import Select from 'react-select';
+import { FiArrowLeft, FiSave, FiCalendar, FiInfo, FiCheckCircle, FiLink } from 'react-icons/fi';
+
 import Input from '@/components/form/Input';
+import TextArea from '@/components/form/TextArea';
 import Button from '@/components/buttons/Button';
+import IconButton from '@/components/buttons/IconButton';
 import Typography from '@/components/Typography';
 import SelectInput from '@/components/form/SelectInput';
-import useAuthStore from '@/store/useAuthStore';
 import { showToast, SUCCESS_TOAST, DANGER_TOAST } from '@/components/Toast';
 import withAuth from '@/components/hoc/withAuth';
+import AdminDashboard from '@/layouts/AdminDashboard';
+import api from '@/lib/api';
 
 const jenisOptions = [
   { value: 'FULL', label: 'Full Scholarship' },
@@ -31,43 +36,9 @@ const jenjangOptions = [
 ];
 
 export default withAuth(EditBeasiswaPage, 'admin');
-function EditBeasiswaPage() {
-  type FormValues = {
-    nama: string;
-    jenis: string;
-    penyelenggara: string;
-    benefit: string;
-    open_registration: string;
-    close_registration: string;
-    khusus_daerah_tertentu: boolean;
-    asal_daerah: string;
-    status_batas_usia: boolean;
-    min_umur: string;
-    max_umur: string;
-    status_gender_khusus: boolean;
-    gender: string;
-    jenjang: string[];
-    status_semester_khusus: boolean;
-    semester_khusus: string;
-    status_fakultas_khusus: boolean;
-    fakultas_khusus: string;
-    status_jurusan_khusus: boolean;
-    jurusan_khusus: string;
-    status_kebutuhan_ipk: boolean;
-    min_ipk: string;
-    status_beasiswa_double: boolean;
-    status_keluarga_tidak_mampu: boolean;
-    status_disabilitas: boolean;
-    img_path: string;
-    kampus_bisa_daftar: string;
-    link_guidebook: string;
-    link_pendaftaran: string;
-    persyaratan: string;
-    lainnya: string;
-    deskripsi: string;
-  };
 
-  const methods = useForm<FormValues>({
+function EditBeasiswaPage() {
+  const methods = useForm({
     defaultValues: {
       nama: '',
       jenis: '',
@@ -82,7 +53,7 @@ function EditBeasiswaPage() {
       max_umur: '',
       status_gender_khusus: false,
       gender: '',
-      jenjang: [],
+      jenjang: [] as string[],
       status_semester_khusus: false,
       semester_khusus: '',
       status_fakultas_khusus: false,
@@ -104,50 +75,36 @@ function EditBeasiswaPage() {
     },
   });
 
-  const { handleSubmit, reset, watch, control, register } = methods;
+  const { handleSubmit, reset, watch, control, register, formState: { errors } } = methods;
   const router = useRouter();
   const { slug } = router.query;
-  const token = useAuthStore((s) => s.token || s.user?.token);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
 
-  // Watch conditional fields
-  const status_batas_usia = watch('status_batas_usia');
-  const status_gender_khusus = watch('status_gender_khusus');
-  const status_kebutuhan_ipk = watch('status_kebutuhan_ipk');
+  useEffect(() => setHydrated(true), []);
+
   const khusus_daerah_tertentu = watch('khusus_daerah_tertentu');
-  const status_semester_khusus = watch('status_semester_khusus');
-  const status_fakultas_khusus = watch('status_fakultas_khusus');
-  const status_jurusan_khusus = watch('status_jurusan_khusus');
+  const status_batas_usia = watch('status_batas_usia');
+  const status_kebutuhan_ipk = watch('status_kebutuhan_ipk');
+  const status_gender_khusus = watch('status_gender_khusus');
 
-  // Fetch data beasiswa
+  // Fetch data
   useEffect(() => {
-    if (!slug || !token) return;
+    if (!slug) return;
 
     const fetchData = async () => {
       try {
         setLoading(true);
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_API_URL}/scholarship/${slug}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        // Use api client which handles token automatically
+        const { data: resJson } = await api.get(`/scholarship/${slug}`);
 
-        if (!res.ok) throw new Error('Gagal memuat data beasiswa');
-        const resJson = await res.json();
-        // console.log('🧱 resJson:', resJson);
-        // console.log('🧱 resJson.data:', resJson.data);
-        // console.log('🧱 resJson.data[0]:', resJson.data?.[0]);
-        const data =
-          Array.isArray(resJson.data) ? resJson.data[0] : resJson.data || resJson;
+        const data = Array.isArray(resJson.data) ? resJson.data[0] : resJson.data || resJson;
 
-        // Convert gender dari MALE/FEMALE ke L/P
         let genderValue = '';
         if (data.gender === 'MALE') genderValue = 'L';
         else if (data.gender === 'FEMALE') genderValue = 'P';
 
-        // Reset form dengan data dari API
         reset({
           nama: data.nama || '',
           jenis: data.jenis || '',
@@ -192,20 +149,18 @@ function EditBeasiswaPage() {
         });
       } catch (err: any) {
         console.error(err);
-        showToast(err.message, DANGER_TOAST);
+        showToast(err.response?.data?.message || err.message || 'Gagal memuat data beasiswa', DANGER_TOAST);
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, [slug, token, reset]);
+  }, [slug, reset]);
 
   const onSubmit = async (formData: any) => {
     try {
       setSaving(true);
-
-      // Convert gender dari L/P ke MALE/FEMALE
       let gender: 'MALE' | 'FEMALE' | null = null;
       if (formData.gender === 'L') gender = 'MALE';
       else if (formData.gender === 'P') gender = 'FEMALE';
@@ -217,276 +172,267 @@ function EditBeasiswaPage() {
         benefit: formData.benefit || '',
         open_registration: new Date(formData.open_registration),
         close_registration: new Date(formData.close_registration),
-
         khusus_daerah_tertentu: !!formData.khusus_daerah_tertentu,
         asal_daerah: formData.asal_daerah || '',
-
         status_batas_usia: !!formData.status_batas_usia,
         min_umur: formData.min_umur ? Number(formData.min_umur) : null,
         max_umur: formData.max_umur ? Number(formData.max_umur) : null,
-
         status_gender_khusus: !!formData.status_gender_khusus,
         gender,
-
-        jenjang: Array.isArray(formData.jenjang)
-          ? formData.jenjang
-          : [formData.jenjang].filter(Boolean),
-
+        jenjang: Array.isArray(formData.jenjang) ? formData.jenjang : [formData.jenjang].filter(Boolean),
         status_semester_khusus: !!formData.status_semester_khusus,
         semester_khusus: formData.semester_khusus ? Number(formData.semester_khusus) : null,
-
         status_fakultas_khusus: !!formData.status_fakultas_khusus,
         fakultas_khusus: formData.fakultas_khusus || '',
-
         status_jurusan_khusus: !!formData.status_jurusan_khusus,
         jurusan_khusus: formData.jurusan_khusus || '',
-
         status_kebutuhan_ipk: !!formData.status_kebutuhan_ipk,
         min_ipk: formData.min_ipk ? Number(formData.min_ipk) : null,
-
         status_beasiswa_double: !!formData.status_beasiswa_double,
         status_keluarga_tidak_mampu: !!formData.status_keluarga_tidak_mampu,
         status_disabilitas: !!formData.status_disabilitas,
-
         img_path: formData.img_path || '',
-        kampus_bisa_daftar: formData.kampus_bisa_daftar
-          ? formData.kampus_bisa_daftar.split(',').map((s: string) => s.trim())
-          : [],
+        kampus_bisa_daftar: formData.kampus_bisa_daftar ? formData.kampus_bisa_daftar.split(',').map((s: string) => s.trim()) : [],
         link_guidebook: formData.link_guidebook || '',
         link_pendaftaran: formData.link_pendaftaran || '',
-        persyaratan: formData.persyaratan
-          ? formData.persyaratan.split(',').map((s: string) => s.trim())
-          : [],
-        lainnya: formData.lainnya
-          ? formData.lainnya.split(',').map((s: string) => s.trim())
-          : [],
+        persyaratan: formData.persyaratan ? formData.persyaratan.split(',').map((s: string) => s.trim()) : [],
+        lainnya: formData.lainnya ? formData.lainnya.split(',').map((s: string) => s.trim()) : [],
         deskripsi: formData.deskripsi || '',
       };
 
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_API_URL}/scholarship/${slug}`,
-        {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(payload),
-        }
-      );
-
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.message || 'Gagal memperbarui data');
-      }
+      await api.put(`/scholarship/${slug}`, payload);
 
       showToast('Beasiswa berhasil diperbarui', SUCCESS_TOAST);
       router.push('/admin/manajemen-beasiswa');
     } catch (err: any) {
-      showToast(err.message, DANGER_TOAST);
+      console.error(err);
+      showToast(err.response?.data?.message || err.message || 'Gagal memperbarui data', DANGER_TOAST);
     } finally {
       setSaving(false);
     }
   };
 
-  if (loading)
+  if (!hydrated) return null;
+
+  if (loading) {
     return (
-      <p className="mt-10 text-center text-gray-500">Memuat data beasiswa...</p>
+      <AdminDashboard withSidebar>
+        <div className="flex items-center justify-center p-20">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-blue"></div>
+        </div>
+      </AdminDashboard>
     );
+  }
 
   return (
-    <FormProvider {...methods}>
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col max-w-4xl gap-8 p-8 mx-auto"
-      >
-        <Typography
-          variant="h3"
-          weight="bold"
-          className="py-4 text-center text-white rounded-lg shadow-md bg-primary-blue"
-        >
-          Edit Data Beasiswa
-        </Typography>
-
-        {/* Informasi Utama */}
-        <section className="flex flex-col gap-4">
-          <Typography variant="h5" weight="semibold" className="mt-8 text-primary-blue">
-            Informasi Utama
-          </Typography>
-          <Input id="nama" label="Nama Beasiswa" validation={{ required: 'Nama beasiswa wajib diisi' }} />
-          <SelectInput id="jenis" label="Jenis Beasiswa" validation={{ required: 'Jenis wajib dipilih' }}>
-            <option value="">Pilih Jenis</option>
-            {jenisOptions.map((j) => (
-              <option key={j.value} value={j.value}>
-                {j.label}
-              </option>
-            ))}
-          </SelectInput>
-          <Input id="penyelenggara" label="Penyelenggara" validation={{ required: 'Penyelenggara wajib diisi' }} />
-          <Input id="benefit" label="Benefit" />
-        </section>
-
-        {/* Periode Pendaftaran */}
-        <section className="flex flex-col gap-4">
-          <Typography variant="h5" weight="semibold" className="mt-8 text-primary-blue">
-            Periode Pendaftaran
-          </Typography>
-          <div className="flex flex-col gap-3 md:flex-row">
-            <Input
-              id="open_registration"
-              label="Buka Pendaftaran"
-              type="date"
-              validation={{ required: 'Tanggal pembukaan wajib diisi' }}
-            />
-            <Input
-              id="close_registration"
-              label="Tutup Pendaftaran"
-              type="date"
-              validation={{ required: 'Tanggal penutupan wajib diisi' }}
-            />
-          </div>
-        </section>
-
-        {/* Batasan & Syarat */}
-        <section className="flex flex-col gap-4">
-          <Typography variant="h5" weight="semibold" className="mt-8 text-primary-blue">
-            Batasan & Syarat
-          </Typography>
-
-          {/* Daerah */}
-          <label className="flex items-center gap-2">
-            <input type="checkbox" {...register('khusus_daerah_tertentu')} />
-            <Typography variant="c1">Khusus daerah tertentu?</Typography>
-          </label>
-          {khusus_daerah_tertentu && <Input id="asal_daerah" label="Asal Daerah" />}
-
-          {/* Umur */}
-          <label className="flex items-center gap-2">
-            <input type="checkbox" {...register('status_batas_usia')} />
-            <Typography variant="c1">Batasi usia?</Typography>
-          </label>
-          {status_batas_usia && (
-            <div className="flex flex-col gap-3 md:flex-row">
-              <Input id="min_umur" label="Usia Minimum" type="number" />
-              <Input id="max_umur" label="Usia Maksimum" type="number" />
-            </div>
-          )}
-
-          {/* Gender */}
-          <label className="flex items-center gap-2">
-            <input type="checkbox" {...register('status_gender_khusus')} />
-            <Typography variant="c1">Gender khusus?</Typography>
-          </label>
-          {status_gender_khusus && (
-            <SelectInput id="gender" label="Gender">
-              <option value="">Pilih Gender</option>
-              {genderOptions.map((g) => (
-                <option key={g.value} value={g.value}>
-                  {g.label}
-                </option>
-              ))}
-            </SelectInput>
-          )}
-
-          {/* IPK */}
-          <label className="flex items-center gap-2">
-            <input type="checkbox" {...register('status_kebutuhan_ipk')} />
-            <Typography variant="c1">Butuh IPK minimum?</Typography>
-          </label>
-          {status_kebutuhan_ipk && (
-            <Input id="min_ipk" label="Minimum IPK" type="number" step="0.01" />
-          )}
-        </section>
-
-        {/* Jenjang */}
-        <section className="flex flex-col gap-2 mt-4">
-          <Typography variant="h5" weight="semibold" className="text-primary-blue">
-            Jenjang Pendidikan
-          </Typography>
-          <Controller
-            name="jenjang"
-            control={control}
-            rules={{ required: 'Pilih minimal satu jenjang' }}
-            render={({ field }) => (
-              <Select
-                isMulti
-                options={jenjangOptions}
-                placeholder="Pilih Jenjang"
-                value={jenjangOptions.filter((j) => field.value.includes(j.value))}
-                onChange={(selected: any) =>
-                  field.onChange(selected.map((opt: any) => opt.value))
-                }
-              />
-            )}
-          />
-        </section>
-
-        {/* Kondisi Tambahan */}
-        <section className="flex flex-col gap-4 mt-4">
-          <Typography variant="h5" weight="semibold" className="text-primary-blue">
-            Kondisi Tambahan
-          </Typography>
-
-          <label className="flex items-center gap-2">
-            <input type="checkbox" {...register('status_semester_khusus')} />
-            <Typography variant="c1">Semester khusus?</Typography>
-          </label>
-          {status_semester_khusus && (
-            <Input id="semester_khusus" label="Semester (jika ada)" type="number" />
-          )}
-
-          <label className="flex items-center gap-2">
-            <input type="checkbox" {...register('status_fakultas_khusus')} />
-            <Typography variant="c1">Fakultas khusus?</Typography>
-          </label>
-          {status_fakultas_khusus && (
-            <Input id="fakultas_khusus" label="Nama Fakultas" type="text" />
-          )}
-
-          <label className="flex items-center gap-2">
-            <input type="checkbox" {...register('status_jurusan_khusus')} />
-            <Typography variant="c1">Jurusan khusus?</Typography>
-          </label>
-          {status_jurusan_khusus && (
-            <Input id="jurusan_khusus" label="Nama Jurusan" type="text" />
-          )}
-
-          <label className="flex items-center gap-2">
-            <input type="checkbox" {...register('status_beasiswa_double')} />
-            <Typography variant="c1">Izinkan double beasiswa?</Typography>
-          </label>
-
-          <label className="flex items-center gap-2">
-            <input type="checkbox" {...register('status_keluarga_tidak_mampu')} />
-            <Typography variant="c1">Khusus keluarga tidak mampu?</Typography>
-          </label>
-
-          <label className="flex items-center gap-2">
-            <input type="checkbox" {...register('status_disabilitas')} />
-            <Typography variant="c1">Khusus penyandang disabilitas?</Typography>
-          </label>
-        </section>
-
-        {/* Link & Deskripsi */}
-        <section className="flex flex-col gap-4 mt-4">
-          <Input id="img_path" label="Path Gambar (opsional)" />
-          <Input id="kampus_bisa_daftar" label="Kampus Bisa Daftar (pisahkan dengan koma)" />
-          <Input id="persyaratan" label="Persyaratan (pisahkan dengan koma)" />
-          <Input id="lainnya" label="Lainnya (pisahkan dengan koma)" />
-          <Input id="link_guidebook" label="Link Guidebook" />
-          <Input id="link_pendaftaran" label="Link Pendaftaran" />
-          <Input id="deskripsi" label="Deskripsi" validation={{ required: 'Deskripsi wajib diisi' }} />
-        </section>
-
-        <div className="flex justify-end gap-4 mt-8">
-          <Button type="button" variant="warning" onClick={() => router.back()}>
-            Batal
-          </Button>
-          <Button type="submit" disabled={saving}>
-            {saving ? 'Menyimpan...' : 'Simpan Perubahan'}
-          </Button>
+    <AdminDashboard withSidebar>
+      <div className="flex items-center gap-4 mb-6">
+        <IconButton
+          variant='unstyled'
+          icon={FiArrowLeft}
+          onClick={() => router.back()}
+          className="p-2 bg-white border border-gray-200 hover:bg-gray-50 text-gray-600 rounded-lg transition-colors"
+        />
+        <div>
+          <Typography variant="h5" className="font-bold text-gray-900">Edit Data Beasiswa</Typography>
+          <Typography variant="c1" className="text-gray-500">Perbarui informasi beasiswa yang terdaftar.</Typography>
         </div>
-      </form>
-    </FormProvider>
+      </div>
+
+      <FormProvider {...methods}>
+        <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 lg:grid-cols-3 gap-6 pb-20">
+
+          {/* LEFT COLUMN (2/3) */}
+          <div className="lg:col-span-2 space-y-6">
+
+            {/* Card: Informasi Utama */}
+            <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+              <div className="flex items-center gap-2 mb-4 pb-4 border-b border-gray-100">
+                <FiInfo className="text-[#1B7691]" />
+                <Typography variant="h6" className="font-bold text-gray-800">Informasi Utama</Typography>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="md:col-span-2">
+                  <Input id="nama" label="Nama Beasiswa" validation={{ required: 'Nama beasiswa wajib diisi' }} />
+                </div>
+                <SelectInput id="jenis" label="Jenis Pendanaan" validation={{ required: 'Jenis wajib dipilih' }}>
+                  <option value="">Pilih Jenis</option>
+                  {jenisOptions.map(j => <option key={j.value} value={j.value}>{j.label}</option>)}
+                </SelectInput>
+                <Input id="penyelenggara" label="Penyelenggara" validation={{ required: 'Penyelenggara wajib diisi' }} />
+
+                <div className="md:col-span-2">
+                  <div className="space-y-1">
+                    <Typography variant="c1" weight="semibold" className="text-sm">Jenjang Pendidikan <span className="text-red-500">*</span></Typography>
+                    <Controller
+                      name="jenjang"
+                      control={control}
+                      rules={{ required: 'Pilih minimal satu jenjang' }}
+                      render={({ field }) => (
+                        <Select
+                          isMulti
+                          options={jenjangOptions}
+                          placeholder="Pilih Jenjang..."
+                          value={jenjangOptions.filter(j => field.value?.includes(j.value))}
+                          onChange={(selected: any) => field.onChange(selected.map((opt: any) => opt.value))}
+                          className="react-select-container"
+                          classNamePrefix="react-select"
+                          styles={{
+                            control: (base) => ({
+                              ...base,
+                              borderColor: errors.jenjang ? '#EF4444' : '#E2E8F0',
+                              borderRadius: '0.5rem',
+                              padding: '2px',
+                              boxShadow: 'none',
+                              '&:hover': { borderColor: '#CBD5E1' }
+                            })
+                          }}
+                        />
+                      )}
+                    />
+                    {errors.jenjang && <Typography className="text-red-500 text-xs mt-1">{String(errors.jenjang.message)}</Typography>}
+                  </div>
+                </div>
+
+                <div className="md:col-span-2">
+                  <Input id="benefit" label="Benefit Singkat" />
+                </div>
+              </div>
+            </div>
+
+            {/* Card: Persyaratan & Kriteria */}
+            <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+              <div className="flex items-center gap-2 mb-4 pb-4 border-b border-gray-100">
+                <FiCheckCircle className="text-[#1B7691]" />
+                <Typography variant="h6" className="font-bold text-gray-800">Persyaratan & Kriteria</Typography>
+              </div>
+
+              <div className="bg-gray-50/50 p-4 rounded-lg space-y-4 mb-4 border border-gray-100">
+                <label className="flex items-center justify-between cursor-pointer group">
+                  <span className="text-sm text-gray-700 font-medium group-hover:text-[#1B7691]">Khusus daerah tertentu?</span>
+                  <input type="checkbox" className="w-5 h-5 rounded border-gray-300 text-[#1B7691] focus:ring-[#1B7691]" {...register('khusus_daerah_tertentu')} />
+                </label>
+                {khusus_daerah_tertentu && <Input id="asal_daerah" placeholder="Contoh: Jawa Barat, Papua" />}
+
+                <hr className="border-gray-200/60" />
+
+                <label className="flex items-center justify-between cursor-pointer group">
+                  <span className="text-sm text-gray-700 font-medium group-hover:text-[#1B7691]">Batasan Usia?</span>
+                  <input type="checkbox" className="w-5 h-5 rounded border-gray-300 text-[#1B7691] focus:ring-[#1B7691]" {...register('status_batas_usia')} />
+                </label>
+                {status_batas_usia && (
+                  <div className="grid grid-cols-2 gap-4">
+                    <Input id="min_umur" placeholder="Min" type="number" />
+                    <Input id="max_umur" placeholder="Max" type="number" />
+                  </div>
+                )}
+
+                <hr className="border-gray-200/60" />
+
+                <label className="flex items-center justify-between cursor-pointer group">
+                  <span className="text-sm text-gray-700 font-medium group-hover:text-[#1B7691]">Syarat IPK Minimum?</span>
+                  <input type="checkbox" className="w-5 h-5 rounded border-gray-300 text-[#1B7691] focus:ring-[#1B7691]" {...register('status_kebutuhan_ipk')} />
+                </label>
+                {status_kebutuhan_ipk && <Input id="min_ipk" placeholder="Contoh: 3.25" type="number" step="0.01" />}
+
+                <hr className="border-gray-200/60" />
+
+                <label className="flex items-center justify-between cursor-pointer group">
+                  <span className="text-sm text-gray-700 font-medium group-hover:text-[#1B7691]">Gender Khusus?</span>
+                  <input type="checkbox" className="w-5 h-5 rounded border-gray-300 text-[#1B7691] focus:ring-[#1B7691]" {...register('status_gender_khusus')} />
+                </label>
+                {status_gender_khusus && (
+                  <SelectInput id="gender">
+                    <option value="">Pilih Gender</option>
+                    {genderOptions.map(g => <option key={g.value} value={g.value}>{g.label}</option>)}
+                  </SelectInput>
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <label className="flex items-center gap-2 text-sm text-gray-600">
+                  <input type="checkbox" className="rounded text-[#1B7691] focus:ring-[#1B7691]" {...register("status_beasiswa_double")} />
+                  Izinkan Double Funding?
+                </label>
+                <label className="flex items-center gap-2 text-sm text-gray-600">
+                  <input type="checkbox" className="rounded text-[#1B7691] focus:ring-[#1B7691]" {...register("status_keluarga_tidak_mampu")} />
+                  Khusus Keluarga Tidak Mampu (SKTM)?
+                </label>
+                <label className="flex items-center gap-2 text-sm text-gray-600">
+                  <input type="checkbox" className="rounded text-[#1B7691] focus:ring-[#1B7691]" {...register("status_disabilitas")} />
+                  Prioritas Disabilitas?
+                </label>
+              </div>
+            </div>
+
+            {/* Card: Deskripsi & Links */}
+            <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+              <div className="flex items-center gap-2 mb-4 pb-4 border-b border-gray-100">
+                <FiLink className="text-[#1B7691]" />
+                <Typography variant="h6" className="font-bold text-gray-800">Detail & Tautan</Typography>
+              </div>
+              <div className="space-y-4">
+                <TextArea id="deskripsi" label="Deskripsi Lengkap" rows={6} placeholder="Jelaskan detail program, cakupan biaya, dan visi misi beasiswa..." validation={{ required: 'Deskripsi wajib diisi' }} />
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Input id="link_pendaftaran" label="Link Pendaftaran" placeholder="https://..." />
+                  <Input id="link_guidebook" label="Link Guidebook / Panduan" placeholder="https://..." />
+                </div>
+
+                <Input id="img_path" label="Image URL Banner" placeholder="https://..." />
+              </div>
+            </div>
+          </div>
+
+          {/* RIGHT COLUMN (1/3) */}
+          <div className="lg:col-span-1 space-y-6">
+
+            {/* Card: Jadwal */}
+            <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm sticky top-24">
+              <div className="flex items-center gap-2 mb-4 pb-4 border-b border-gray-100">
+                <FiCalendar className="text-[#1B7691]" />
+                <Typography variant="h6" className="font-bold text-gray-800">Jadwal</Typography>
+              </div>
+              <div className="space-y-4">
+                <Input id="open_registration" label="Dibuka Tanggal" type="date" validation={{ required: 'Required' }} />
+                <Input id="close_registration" label="Ditutup Tanggal" type="date" validation={{ required: 'Required' }} />
+
+                <div className="p-3 bg-blue-50 text-blue-700 rounded-lg text-xs">
+                  Pastikan tanggal sesuai dengan zona waktu WIB.
+                </div>
+              </div>
+
+              <div className="mt-8 pt-6 border-t border-gray-100">
+                <Button
+                  type="submit"
+                  disabled={saving}
+                  className="w-full justify-center bg-[#1B7691] hover:bg-[#15627a]"
+                >
+                  {saving ? (
+                    <span className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                      Menyimpan...
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-2">
+                      <FiSave /> Simpan Perubahan
+                    </span>
+                  )}
+                </Button>
+                <Button
+                  type="button"
+                  variant="unstyled"
+                  onClick={() => router.back()}
+                  className="w-full mt-2 justify-center text-gray-500 hover:text-gray-700"
+                >
+                  Batal
+                </Button>
+              </div>
+            </div>
+          </div>
+
+        </form>
+      </FormProvider>
+    </AdminDashboard>
   );
 }

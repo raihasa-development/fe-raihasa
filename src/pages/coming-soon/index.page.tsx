@@ -11,8 +11,8 @@ export default function ComingSoonPage() {
   return (
     <Layout withFooter={true} withNavbar={true}>
       <SEO
-        title='Coming Soon!'
-        description='Tungguin ya sobat Raihasa! Kami lagi siapin yang bermanfaat buat kalian!'
+        title='Under Maintenance'
+        description='Halaman ini sedang dalam perbaikan. Silakan kunjungi Dreamshub untuk informasi beasiswa.'
       />
       <section className='h-full mt-32 mb-24 md:mb-28'>
         <div className='flex flex-col justify-center items-center gap-2'>
@@ -31,7 +31,7 @@ export default function ComingSoonPage() {
               variant='h3'
               className='text-white lg:px-10 lg:py-4 px-6 py-2 bg-secondary w-fit text-3xl'
             >
-              Coming Soon!
+              Under Maintenance
             </Typography>
             <Typography
               as='p'
@@ -39,12 +39,12 @@ export default function ComingSoonPage() {
               variant='t'
               className='text-[#1B7691] text-center text-xs w-[75%]'
             >
-              Tungguin ya sobat Raihasa! Kami lagi siapin yang bermanfaat buat
-              kalian!
+              Fitur ini sedang dalam perbaikan/pengembangan. <br />
+              Mau cari info beasiswa? Yuk gabung diskusi di Dreamshub!
             </Typography>
           </div>
           <ButtonLink
-            href='/'
+            href='/dreamshub'
             variant='primary'
             leftIcon={AiFillHome}
             className='py-2 px-4 md:py-4 md:px-8 rounded-sm items-center flex flex-row gap-2 justify-center hover:bg-[#1b7691e1] mt-4 lg:mt-6'
@@ -55,7 +55,7 @@ export default function ComingSoonPage() {
               variant='bt'
               className='text-white'
             >
-              Kembali ke Home
+              Ke Dreamshub
             </Typography>
           </ButtonLink>
         </div>
