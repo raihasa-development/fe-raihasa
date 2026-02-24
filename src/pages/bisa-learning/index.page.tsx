@@ -21,6 +21,7 @@ const courseCategories = [
 	{ id: 'unggulan', title: 'Beasiswa Unggulan', color: 'bg-indigo-600' },
 	{ id: 'bangkit', title: 'Indonesia Bangkit', color: 'bg-teal-600' },
 	{ id: 'paragon', title: 'Paragon', color: 'bg-pink-600' },
+	{ id: 'glow-lovely', title: 'Glow and Lovely', color: 'bg-yellow-500' },
 ];
 
 const courses = [
@@ -159,6 +160,23 @@ const courses = [
 		videoId: 'iqKSSnao_a4',
 		thumbnail: 'https://img.youtube.com/vi/iqKSSnao_a4/maxresdefault.jpg',
 		tags: ['CV', 'Corporate', 'Career']
+	},
+	{
+		id: 'glow-and-lovely',
+		categoryId: 'glow-lovely',
+		title: 'A-Z Glow and Lovely Bintang Beasiswa',
+		subtitle: 'Beasiswa untuk perempuan Indonesia yang bercahaya.',
+		description: 'Dapatkan motivasi dan strategi lolos Glow and Lovely Bintang Beasiswa bersama Ajeng Puspita, mulai dari essay hingga home visit.',
+		duration: '45 Menit',
+		lessons: 13,
+		students: 750,
+		rating: 4.8,
+		level: 'Beginner',
+		instructor: 'Ajeng Puspita',
+		role: 'Awardee GAL',
+		videoId: '05o6X4KI50c',
+		thumbnail: 'https://img.youtube.com/vi/05o6X4KI50c/maxresdefault.jpg',
+		tags: ['Female', 'Social', 'Essay']
 	},
 ];
 

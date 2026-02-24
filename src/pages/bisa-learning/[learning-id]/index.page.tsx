@@ -35,13 +35,13 @@ const courseData = {
     pdfName: 'A-Z Series Beasiswa PERTAMINA Sobat Bumi (SOBI).pdf',
     instructor: 'Hilmy Fadel',
     topics: [
-      'Intro: Kenalan sama Hilmy Fadel',
-      'My Revenge Story: From Failure to Success',
-      'Beasiswa Pertamina Sobat Bumi Explained',
-      'Timeline dan Teknis Pendaftaran',
-      'Tips Bikin Essay Juara (STAR Method)',
-      'Bedah Interview & Mockup',
-      'Studi Kasus FGD & Tips Lolos',
+      'Kenalan sama Hilmy Fadel: Cerita Perjalanan dari 0 sampai 1 lewat Beasiswa SoBi',
+      'My Revenge Story: Gimana Kegagalan Bisa Jadi Bahan Bakar Menuju Versi Diri yang Lebih Baik',
+      'Beasiswa Pertamina Sobat Bumi: Apa Aja Benefitnya dan Gimana Cara Daftarnya',
+      'Timeline dan Teknis Pendaftaran: Panduan Lengkap Biar Nggak Salah Langkah',
+      'Tips Bikin Essay Juara: Mulai dari STAR Method sampai Bedah Essay Hilmy',
+      'Bedah Interview: Strategi Hadapi Interview dan Belajar dari Pengalaman Hilmy',
+      'Studi Kasus FGD: Contoh Jawaban yang Bikin Lolos vs Yang Bikin Gagal',
     ],
   },
   'tanoto-teladan': {
@@ -69,10 +69,13 @@ const courseData = {
       'Kenalan sama Fazmi dari TELADAN!',
       'Apa itu Beasiswa TELADAN?',
       'Proses Seleksi TELADAN',
-      'Outstanding in Administration',
-      'Crafting Your Leadership Essay',
-      'Assessment & LGD Tips',
-      'Final Interview Secrets',
+      'How to be outstanding in ADMINISTRATION Process?',
+      'Crafting your leadership story through ESSAY - Bedah Essay Fazmi',
+      'Tahapan & Tips Sukses dalam setiap ASSESSMENT',
+      'LGD itu harusnya gini...',
+      'Last step : Let\'s talk about INTERVIEW',
+      'Bring these TIPS on your pocket in every step',
+      'Pesan dari Fazmi untuk Peraih Asa',
     ],
   },
   'bright-scholarship': {
@@ -90,11 +93,14 @@ const courseData = {
     pdfName: 'A-Z Series Beasiswa BRIGHT.pdf',
     instructor: 'Dinar Annasta',
     topics: [
-      'Introduction to Bright Scholarship',
+      'Kenalan sama Dinar dari Bright Scholarship!',
+      'Get to know Bright Scholarship',
       'Tahapan Seleksi & Administrasi',
-      'Writing Personal Statement',
-      'Interview Predictions',
-      'Preparation Checklist'
+      'Create your Personal Statement',
+      'Bedah personal statement Dinar',
+      'Prediksi pertanyaan Interview',
+      'Persiapkan hal ini sebelum mendaftar!',
+      'Pesan dari Dinar untuk Peraih Asa',
     ],
   },
   'bakti-bca': {
@@ -112,12 +118,18 @@ const courseData = {
     pdfName: 'A-Z Series Beasiswa Bakti BCA.pdf',
     instructor: 'Shabrina Yasmin',
     topics: [
-      'Introduction: Meet Shabrina',
-      'Beasiswa Bakti BCA Overview',
-      'Tahapan Seleksi',
-      'Short Essay Writing',
-      'Nailing the Assessment',
-      'Online Interview Tips'
+      'Kenalan sama Shabrina dari Bakti BCA!',
+      'Persiapkan hal ini sebelum mendaftar selama masa perkuliahan',
+      'Apa itu Beasiswa Bakti BCA?',
+      'Tahapan seleksi Bakti BCA',
+      'Persyaratan & Berkas Administrasi',
+      'Short Essay - Bedah Essay Shabrina',
+      'Let\'s nail your Assessment & Interview!',
+      'Assessment 1 & 2',
+      'Teknis & Tips Online Interview - Bedah Interview Shabrina',
+      'Timeline & Alur Pendaftaran',
+      'Checklist your preparation',
+      'Pesan dari Shabrina untuk Peraih Asa',
     ],
   },
   'kse-scholarship': {
@@ -135,11 +147,15 @@ const courseData = {
     pdfName: 'A-Z Series Beasiswa KSE.pdf',
     instructor: 'Prisilia Dita',
     topics: [
-      'Introduction to KSE',
-      'PKSE & Benefits',
-      'Administration Tips',
-      'Essay Writing Secrets',
-      'Interview Stage 1 & 2'
+      'Kenalan sama Prisilia dari Beasiswa KSE!',
+      'Get to know Beasiswa KSE',
+      'About PKSE',
+      'Fastrack KSE for you!',
+      'Step 1: Administration tips - Bedah berkas Prisilia',
+      'Step 2: Essay tips - Bedah essay Prisilia',
+      'Mastering Interview Stage 1',
+      'Mastering Interview Stage 2',
+      'Pesan dari Prisilia untuk Peraih Asa',
     ],
   },
   'beasiswa-unggulan': {
@@ -157,12 +173,17 @@ const courseData = {
     pdfName: 'A-Z Series Beasiswa Unggulan.pdf',
     instructor: 'Reza Nafi',
     topics: [
-      'Introduction: Meet Afa',
-      'Persyaratan Umum & Khusus',
-      'Bedah Tips Essay',
-      'Persiapan Tes UKBI',
-      'Tahap Interview',
-      'Tutorial Pendaftaran'
+      'Kenalan sama Afa dari Beasiswa Unggulan!',
+      'Apa itu Beasiswa Unggulan?',
+      'Persyaratan umum & khusus BU',
+      'Bedah & Tips Essay Afa',
+      'Bedah Tes UKBI',
+      'Cek kelengkapan berkasmu!',
+      'Do & Don\'ts: Tahap Administrasi',
+      'Menguasai tahap Interview - Bedah interview Afa',
+      'Timeline pendaftaran',
+      'Tutorial pendaftaran',
+      'Pesan dari Afa untuk Peraih Asa',
     ],
   },
   'indonesia-bangkit': {
@@ -180,12 +201,17 @@ const courseData = {
     pdfName: 'A-Z Series Beasiswa Indonesia Bangkit.pdf',
     instructor: 'Hasna Zahra',
     topics: [
-      'Introduction to BIB',
-      'Alur Seleksi',
-      'Essay Writing Guide',
-      'Tes Skolastik Prep',
-      'Interview Success Keys',
-      'Step-by-step Registration'
+      'Kenalan sama Hasna dari Beasiswa Indonesia Bangkit!',
+      'Get to know Beasiswa Indonesia Bangkit',
+      'Alur seleksi BIB',
+      'Dokumen pendaftaran yang perlu kamu siapkan',
+      'How to write essay - Bedah Essay Hasna',
+      'Kupas tuntas Tes Skolastik',
+      'Interview',
+      'Persiapkan ini dari sekarang',
+      'Step by step mendaftar BIB',
+      'Kunci sukses penerima beasiswa',
+      'Pesan dari Hasna untuk Peraih Asa',
     ],
   },
   'paragon-scholarship': {
@@ -203,11 +229,61 @@ const courseData = {
     pdfName: 'A-Z Series Beasiswa Paragon.pdf',
     instructor: 'Floren Aliza',
     topics: [
-      'Introduction: Why Scholarship?',
+      'Kenalan sama Flo dari Paragon Scholarship Program!',
+      'Kenapa sih harus banget dapet beasiswa?',
       'Paragon Scholarship Journey',
-      'CV & Essay Preparation',
-      'Online Test Strategy',
-      'Corporate Interview Tips'
+      'Why should PSP?',
+      'Let\'s get to know Paragon Scholarship Program',
+      'Timeline PSP',
+      'Registration preparation',
+      'CV preparation - Bedah CV Flo',
+      'Essay preparation - Bedah Essay Flo',
+      'Online test preparation',
+      'Interview test preparation',
+      'What to prepare?',
+      'Pesan dari Flo untuk Peraih Asa',
+    ],
+  },
+  'glow-and-lovely': {
+    id: 'glow-and-lovely',
+    title: 'A-Z Glow and Lovely Bintang Beasiswa',
+    subtitle: 'Beasiswa untuk perempuan Indonesia yang bercahaya.',
+    description: `A-Z Scholarship Series Beasiswa Glow and Lovely akan mengupas tuntas tips and tricks lolos bareng sama Awardee langsung! Bersama dengan Kak Ajeng, video akan membahas seputar:
+
+    • Kenalan sama Ajeng dari Glow and Lovely Bintang Beasiswa!
+    • How i found my way...
+    • How to start?
+    • Get to know Glow and Lovely Bintang Beasiswa
+    • Timeline GAL Bintang Beasiswa
+    • How to build a good essay
+    • Bedah Esai Ajeng
+    • Interview day, you slay!
+    • Contoh pertanyaan & format menjawab interview
+    • Home visit selection
+    • Kunci agar lolos GAL Bintang Beasiswa!
+    • Pesan dari Ajeng untuk Peraih Asa`,
+    duration: '45 Menit',
+    type: 'video',
+    level: 'Beginner',
+    category: 'Glow and Lovely',
+    videoUrl: 'https://www.youtube.com/embed/05o6X4KI50c',
+    videoId: '05o6X4KI50c',
+    pdfUrl: 'https://drive.google.com/file/d/1dQ85VPk6qHk4cmTWCsonoLhaooHDQkBu/view?usp=drivesdk',
+    pdfName: 'A-Z Series Beasiswa Glow and Lovely.pdf',
+    instructor: 'Ajeng Puspita',
+    topics: [
+      'Kenalan sama Ajeng dari Glow and Lovely',
+      'How I Found My Way...',
+      'How to Start?',
+      'Get to Know Glow and Lovely Bintang Beasiswa',
+      'Timeline GAL Bintang Beasiswa',
+      'How to Build a Good Essay',
+      'Bedah Esai Ajeng',
+      'Interview Day, You Slay!',
+      'Contoh Pertanyaan & Format Menjawab Interview',
+      'Home Visit Selection',
+      'Kunci Agar Lolos GAL Bintang Beasiswa',
+      'Pesan dari Ajeng untuk Peraih Asa'
     ],
   },
 };
