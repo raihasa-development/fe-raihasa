@@ -10,7 +10,7 @@ import Button from '@/components/buttons/Button';
 import Input from '@/components/form/Input';
 import ButtonLink from '@/components/links/ButtonLink';
 import SEO from '@/components/SEO';
-import { showToast, SUCCESS_TOAST } from '@/components/Toast';
+import { DANGER_TOAST, showToast, SUCCESS_TOAST } from '@/components/Toast';
 import Typography from '@/components/Typography';
 import useMutationToast from '@/hooks/useMutationToast';
 import Layout from '@/layouts/Layout';
@@ -68,6 +68,20 @@ function LoginPage() {
 
       router.push(target);
     },
+    onError: (error) => {
+      if (error.response?.data?.message === 'Account not verified') {
+        methods.setError('root', {
+          message: 'Akun Anda belum diverifikasi.',
+        });
+      }
+    },
+  });
+
+  const resendMutation = useMutation<void, AxiosError<ApiError>, string>({
+    mutationFn: async (email: string) => {
+      await api.post('/auth/resend-verification', { email });
+      showToast('Email verifikasi telah dikirim ulang', SUCCESS_TOAST);
+    },
   });
 
   const { mutate: loginMutation, isPending } =
@@ -75,6 +89,15 @@ function LoginPage() {
 
   const onSubmit = (data: LoginForm) => {
     loginMutation(data);
+  };
+
+  const handleResend = () => {
+    const email = methods.getValues('email');
+    if (email) {
+      resendMutation.mutate(email);
+    } else {
+      showToast('Masukkan email terlebih dahulu', DANGER_TOAST);
+    }
   };
 
   return (
@@ -181,6 +204,22 @@ function LoginPage() {
                   >
                     Masuk
                   </Button>
+
+                  {methods.formState.errors.root?.message === 'Akun Anda belum diverifikasi.' && (
+                    <div className='mt-2 text-center'>
+                      <Typography variant='c1' className='text-gray-600'>
+                        {methods.formState.errors.root.message}{' '}
+                        <button
+                          type='button'
+                          onClick={handleResend}
+                          disabled={resendMutation.isPending}
+                          className='font-semibold text-[#1B7691] hover:underline disabled:opacity-50'
+                        >
+                          {resendMutation.isPending ? 'Mengirim...' : 'Kirim Ulang Email Verifikasi'}
+                        </button>
+                      </Typography>
+                    </div>
+                  )}
 
                   <div className="relative my-8">
                     <div className="absolute inset-0 flex items-center">
