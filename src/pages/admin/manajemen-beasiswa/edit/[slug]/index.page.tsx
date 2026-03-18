@@ -72,6 +72,7 @@ function EditBeasiswaPage() {
       persyaratan: '',
       lainnya: '',
       deskripsi: '',
+      is_favorite: false,
     },
   });
 
@@ -146,6 +147,7 @@ function EditBeasiswaPage() {
             : '',
           lainnya: Array.isArray(data.lainnya) ? data.lainnya.join(', ') : '',
           deskripsi: data.deskripsi || '',
+          is_favorite: data.is_favorite || false,
         });
       } catch (err: any) {
         console.error(err);
@@ -198,6 +200,7 @@ function EditBeasiswaPage() {
         persyaratan: formData.persyaratan ? formData.persyaratan.split(',').map((s: string) => s.trim()) : [],
         lainnya: formData.lainnya ? formData.lainnya.split(',').map((s: string) => s.trim()) : [],
         deskripsi: formData.deskripsi || '',
+        is_favorite: !!formData.is_favorite,
       };
 
       await api.put(`/scholarship/${slug}`, payload);
@@ -350,6 +353,10 @@ function EditBeasiswaPage() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <label className="flex items-center gap-2 text-sm text-gray-600">
+                  <input type="checkbox" className="rounded text-[#1B7691] focus:ring-[#1B7691]" {...register("is_favorite")} />
+                  Jadikan Beasiswa Favorit (Rekomendasi Teratas)?
+                </label>
                 <label className="flex items-center gap-2 text-sm text-gray-600">
                   <input type="checkbox" className="rounded text-[#1B7691] focus:ring-[#1B7691]" {...register("status_beasiswa_double")} />
                   Izinkan Double Funding?

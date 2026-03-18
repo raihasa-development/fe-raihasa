@@ -167,7 +167,7 @@ function LoginPage() {
 
             <div className="bg-white">
               <FormProvider {...methods}>
-                <form className='space-y-5' onSubmit={handleSubmit(onSubmit)}>
+                <form method='post' className='space-y-5' onSubmit={handleSubmit(onSubmit)}>
                   <div className="space-y-4">
                     <Input
                       id='email'
