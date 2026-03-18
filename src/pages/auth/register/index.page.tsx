@@ -137,6 +137,7 @@ export default function RegisterPage() {
             <div className="bg-white">
               <FormProvider {...methods}>
                 <form
+                  method="post"
                   className='space-y-4 md:space-y-5'
                   onSubmit={handleSubmit(onSubmit)}
                 >

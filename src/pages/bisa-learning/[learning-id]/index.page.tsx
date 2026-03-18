@@ -215,7 +215,7 @@ function LearningDetailPage() {
             <div className='grid grid-cols-1 lg:grid-cols-3 gap-8'>
 
               {/* LEFT: Video Player & Content */}
-              <div className='lg:col-span-2'>
+              <div className='lg:col-span-3'>
                 {/* PROTECTED Video Player */}
                 <div className='bg-black rounded-2xl overflow-hidden shadow-2xl aspect-video relative'>
                   <iframe
@@ -264,7 +264,7 @@ function LearningDetailPage() {
                         {course.description}
                       </p>
 
-                      <div className='mt-6 p-6 bg-blue-50 rounded-xl border border-blue-100'>
+                      {/* <div className='mt-6 p-6 bg-blue-50 rounded-xl border border-blue-100'>
                         <h3 className='font-bold text-[#1B7691] mb-3 flex items-center gap-2'>
                           <FiCheckCircle /> What needs to be prepared?
                         </h3>
@@ -274,7 +274,7 @@ function LearningDetailPage() {
                           <div className='flex items-center gap-2 text-sm'><div className='w-1.5 h-1.5 bg-[#FB991A] rounded-full'></div> English Proficiency Test</div>
                           <div className='flex items-center gap-2 text-sm'><div className='w-1.5 h-1.5 bg-[#FB991A] rounded-full'></div> Recommendation Letter</div>
                         </div>
-                      </div>
+                      </div> */}
                     </div>
                   )}
 
@@ -303,12 +303,11 @@ function LearningDetailPage() {
                 </div>
               </div>
 
-              {/* RIGHT: Playlist Sidebar */}
-              <div className='lg:col-span-1'>
+              {/* RIGHT: Playlist Sidebar - COMMENTED OUT AS REQUESTED */}
+              {/* <div className='lg:col-span-1'>
                 <div className='bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden sticky top-24'>
                   <div className='p-6 bg-[#1B7691] text-white'>
                     <h3 className='font-bold text-lg mb-4'>Course Content</h3>
-                    {/* Fake Progress Bar */}
                     <div className='mt-4 flex items-center justify-between text-xs font-bold mb-1'>
                       <span>Your Progress</span>
                       <span>0%</span>
@@ -340,7 +339,7 @@ function LearningDetailPage() {
                     ))}
                   </div>
                 </div>
-              </div>
+              </div> */}
 
             </div>
           </div>

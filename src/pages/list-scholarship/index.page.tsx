@@ -12,7 +12,8 @@ import {
     FiClock,
     FiLock,
     FiChevronLeft,
-    FiChevronRight
+    FiChevronRight,
+    FiStar
 } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -36,6 +37,7 @@ type ScholarshipData = {
     img_path: string | null;
     benefit: string;
     is_pinned: boolean;
+    is_favorite: boolean;
 };
 
 type FilterStatus = 'all' | 'open' | 'closed';
@@ -129,8 +131,11 @@ export default function ListScholarshipPage() {
             results = results.filter(s => selectedJenis.includes(s.jenis));
         }
 
-        // Sort: Open first, then by deadline
+        // Sort: Favorite first, then Open first, then by deadline
         results.sort((a, b) => {
+            if (a.is_favorite && !b.is_favorite) return -1;
+            if (!a.is_favorite && b.is_favorite) return 1;
+
             const openA = isOpen(a.close_registration);
             const openB = isOpen(b.close_registration);
 
@@ -345,6 +350,12 @@ export default function ListScholarshipPage() {
                                                         ) : (
                                                             <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-gray-200 text-gray-600">
                                                                 Ditutup
+                                                            </span>
+                                                        )}
+
+                                                        {s.is_favorite && (
+                                                            <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-yellow-100 text-yellow-700 flex items-center gap-1 border border-yellow-200">
+                                                                <FiStar className="w-3 h-3 fill-yellow-500 text-yellow-500" /> Favorit
                                                             </span>
                                                         )}
 
