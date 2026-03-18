@@ -10,10 +10,7 @@ import EnhancedChatbox from './components/enhanced-chatbox';
 
 export const getServerSideProps: GetServerSideProps = async () => {
   return {
-    redirect: {
-      destination: '/coming-soon',
-      permanent: false,
-    },
+    props: {},
   };
 };
 
@@ -21,8 +18,8 @@ export default function ScholarshipRecommendationPage() {
   return (
     <Layout withNavbar withFooter>
       <SEO
-        title="Scholra AI - Rekomendasi Beasiswa | Raihasa"
-        description="Temukan beasiswa yang tepat untukmu dengan bantuan Scholra AI. Dapatkan rekomendasi beasiswa yang sesuai dengan profil dan kebutuhanmu."
+        title="Scholra - Rekomendasi Beasiswa | Raihasa"
+        description="Temukan beasiswa yang tepat untukmu dengan bantuan Scholra. Dapatkan rekomendasi beasiswa yang sesuai dengan profil dan kebutuhanmu."
       />
 
       <main className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 py-12 px-4">
@@ -40,7 +37,7 @@ export default function ScholarshipRecommendationPage() {
               <span className="text-sm font-semibold text-[#1B7691]">Powered by AI</span>
             </div>
             <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
-              Scholra AI
+              Scholra
             </h1>
             <p className="text-gray-600 text-lg max-w-2xl mx-auto">
               Temukan beasiswa yang tepat untukmu dengan bantuan AI. Jawab beberapa pertanyaan

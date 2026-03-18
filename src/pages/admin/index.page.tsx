@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  FiBookOpen, FiUsers, FiAward, FiCpu, FiArrowRight, FiDollarSign, FiUserCheck, FiActivity
+  FiBookOpen, FiUsers, FiAward, FiCpu, FiArrowRight, FiDollarSign, FiUserCheck, FiActivity, FiCreditCard
 } from 'react-icons/fi';
 
 import withAuth from '@/components/hoc/withAuth';
@@ -19,18 +19,25 @@ const modules = [
     color: 'bg-blue-50 text-blue-600',
   },
   {
-    title: 'Payment Monitoring',
-    description: 'Track transactions, verify payments, and handle manual overrides.',
+    title: 'Manage Courses',
+    description: 'Update BISA Learning videos, durations, levels, and instructors.',
+    icon: FiBookOpen,
+    href: '/admin/courses',
+    color: 'bg-indigo-50 text-indigo-600',
+  },
+  {
+    title: 'Manage Pricing',
+    description: 'Adjust prices for scholarship packages and other services.',
     icon: FiDollarSign,
-    href: '/admin/payments',
+    href: '/admin/pricing',
     color: 'bg-emerald-50 text-emerald-600',
   },
   {
-    title: 'BISA Learning (LMS)',
-    description: 'Manage courses, video content, and learning materials.',
-    icon: FiBookOpen,
-    href: '/admin/lms',
-    color: 'bg-indigo-50 text-indigo-600',
+    title: 'Payment Monitoring',
+    description: 'Monitor transactions, verify payments, and manage payment statuses.',
+    icon: FiCreditCard,
+    href: '/admin/payments',
+    color: 'bg-teal-50 text-teal-600',
   },
   {
     title: 'Manajemen Beasiswa',

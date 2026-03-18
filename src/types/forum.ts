@@ -23,6 +23,8 @@ export interface ForumPost {
   content: string;
   is_pinned: boolean;
   is_locked: boolean;
+  is_private: boolean;
+  attachment_url: string | null;
   like_count: number;
   created_at: string;
   updated_at: string;
@@ -63,6 +65,8 @@ export interface CreateForumPostRequest {
   category_id: string;
   title: string;
   content: string;
+  is_private?: boolean;
+  attachment_url?: string;
 }
 
 export interface UpdateForumPostRequest {

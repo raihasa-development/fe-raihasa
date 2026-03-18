@@ -2,20 +2,22 @@
 
 import { useRouter } from 'next/router';
 import React, { useState, useEffect } from 'react';
-import { FiArrowLeft, FiEdit3, FiTag, FiFileText } from 'react-icons/fi';
-
+import { FiArrowLeft, FiEdit3, FiTag, FiFileText, FiUnlock, FiLock, FiInfo, FiLink } from 'react-icons/fi';
 import SEO from '@/components/SEO';
 import Typography from '@/components/Typography';
 import Layout from '@/layouts/Layout';
 import { forumApi } from '@/lib/api/forum';
 import type { ForumCategory } from '@/types/forum';
+import withAuth from '@/components/hoc/withAuth';
 
-export default function CreatePostPage() {
+function CreatePostPage() {
     const router = useRouter();
     const [categories, setCategories] = useState<ForumCategory[]>([]);
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
     const [categoryId, setCategoryId] = useState('');
+    const [attachmentUrl, setAttachmentUrl] = useState('');
+    const [isPrivate, setIsPrivate] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
@@ -42,7 +44,9 @@ export default function CreatePostPage() {
             await forumApi.createPost({
                 title,
                 content,
-                category_id: categoryId
+                category_id: categoryId,
+                is_private: isPrivate,
+                attachment_url: attachmentUrl
             });
             // Success
             router.push('/dreamshub');
@@ -56,7 +60,14 @@ export default function CreatePostPage() {
     return (
         <Layout withNavbar={true} withFooter={true}>
             <SEO title="Buat Diskusi Baru - DreamsHub" />
-            <main className="min-h-screen bg-gray-50 pb-20">
+            <style jsx global>{`
+                @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
+                
+                .font-poppins {
+                    font-family: 'Poppins', sans-serif;
+                }
+            `}</style>
+            <main className="min-h-screen bg-gray-50 pb-20 font-poppins">
                 <div className="bg-gradient-to-r from-[#1B7691] to-[#0d5a6e] h-48 relative">
                     <div className="absolute inset-0 bg-white/5 backdrop-blur-[2px]"></div>
                 </div>
@@ -92,14 +103,71 @@ export default function CreatePostPage() {
                                             type="button"
                                             onClick={() => setCategoryId(cat.id)}
                                             className={`px-4 py-3 rounded-xl border text-sm font-medium transition-all text-left ${categoryId === cat.id
-                                                    ? 'bg-[#1B7691] text-white border-[#1B7691] shadow-md shadow-blue-500/20'
-                                                    : 'bg-white text-gray-600 border-gray-200 hover:border-[#1B7691]/50 hover:bg-blue-50'
+                                                ? 'bg-[#1B7691] text-white border-[#1B7691] shadow-md shadow-blue-500/20'
+                                                : 'bg-white text-gray-600 border-gray-200 hover:border-[#1B7691]/50 hover:bg-blue-50'
                                                 }`}
                                         >
                                             {cat.name}
                                         </button>
                                     ))}
                                 </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+                                    <FiInfo className="text-[#1B7691]" /> Visibilitas Konsultasi
+                                </label>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsPrivate(false)}
+                                        className={`flex items-start gap-4 p-4 rounded-2xl border transition-all text-left ${!isPrivate
+                                            ? 'bg-blue-50 border-[#1B7691] ring-1 ring-[#1B7691]'
+                                            : 'bg-white border-gray-100 hover:border-gray-200'
+                                            }`}
+                                    >
+                                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${!isPrivate ? 'bg-[#1B7691] text-white' : 'bg-gray-100 text-gray-400'}`}>
+                                            <FiUnlock className="w-5 h-5" />
+                                        </div>
+                                        <div>
+                                            <p className={`font-bold text-sm ${!isPrivate ? 'text-[#1B7691]' : 'text-gray-700'}`}>Publik</p>
+                                            <p className="text-xs text-gray-500 mt-1 leading-relaxed">Konsultasi Anda dapat dilihat oleh seluruh komunitas DreamsHub.</p>
+                                        </div>
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsPrivate(true)}
+                                        className={`flex items-start gap-4 p-4 rounded-2xl border transition-all text-left ${isPrivate
+                                            ? 'bg-orange-50 border-[#FB991A] ring-1 ring-[#FB991A]'
+                                            : 'bg-white border-gray-100 hover:border-gray-200'
+                                            }`}
+                                    >
+                                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${isPrivate ? 'bg-[#FB991A] text-white' : 'bg-gray-100 text-gray-400'}`}>
+                                            <FiLock className="w-5 h-5" />
+                                        </div>
+                                        <div>
+                                            <p className={`font-bold text-sm ${isPrivate ? 'text-[#FB991A]' : 'text-gray-700'}`}>Privat (Khusus Admin)</p>
+                                            <p className="text-xs text-gray-500 mt-1 leading-relaxed">Hanya Anda dan Admin yang dapat melihat konsultasi ini.</p>
+                                        </div>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+                                    <FiLink className="text-[#1B7691]" /> Link Lampiran (Optional)
+                                </label>
+                                <input
+                                    type="url"
+                                    value={attachmentUrl}
+                                    onChange={(e) => setAttachmentUrl(e.target.value)}
+                                    className="w-full px-5 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#1B7691] focus:border-transparent transition-all outline-none font-medium placeholder:text-gray-400"
+                                    placeholder="Tempel link Google Drive atau dokumen lain di sini..."
+                                />
+                                <p className="text-[11px] text-gray-400 mt-2 px-1 font-normal italic">
+                                    Pastikan akses link sudah diset agar Admin dapat melihat file tersebut.
+                                </p>
                             </div>
 
                             <div>
@@ -146,3 +214,5 @@ export default function CreatePostPage() {
         </Layout>
     );
 }
+
+export default withAuth(CreatePostPage, 'user');
