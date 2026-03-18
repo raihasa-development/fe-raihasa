@@ -8,7 +8,7 @@ import Button from '@/components/buttons/Button';
 import Input from '@/components/form/Input';
 import ButtonLink from '@/components/links/ButtonLink';
 import SEO from '@/components/SEO';
-import { showToast, SUCCESS_TOAST } from '@/components/Toast';
+import { DANGER_TOAST, showToast, SUCCESS_TOAST } from '@/components/Toast';
 import { REG_EMAIL, REG_PASSWORD } from '@/constants/regex';
 import useMutationToast from '@/hooks/useMutationToast';
 import Layout from '@/layouts/Layout';
@@ -43,9 +43,33 @@ export default function RegisterPage() {
 
       router.push('/login');
     },
+    onError: (error) => {
+      if (error.response?.data?.message === 'Email sudah terdaftar namun belum diverifikasi. Silakan cek email Anda.') {
+        methods.setError('email', {
+          message: error.response.data.message,
+          type: 'manual',
+        });
+      }
+    },
+  });
+
+  const resendMutation = useMutation<void, AxiosError<ApiError>, string>({
+    mutationFn: async (email: string) => {
+      await api.post('/auth/resend-verification', { email });
+      showToast('Email verifikasi telah dikirim ulang', SUCCESS_TOAST);
+    },
   });
 
   const { mutate: registerMutation, isPending } = useMutationToast<void, RegisterForm>(mutation);
+  const { mutate: resendVerificationMutation } = resendMutation;
+
+  const handleResendVerification = (email: string) => {
+    if (email) {
+      resendVerificationMutation(email);
+    } else {
+      showToast('Masukkan email terlebih dahulu', DANGER_TOAST);
+    }
+  };
 
   const onSubmit = (data: RegisterForm) => {
     registerMutation(data);

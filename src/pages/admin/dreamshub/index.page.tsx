@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FiSearch, FiFolder, FiMessageSquare, FiCornerDownRight, FiSend, FiUser, FiTrash2 } from 'react-icons/fi';
+import { FiSearch, FiFolder, FiMessageSquare, FiCornerDownRight, FiSend, FiUser, FiTrash2, FiLock, FiUnlock, FiLink } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 
 import withAuth from '@/components/hoc/withAuth';
@@ -33,7 +33,7 @@ function AdminDreamshubPage() {
 
   const fetchPosts = async () => {
     try {
-      const { data } = await api.get('/posts', { params: { limit: 5 } });
+      const { data } = await api.get('/posts', { params: { limit: 50 } });
       setPosts(data?.data || []);
     } catch {
       toast.error('Failed to fetch posts');
@@ -184,7 +184,14 @@ function AdminDreamshubPage() {
                     className={`relative group p-3 rounded-xl border transition-all cursor-pointer hover:shadow-md ${selectedPost?.id === post.id ? 'border-[#E58941] bg-orange-50' : 'border-gray-100 bg-white hover:border-gray-200'}`}
                   >
                     <div className="pr-6">
-                      <p className="font-bold text-sm text-gray-900 line-clamp-1">{post.title}</p>
+                      <div className="flex items-center gap-2 mb-1">
+                        {post.is_private ? (
+                          <span className="text-[10px] bg-orange-100 text-[#FB991A] rounded px-1.5 py-0.5 font-bold flex items-center gap-1"><FiLock size={10} /> Privat</span>
+                        ) : (
+                          <span className="text-[10px] bg-blue-100 text-[#1B7691] rounded px-1.5 py-0.5 font-bold flex items-center gap-1"><FiUnlock size={10} /> Publik</span>
+                        )}
+                        <p className="font-bold text-sm text-gray-900 line-clamp-1">{post.title}</p>
+                      </div>
                       <p className="text-xs text-gray-500 line-clamp-2 mt-1">{post.content}</p>
                     </div>
                     <button
@@ -220,9 +227,16 @@ function AdminDreamshubPage() {
             <>
               {/* Thread Header */}
               <div className="p-6 border-b border-gray-100 bg-gray-50/50">
-                <span className="text-[10px] bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full mb-2 inline-block">
-                  {selectedPost.category?.name || 'General'}
-                </span>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-[10px] bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full inline-block">
+                    {selectedPost.category?.name || 'General'}
+                  </span>
+                  {selectedPost.is_private ? (
+                    <span className="text-[10px] bg-orange-100 text-[#FB991A] px-2 py-0.5 rounded-full font-bold flex items-center gap-1"><FiLock size={10} /> Privat</span>
+                  ) : (
+                    <span className="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-bold flex items-center gap-1"><FiUnlock size={10} /> Publik</span>
+                  )}
+                </div>
                 <h2 className="text-xl font-bold text-gray-900 mb-2">{selectedPost.title}</h2>
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 text-xs font-bold">
@@ -236,6 +250,17 @@ function AdminDreamshubPage() {
                 <div className="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap">
                   <Linkify>{selectedPost.content}</Linkify>
                 </div>
+                {selectedPost.attachment_url && (
+                    <div className="mt-4 p-3 bg-blue-50 border border-blue-100 rounded-lg text-sm flex items-start gap-2">
+                      <FiLink className="text-[#1B7691] mt-1 shrink-0" />
+                      <div>
+                        <span className="font-bold text-[#1B7691] block mb-1">Lampiran Konsultasi: </span>
+                        <a href={selectedPost.attachment_url} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline break-all block">
+                          {selectedPost.attachment_url}
+                        </a>
+                      </div>
+                    </div>
+                )}
               </div>
 
               {/* Comments Feed */}

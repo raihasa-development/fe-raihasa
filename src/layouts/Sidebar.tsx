@@ -75,6 +75,12 @@ export default function Sidebar() {
           href: '/admin/manajemen-beasiswa',
           icon: IoBulbOutline,
           paths: ['/admin/manajemen-beasiswa']
+        },
+        {
+          title: 'Scholra Tracking',
+          href: '/admin/scholra-tracks',
+          icon: IoBulbOutline,
+          paths: ['/admin/scholra-tracks']
         }
       ]
     }

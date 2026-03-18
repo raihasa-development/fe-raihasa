@@ -26,9 +26,13 @@ import Typography from '@/components/Typography';
 import { TESTIMONIALS } from '@/contents/landing';
 import { sponsorList } from '@/contents/sponsor';
 import Layout from '@/layouts/Layout';
+import api from '@/lib/api';
+import { FiPlay, FiStar, FiClock, FiBookOpen, FiChevronRight } from 'react-icons/fi';
 
 export default function Home() {
   const aboutRef = useRef<HTMLElement>(null);
+  const [previewCourses, setPreviewCourses] = React.useState<any[]>([]);
+  const [isLoadingCourses, setIsLoadingCourses] = React.useState(true);
 
   // Animation Refs
   const pillRef = useRef<HTMLDivElement>(null);
@@ -45,6 +49,19 @@ export default function Home() {
       duration: 800,
       easing: 'ease-out-cubic',
     });
+
+    const fetchPreviewCourses = async () => {
+      try {
+        const response = await api.get('/lms/modul');
+        const dataArray = response.data.data || [];
+        setPreviewCourses(dataArray.slice(0, 3));
+      } catch (error) {
+        console.error('Failed to fetch preview courses', error);
+      } finally {
+        setIsLoadingCourses(false);
+      }
+    };
+    fetchPreviewCourses();
   }, []);
 
   return (
@@ -424,6 +441,110 @@ export default function Home() {
                   </div>
                 </ButtonLink>
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* BISA LEARNING PREVIEW SECTION */}
+        <section className='relative px-4 bg-gray-50/50 md:px-10 py-20 md:py-28 overflow-hidden'>
+          <div className='absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent'></div>
+          <div className='container mx-auto max-w-6xl'>
+            <div className='flex flex-col md:flex-row justify-between items-end mb-12 md:mb-16' data-aos='fade-up'>
+              <div className='max-w-2xl'>
+                <Typography className='text-sm md:text-base font-medium text-[#1B7691] uppercase tracking-widest mb-3'>
+                  BISA Learning Center
+                </Typography>
+                <Typography className='text-3xl md:text-4xl font-bold text-gray-900 leading-tight'>
+                  Materi Eksklusif dari
+                  <span className='text-[#FB991A]'> Awardee & Mentor</span>
+                </Typography>
+                <Typography className='text-gray-600 mt-4 text-sm md:text-base'>
+                  Dapatkan akses ke ratusan materi video dan panduan komprehensif untuk mempersiapkan diri lolos beasiswa melalui BISA Learning Center.
+                </Typography>
+              </div>
+              <ButtonLink href='/products' variant='unstyled' className='hidden md:block group'>
+                <div className='flex items-center gap-2 text-[#1B7691] font-bold group-hover:bg-[#1B7691]/10 px-4 py-2 rounded-full transition-colors'>
+                  Gabung Sekarang <FiChevronRight className='transition-transform group-hover:translate-x-1' />
+                </div>
+              </ButtonLink>
+            </div>
+
+            {isLoadingCourses ? (
+              <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
+                {[1, 2, 3].map(i => (
+                  <div key={i} className='h-[400px] bg-white rounded-3xl animate-pulse shadow-sm border border-gray-100'></div>
+                ))}
+              </div>
+            ) : previewCourses.length > 0 ? (
+              <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
+                {previewCourses.map((course, idx) => {
+                  const thumbnail = course.ThumbnailModule || (course.videoId ? `https://img.youtube.com/vi/${course.videoId}/maxresdefault.jpg` : '');
+                  return (
+                    <div
+                      key={course.id}
+                      data-aos='fade-up'
+                      data-aos-delay={idx * 100}
+                      className='group bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-md hover:shadow-xl transition-all duration-500 hover:-translate-y-2 flex flex-col h-full cursor-pointer'
+                      onClick={() => window.location.href = '/products'}
+                    >
+                      <div className='relative h-56 overflow-hidden'>
+                        <div className='absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors z-10 flex items-center justify-center'>
+                          <div className='bg-white/90 backdrop-blur w-12 h-12 rounded-full flex items-center justify-center transform scale-90 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-300'>
+                            <FiPlay className='w-5 h-5 ml-1 text-[#1B7691] fill-[#1B7691]' />
+                          </div>
+                        </div>
+                        <img
+                          src={thumbnail}
+                          alt={course.name}
+                          className='w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700'
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            if (course.videoId) target.src = `https://img.youtube.com/vi/${course.videoId}/hqdefault.jpg`;
+                          }}
+                        />
+                        <div className='absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent z-20 flex justify-between items-end'>
+                          <div className='flex items-center gap-3'>
+                            <div className='w-8 h-8 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white font-bold text-xs'>
+                              {course.instructor ? course.instructor.charAt(0) : 'M'}
+                            </div>
+                            <div className='text-white'>
+                              <p className='text-[10px] opacity-80 font-light'>Mentor</p>
+                              <p className='text-xs font-bold'>{course.instructor || '-'}</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className='p-6 flex flex-col flex-grow'>
+                        <div className='flex items-center gap-2 mb-3'>
+                          <div className='flex gap-1'>
+                            {[1, 2, 3, 4, 5].map(i => <FiStar key={i} className='w-3 h-3 text-[#FB991A] fill-[#FB991A]' />)}
+                          </div>
+                          <span className='text-[10px] text-gray-400 font-medium'>({course.rating || '4.5'}) • Preview</span>
+                        </div>
+                        <h3 className='text-lg font-bold text-gray-900 mb-2 line-clamp-2 leading-tight group-hover:text-[#1B7691] transition-colors'>
+                          {course.name}
+                        </h3>
+                        <p className='text-sm text-gray-500 line-clamp-2 mb-4'>
+                          {course.deskripsi || 'Modul pembelajaran eksklusif dari Raih Asa untuk membantumu lolos beasiswa impian.'}
+                        </p>
+                        <div className='mt-auto pt-4 border-t border-gray-100 flex items-center justify-between'>
+                          <div className='flex items-center gap-4 text-xs text-gray-500'>
+                            <div className='flex items-center gap-1'><FiClock className='w-3 h-3' /> {course.duration || 'N/A'}</div>
+                            <div className='flex items-center gap-1'><FiBookOpen className='w-3 h-3' /> {course.lessons_count || 0} Bab</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : null}
+            
+            <div className='mt-10 text-center md:hidden'>
+              <ButtonLink href='/products' variant='primary' className='w-full'>
+                Gabung Sekarang
+              </ButtonLink>
             </div>
           </div>
         </section>

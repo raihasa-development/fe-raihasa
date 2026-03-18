@@ -4,7 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import {
   FiMessageCircle, FiHeart, FiUser, FiClock, FiSearch,
-  FiTrendingUp, FiTarget, FiEdit3, FiFilter, FiTrash2
+  FiTrendingUp, FiTarget, FiEdit3, FiFilter, FiTrash2,
+  FiLock, FiUnlock
 } from 'react-icons/fi';
 import { MdOutlinePushPin } from 'react-icons/md';
 
@@ -358,6 +359,11 @@ export default function DreamshubPage() {
                           </div>
                         </div>
                         <div className="flex gap-2">
+                          {post.is_private && (
+                            <span className="text-[10px] px-2 py-0.5 bg-orange-100 text-[#FB991A] rounded-full font-bold flex items-center gap-1">
+                                <FiLock /> Privat
+                            </span>
+                          )}
                           {post.is_pinned && <MdOutlinePushPin className="text-[#FB991A]" />}
                           {post.is_locked && <span className="text-xs px-2 py-1 bg-red-100 text-red-600 rounded-md font-bold">Locked</span>}
                         </div>
