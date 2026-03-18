@@ -1,324 +1,79 @@
+import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/router';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { FiPlay, FiAward, FiVideo, FiClock, FiCheck, FiDownload, FiLock, FiUnlock } from 'react-icons/fi';
 
 import withAuth from '@/components/hoc/withAuth';
 import ButtonLink from '@/components/links/ButtonLink';
 import Typography from '@/components/Typography';
 import AdminDashboard from '@/layouts/AdminDashboard';
-
-// Hardcoded course data with YouTube and Google Drive links
-const courseData = {
-  'pertamina-sobat-bumi': {
-    id: 'pertamina-sobat-bumi',
-    title: 'Pertamina Sobat Bumi',
-    description: `A-Z Scholarship Series Beasiswa Pertamina Sobat Bumi akan mengupas tuntas tips and tricks lolos bareng sama Awardee langsung! Bersama dengan Kak Hilmy, video akan membahas seputar:
-
-• Kenalan sama Hilmy Fadel: Cerita Perjalanan dari 0 sampai 1 lewat Beasiswa SoBi
-• My Revenge Story: Gimana Kegagalan Bisa Jadi Bahan Bakar Menuju Versi Diri yang Lebih Baik
-• Beasiswa Pertamina Sobat Bumi: Apa Aja Benefitnya dan Gimana Cara Daftarnya
-• Timeline dan Teknis Pendaftaran: Panduan Lengkap Biar Nggak Salah Langkah
-• Tips Bikin Essay Juara: Mulai dari STAR Method sampai Bedah Essay Hilmy
-• Bedah Interview: Strategi Hadapi Interview dan Belajar dari Pengalaman Hilmy
-• Studi Kasus FGD: Contoh Jawaban yang Bikin Lolos vs Yang Bikin Gagal`,
-    duration: 'Video Tutorial',
-    type: 'video',
-    level: 'All Levels',
-    category: 'Pertamina Sobat Bumi',
-    videoUrl: 'https://www.youtube.com/embed/2qkHDmjfqb8',
-    pdfUrl: 'https://drive.google.com/file/d/1dV5_moVl1UuMvFnhjq2C--1l0NW-Z8jQ/view?usp=drive_link',
-    pdfName: 'A-Z Series Beasiswa PERTAMINA Sobat Bumi (SOBI).pdf',
-    instructor: 'Hilmy Fadel',
-    topics: [
-      'Kenalan sama Hilmy Fadel: Cerita Perjalanan dari 0 sampai 1 lewat Beasiswa SoBi',
-      'My Revenge Story: Gimana Kegagalan Bisa Jadi Bahan Bakar Menuju Versi Diri yang Lebih Baik',
-      'Beasiswa Pertamina Sobat Bumi: Apa Aja Benefitnya dan Gimana Cara Daftarnya',
-      'Timeline dan Teknis Pendaftaran: Panduan Lengkap Biar Nggak Salah Langkah',
-      'Tips Bikin Essay Juara: Mulai dari STAR Method sampai Bedah Essay Hilmy',
-      'Bedah Interview: Strategi Hadapi Interview dan Belajar dari Pengalaman Hilmy',
-      'Studi Kasus FGD: Contoh Jawaban yang Bikin Lolos vs Yang Bikin Gagal',
-    ],
-  },
-  'tanoto-teladan': {
-    id: 'tanoto-teladan',
-    title: 'Beasiswa TANOTO Foundation',
-    description: `A-Z Scholarship Series Beasiswa TANOTO Foundation akan mengupas tuntas tips and tricks lolos bareng sama Awardee langsung! Bersama dengan Kak Fazmi, video akan membahas seputar:
-
-• Kenalan sama Fazmi dari TELADAN!
-• Apa itu Beasiswa TELADAN?
-• Proses Seleksi TELADAN
-• How to be outstanding in ADMINISTRATION Process?
-• Crafting your leadership story through ESSAY - Bedah Essay Fazmi
-• Tahapan & Tips Sukses dalam setiap ASSESSMENT
-• LGD itu harusnya gini...
-• Last step: Let's talk about INTERVIEW
-• Bring these TIPS on your pocket in every step
-• Pesan dari Fazmi untuk Peraih Asa`,
-    duration: 'Video Tutorial',
-    type: 'video',
-    level: 'All Levels',
-    category: 'TANOTO Foundation',
-    videoUrl: 'https://www.youtube.com/embed/FhLU38bFTTU',
-    pdfUrl: 'https://drive.google.com/file/d/1huT2K2fPrDTdjCTR8wJbZRpPab5XHSaw/view?usp=drive_link',
-    pdfName: 'A-Z Series Beasiswa TANOTO Foundation.pdf',
-    instructor: 'Fazmi Rizki Al Ghifari',
-    topics: [
-      'Kenalan sama Fazmi dari TELADAN!',
-      'Apa itu Beasiswa TELADAN?',
-      'Proses Seleksi TELADAN',
-      'How to be outstanding in ADMINISTRATION Process?',
-      'Crafting your leadership story through ESSAY - Bedah Essay Fazmi',
-      'Tahapan & Tips Sukses dalam setiap ASSESSMENT',
-      'LGD itu harusnya gini...',
-      'Last step: Let\'s talk about INTERVIEW',
-      'Bring these TIPS on your pocket in every step',
-      'Pesan dari Fazmi untuk Peraih Asa',
-    ],
-  },
-  'bright-scholarship': {
-    id: 'bright-scholarship',
-    title: 'Bright Scholarship',
-    description: `A-Z Scholarship Series Beasiswa Bright Scholarship akan mengupas tuntas tips and tricks lolos bareng sama Awardee langsung! Bersama dengan Kak Dinar, video akan membahas seputar:
-
-• Kenalan sama Dinar dari Bright Scholarship!
-• Get to know Bright Scholarship
-• Tahapan Seleksi & Administrasi
-• Create your Personal Statement
-• Bedah personal statement Dinar
-• Prediksi pertanyaan Interview
-• Persiapkan hal ini sebelum mendaftar!
-• Pesan dari Dinar untuk Peraih Asa`,
-    duration: 'Video Tutorial',
-    type: 'video',
-    level: 'All Levels',
-    category: 'Bright Scholarship',
-    videoUrl: 'https://www.youtube.com/embed/KmVYW3yBy2Y',
-    pdfUrl: 'https://drive.google.com/file/d/10grQn5ja0yUZghgqIn2IKPxU3NqC1LiC/view?usp=drive_link',
-    pdfName: 'A-Z Series Beasiswa BRIGHT.pdf',
-    instructor: 'Dinar Annasta Naja Mayra',
-    topics: [
-      'Kenalan sama Dinar dari Bright Scholarship!',
-      'Get to know Bright Scholarship',
-      'Tahapan Seleksi & Administrasi',
-      'Create your Personal Statement',
-      'Bedah personal statement Dinar',
-      'Prediksi pertanyaan Interview',
-      'Persiapkan hal ini sebelum mendaftar!',
-      'Pesan dari Dinar untuk Peraih Asa',
-    ],
-  },
-  'bakti-bca': {
-    id: 'bakti-bca',
-    title: 'Beasiswa Bakti BCA',
-    description: `A-Z Scholarship Series Beasiswa Bakti BCA akan mengupas tuntas tips and tricks lolos bareng sama Awardee langsung! Bersama dengan Kak Shabrina, video akan membahas seputar:
-
-• Kenalan sama Shabrina dari Bakti BCA!
-• Persiapkan hal ini sebelum mendaftar selama masa perkuliahan
-• Apa itu Beasiswa Bakti BCA?
-• Tahapan seleksi Bakti BCA
-• Persyaratan & Berkas Administrasi
-• Short Essay - Bedah Essay Shabrina
-• Let's nail your Assessment & Interview!
-• Assessment 1 & 2
-• Teknis & Tips Online Interview - Bedah Interview Shabrina
-• Timeline & Alur Pendaftaran
-• Checklist your preparation
-• Pesan dari Shabrina untuk Peraih Asa`,
-    duration: 'Video Tutorial',
-    type: 'video',
-    level: 'All Levels',
-    category: 'Bakti BCA',
-    videoUrl: 'https://www.youtube.com/embed/Dpk5kXWd9E0',
-    pdfUrl: 'https://drive.google.com/file/d/18nU0SfK1qJtJRi09uncyDHqQwvEa19bW/view?usp=drive_link',
-    pdfName: 'A-Z Series Beasiswa Bakti BCA.pdf',
-    instructor: 'Shabrina Yasmin',
-    topics: [
-      'Kenalan sama Shabrina dari Bakti BCA!',
-      'Persiapkan hal ini sebelum mendaftar selama masa perkuliahan',
-      'Apa itu Beasiswa Bakti BCA?',
-      'Tahapan seleksi Bakti BCA',
-      'Persyaratan & Berkas Administrasi',
-      'Short Essay - Bedah Essay Shabrina',
-      'Let\'s nail your Assessment & Interview!',
-      'Assessment 1 & 2',
-      'Teknis & Tips Online Interview - Bedah Interview Shabrina',
-      'Timeline & Alur Pendaftaran',
-      'Checklist your preparation',
-      'Pesan dari Shabrina untuk Peraih Asa',
-    ],
-  },
-  'kse-scholarship': {
-    id: 'kse-scholarship',
-    title: 'Beasiswa Karya Salemba Empat (KSE)',
-    description: `A-Z Scholarship Series Beasiswa Karya Salemba Empat (KSE) akan mengupas tuntas tips and tricks lolos bareng sama Awardee langsung! Bersama dengan Kak Prisilia, video akan membahas seputar:
-
-• Kenalan sama Prisilia dari Beasiswa KSE!
-• Get to know Beasiswa KSE
-• About PKSE
-• Fastrack KSE for you!
-• Step 1: Administration tips - Bedah berkas Prisilia
-• Step 2: Essay tips - Bedah essay Prisilia
-• Mastering Interview Stage 1
-• Mastering Interview Stage 2
-• Pesan dari Prisilia untuk Peraih Asa`,
-    duration: 'Video Tutorial',
-    type: 'video',
-    level: 'All Levels',
-    category: 'Karya Salemba Empat',
-    videoUrl: 'https://www.youtube.com/embed/dnOoatalKlU',
-    pdfUrl: 'https://drive.google.com/file/d/1WSIDWTAFBB6Pa7O3PUJwL1U6fi0jtfWk/view?usp=drive_link',
-    pdfName: 'A-Z Series Beasiswa KSE.pdf',
-    instructor: 'Prisilia Dita Sepirasari',
-    topics: [
-      'Kenalan sama Prisilia dari Beasiswa KSE!',
-      'Get to know Beasiswa KSE',
-      'About PKSE',
-      'Fastrack KSE for you!',
-      'Step 1: Administration tips - Bedah berkas Prisilia',
-      'Step 2: Essay tips - Bedah essay Prisilia',
-      'Mastering Interview Stage 1',
-      'Mastering Interview Stage 2',
-      'Pesan dari Prisilia untuk Peraih Asa',
-    ],
-  },
-  'beasiswa-unggulan': {
-    id: 'beasiswa-unggulan',
-    title: 'Beasiswa Unggulan',
-    description: `A-Z Scholarship Series Beasiswa Unggulan akan mengupas tuntas tips and tricks lolos bareng sama Awardee langsung! Bersama dengan Kak Afa, video akan membahas seputar:
-
-• Kenalan sama Afa dari Beasiswa Unggulan!
-• Apa itu Beasiswa Unggulan?
-• Persyaratan umum & khusus BU
-• Bedah & Tips Essay Afa
-• Bedah Tes UKBI
-• Cek kelengkapan berkasmu!
-• Do & Don'ts: Tahap Administrasi
-• Menguasai tahap Interview - Bedah interview Afa
-• Timeline pendaftaran
-• Tutorial pendaftaran
-• Pesan dari Afa untuk Peraih Asa`,
-    duration: 'Video Tutorial',
-    type: 'video',
-    level: 'All Levels',
-    category: 'Beasiswa Unggulan',
-    videoUrl: 'https://www.youtube.com/embed/youqpWSv3qU',
-    pdfUrl: 'https://drive.google.com/file/d/1nb79DkV0FK95D_JdbEWk9MAMV3WVGeLW/view?usp=drive_link',
-    pdfName: 'A-Z Series Beasiswa Unggulan.pdf',
-    instructor: 'Reza Nafi Rizqi Musyaffa',
-    topics: [
-      'Kenalan sama Afa dari Beasiswa Unggulan!',
-      'Apa itu Beasiswa Unggulan?',
-      'Persyaratan umum & khusus BU',
-      'Bedah & Tips Essay Afa',
-      'Bedah Tes UKBI',
-      'Cek kelengkapan berkasmu!',
-      'Do & Don\'ts: Tahap Administrasi',
-      'Menguasai tahap Interview - Bedah interview Afa',
-      'Timeline pendaftaran',
-      'Tutorial pendaftaran',
-      'Pesan dari Afa untuk Peraih Asa',
-    ],
-  },
-  'indonesia-bangkit': {
-    id: 'indonesia-bangkit',
-    title: 'Beasiswa Indonesia Bangkit',
-    description: `A-Z Scholarship Series Beasiswa Indonesia Bangkit akan mengupas tuntas tips and tricks lolos bareng sama Awardee langsung! Bersama dengan Kak Hasna, video akan membahas seputar:
-
-• Kenalan sama Hasna dari Beasiswa Indonesia Bangkit!
-• Get to know Beasiswa Indonesia Bangkit
-• Alur seleksi BIB
-• Dokumen pendaftaran yang perlu kamu siapkan
-• How to write essay - Bedah Essay Hasna
-• Kupas tuntas Tes Skolastik
-• Interview
-• Persiapkan ini dari sekarang
-• Step by step mendaftar BIB
-• Kunci sukses penerima beasiswa
-• Pesan dari Hasna untuk Peraih Asa`,
-    duration: 'Video Tutorial',
-    type: 'video',
-    level: 'All Levels',
-    category: 'Indonesia Bangkit',
-    videoUrl: 'https://www.youtube.com/embed/ECXJ47jHSz0',
-    pdfUrl: 'https://drive.google.com/file/d/1SHIR4yKRik52Z-XvGlC38Zng4bd8e14v/view?usp=drive_link',
-    pdfName: 'A-Z Series Beasiswa Indonesia Bangkit.pdf',
-    instructor: 'Hasna Zahra Annabilah',
-    topics: [
-      'Kenalan sama Hasna dari Beasiswa Indonesia Bangkit!',
-      'Get to know Beasiswa Indonesia Bangkit',
-      'Alur seleksi BIB',
-      'Dokumen pendaftaran yang perlu kamu siapkan',
-      'How to write essay - Bedah Essay Hasna',
-      'Kupas tuntas Tes Skolastik',
-      'Interview',
-      'Persiapkan ini dari sekarang',
-      'Step by step mendaftar BIB',
-      'Kunci sukses penerima beasiswa',
-      'Pesan dari Hasna untuk Peraih Asa',
-    ],
-  },
-  'paragon-scholarship': {
-    id: 'paragon-scholarship',
-    title: 'Beasiswa Paragon',
-    description: `A-Z Scholarship Series Beasiswa Paragon akan mengupas tuntas tips and tricks lolos bareng sama Awardee langsung! Bersama dengan Kak Flo, video akan membahas seputar:
-
-• Kenalan sama Flo dari Paragon Scholarship Program!
-• Kenapa sih harus banget dapet beasiswa?
-• Paragon Scholarship Journey
-• Why should PSP?
-• Let's get to know Paragon Scholarship Program
-• Timeline PSP
-• Registration preparation
-• CV preparation - Bedah CV Flo
-• Essay preparation - Bedah Essay Flo
-• Online test preparation
-• Interview test preparation
-• What to prepare?
-• Pesan dari Flo untuk Peraih Asa`,
-    duration: 'Video Tutorial',
-    type: 'video',
-    level: 'All Levels',
-    category: 'Paragon',
-    videoUrl: 'https://www.youtube.com/embed/iqKSSnao_a4',
-    pdfUrl: 'https://drive.google.com/file/d/13UQqMOfO1JvtHViYNn1mOo7hG5u_Q7pj/view?usp=drive_link',
-    pdfName: 'A-Z Series Beasiswa Paragon.pdf',
-    instructor: 'Floren Aliza',
-    topics: [
-      'Kenalan sama Flo dari Paragon Scholarship Program!',
-      'Kenapa sih harus banget dapet beasiswa?',
-      'Paragon Scholarship Journey',
-      'Why should PSP?',
-      'Let\'s get to know Paragon Scholarship Program',
-      'Timeline PSP',
-      'Registration preparation',
-      'CV preparation - Bedah CV Flo',
-      'Essay preparation - Bedah Essay Flo',
-      'Online test preparation',
-      'Interview test preparation',
-      'What to prepare?',
-      'Pesan dari Flo untuk Peraih Asa',
-    ],
-  },
-};
+import api from '@/lib/api';
 
 export default withAuth(LearningDetailPage, 'user');
+
 function LearningDetailPage() {
   const router = useRouter();
   const { 'learning-id': learningId } = router.query;
+  const [secureUrl, setSecureUrl] = useState('');
 
-  const course = courseData[learningId as keyof typeof courseData];
+  const { data: course, isLoading, isError } = useQuery({
+    queryKey: ['module', learningId],
+    queryFn: async () => {
+      if (!learningId) return null;
+      const res = await api.get(`/lms/modul/${learningId}`);
+      const c = res.data.data;
+      
+      const topics = c.Sections && c.Sections.length > 0 
+        ? c.Sections.map((s: any) => s.name)
+        : ['Overview Course'];
 
-  if (!course) {
+      return {
+        id: c.id,
+        title: c.name,
+        description: c.deskripsi?.deskripsi || 'Tidak ada deskripsi tersedia.',
+        duration: c.duration || 'Video Tutorial',
+        category: c.categoryId || 'General',
+        videoId: c.videoId || '',
+        pdfUrl: c.pdfUrl || null,
+        pdfName: c.pdfName || 'Materi Pendukung.pdf',
+        instructor: c.instructor || 'Mentor Raihasa',
+        topics: topics,
+      };
+    },
+    enabled: !!learningId,
+  });
+
+  useEffect(() => {
+    if (course?.videoId) {
+      if (typeof window !== 'undefined') {
+        const origin = window.location.origin;
+        setSecureUrl(`https://www.youtube.com/embed/${course.videoId}?enablejsapi=1&rel=0&modestbranding=1&controls=1&showinfo=0&origin=${origin}`);
+      }
+    }
+  }, [course?.videoId]);
+
+  if (isLoading) {
     return (
       <AdminDashboard withSidebar>
-        <div className='container mx-auto px-4 py-8'>
-          <Typography className='text-center text-xl text-gray-600'>
-            Kursus tidak ditemukan
+        <div className='container mx-auto px-4 py-20 text-center flex flex-col items-center justify-center min-h-[60vh]'>
+            <div className='w-16 h-16 border-4 border-[#1B7691] border-t-transparent rounded-full animate-spin mb-6'></div>
+            <Typography>Memuat materi...</Typography>
+        </div>
+      </AdminDashboard>
+    );
+  }
+
+  if (isError || !course) {
+    return (
+      <AdminDashboard withSidebar>
+        <div className='container mx-auto px-4 py-20 text-center flex flex-col items-center justify-center min-h-[60vh]'>
+          <Typography className='text-2xl font-bold text-gray-900 mb-2'>
+            Materi tidak ditemukan
           </Typography>
-          <div className='text-center mt-4'>
-            <ButtonLink href='/dashboard/bisa-learning' className='text-primary-blue'>
-              Kembali ke BISA Learning
-            </ButtonLink>
-          </div>
+          <p className='text-gray-500 mb-8'>Materi mungkin telah dihapus atau Anda tidak memiliki akses.</p>
+          <ButtonLink href='/dashboard/bisa-learning' className='bg-[#1B7691] text-white px-6 py-3 rounded-xl font-bold hover:bg-[#15627a]'>
+            Kembali ke Learning Center
+          </ButtonLink>
         </div>
       </AdminDashboard>
     );
@@ -333,100 +88,113 @@ function LearningDetailPage() {
         {/* Breadcrumb */}
         <div className='pt-6 pb-4'>
           <div className='flex items-center gap-2 text-sm text-gray-600'>
-            <ButtonLink href='/dashboard/bisa-learning' className='hover:text-primary-blue'>
+            <ButtonLink href='/dashboard/bisa-learning' className='hover:text-[#1B7691] font-medium'>
               BISA Learning
             </ButtonLink>
-            <span>/</span>
-            <span className='text-primary-blue'>{course.title}</span>
+            <span className='opacity-30'>/</span>
+            <span className='text-[#1B7691] font-bold'>{course.title}</span>
           </div>
         </div>
 
-        <div className='grid grid-cols-1 lg:grid-cols-3 gap-6 pb-12'>
+        <div className='grid grid-cols-1 lg:grid-cols-3 gap-8 pb-12'>
           {/* Main Content */}
           <div className='lg:col-span-2 space-y-6'>
             {/* Video Player */}
-            <div className='bg-white rounded-xl shadow-lg overflow-hidden'>
-              <div className='aspect-video bg-gray-900'>
-                <iframe
-                  src={course.videoUrl}
-                  title={course.title}
-                  className='w-full h-full'
-                  allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
-                  allowFullScreen
-                />
+            <div className='bg-white rounded-[2.5rem] shadow-2xl shadow-blue-900/5 overflow-hidden border border-white p-2'>
+              <div className='aspect-video bg-gray-900 rounded-[2rem] overflow-hidden shadow-inner'>
+                {secureUrl ? (
+                  <iframe
+                    src={secureUrl}
+                    title={course.title}
+                    className='w-full h-full'
+                    allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
+                    allowFullScreen
+                  />
+                ) : (
+                  <div className='w-full h-full flex flex-col items-center justify-center text-gray-400'>
+                    <FiVideo size={48} className='mb-4 opacity-20' />
+                    <p>Video tidak tersedia</p>
+                  </div>
+                )}
               </div>
             </div>
 
             {/* Course Info */}
-            <div className='bg-white rounded-xl shadow-lg p-6'>
-              <div className='flex flex-wrap items-center gap-2 mb-4'>
-                <span className='px-3 py-1 rounded-lg text-xs font-semibold bg-red-100 text-red-800'>
-                  Video Course
+            <div className='bg-white rounded-[2.5rem] shadow-xl shadow-blue-900/5 p-8 border border-gray-50'>
+              <div className='flex flex-wrap items-center gap-2 mb-6'>
+                <span className='px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-red-100 text-red-600 border border-red-200'>
+                  Premium Content
                 </span>
-                <span className='bg-blue-100 text-blue-800 px-3 py-1 rounded-lg text-xs font-semibold'>
+                <span className='bg-blue-50 text-[#1B7691] px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest border border-blue-100'>
                   {course.category}
-                </span>
-                <span className='px-3 py-1 rounded-lg text-xs font-semibold bg-purple-100 text-purple-800'>
-                  {course.level}
                 </span>
               </div>
 
-              <Typography className='text-2xl sm:text-3xl font-bold text-gray-900 mb-3'>
+              <Typography variant='h1' className='text-3xl font-black text-gray-900 mb-4 tracking-tight leading-tight'>
                 {course.title}
               </Typography>
 
-              <div className='flex items-center gap-4 text-sm text-gray-600 mb-4 pb-4 border-b border-gray-200'>
-                <div className='flex items-center gap-2'>
-                  <div className='w-8 h-8 bg-primary-blue rounded-full flex items-center justify-center'>
-                    <span className='text-white text-xs font-bold'>
-                      {course.instructor.split(' ').map(n => n[0]).join('')}
-                    </span>
+              <div className='flex items-center gap-4 text-sm text-gray-600 mb-8 pb-8 border-b border-gray-100'>
+                <div className='flex items-center gap-3'>
+                  <div className='w-12 h-12 bg-gradient-to-br from-[#1B7691] to-[#0d5a6e] rounded-2xl flex items-center justify-center text-white font-black text-sm shadow-lg shadow-blue-900/20'>
+                    {course.instructor.split(' ').map((n: string) => n[0]).join('')}
                   </div>
-                  <span className='font-medium'>{course.instructor}</span>
+                  <div>
+                    <p className='font-bold text-gray-900'>{course.instructor}</p>
+                    <p className='text-xs text-gray-500'>LMS Instructor</p>
+                  </div>
                 </div>
               </div>
 
-              <div className='space-y-4'>
-                <Typography className='text-gray-700 leading-relaxed text-sm'>
-                  {course.description.split('\n\n')[0]}
-                </Typography>
-                
-                <Typography className='text-base font-semibold text-gray-900 mt-6'>
-                  Apa yang akan kamu pelajari:
-                </Typography>
-                <ul className='space-y-2'>
-                  {course.topics.map((topic, index) => (
-                    <li key={index} className='flex items-start gap-3'>
-                      <div className='w-5 h-5 bg-primary-blue/10 text-primary-blue rounded-full flex items-center justify-center text-xs font-medium mt-0.5 flex-shrink-0'>
-                        ✓
-                      </div>
-                      <Typography className='text-gray-700 text-sm leading-relaxed'>
-                        {topic}
-                      </Typography>
-                    </li>
+              <div className='space-y-8'>
+                <div className='prose prose-sm max-w-none text-gray-600 leading-relaxed'>
+                  {course.description.split('\n').map((para: string, i: number) => (
+                    <p key={i} className='mb-4 last:mb-0'>{para}</p>
                   ))}
-                </ul>
+                </div>
+                
+                <div className='bg-gray-50 rounded-[2rem] p-8 border border-gray-100'>
+                  <Typography className='text-lg font-black text-gray-900 mb-6 flex items-center gap-2'>
+                    <FiAward className='text-[#FB991A]' /> Apa yang kamu pelajari:
+                  </Typography>
+                  <ul className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                    {course.topics.map((topic: string, index: number) => (
+                      <li key={index} className='flex items-start gap-4 p-3 rounded-2xl bg-white border border-gray-100 transition-hover hover:border-[#1B7691]/30 hover:shadow-lg hover:shadow-[#1B7691]/5'>
+                        <div className='w-6 h-6 bg-green-100 text-green-600 rounded-lg flex items-center justify-center text-xs font-black mt-0.5 flex-shrink-0'>
+                          <FiCheck />
+                        </div>
+                        <Typography className='text-gray-700 text-sm font-semibold leading-snug'>
+                          {topic}
+                        </Typography>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
             </div>
 
             {/* Download Materials */}
             {course.pdfUrl && (
-              <div className='bg-white rounded-xl shadow-lg p-6'>
-                <Typography className='text-xl font-semibold text-primary-blue mb-4'>
-                  Download Materi
+              <div className='bg-white rounded-[2.5rem] shadow-xl shadow-blue-900/5 p-8 border border-gray-50'>
+                <Typography className='text-xl border-l-[6px] border-[#FB991A] pl-4 font-black text-gray-900 mb-6 uppercase tracking-wider'>
+                  Materi Pendukung
                 </Typography>
-                <div className='bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 border-2 border-primary-blue/20'>
-                  <div className='flex items-center justify-between gap-4'>
-                    <div className='flex items-center gap-4 flex-1 min-w-0'>
-                      <div className='w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0'>
-                        <span className='text-red-600 font-bold text-sm'>PDF</span>
+                <div className='bg-gradient-to-br from-[#1B7691] to-[#12586b] rounded-[2rem] p-8 text-white relative overflow-hidden group'>
+                  <div className='absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-3xl transition-transform group-hover:scale-150' />
+                  <div className='relative z-10 flex flex-col md:flex-row items-center justify-between gap-6'>
+                    <div className='flex items-center gap-6 flex-1 min-w-0'>
+                      <div className='w-20 h-20 bg-white rounded-3xl flex items-center justify-center flex-shrink-0 shadow-2xl -rotate-6 group-hover:rotate-0 transition-transform'>
+                        <div className='text-center'>
+                          <p className='text-red-500 font-black text-xs uppercase'>PDF</p>
+                          <FiDownload className='text-[#1B7691]' size={24} />
+                        </div>
                       </div>
-                      <div className='flex-1 min-w-0'>
-                        <Typography className='font-semibold text-gray-900 truncate'>
+                      <div className='flex-1 min-w-0 text-center md:text-left'>
+                        <Typography className='text-xl font-black text-white truncate mb-1'>
                           {course.pdfName}
                         </Typography>
-                        <Typography className='text-sm text-gray-600'>
-                          Materi pembelajaran lengkap
+                        <Typography className='text-sm text-blue-100 opacity-80'>
+                          Unduh materi lengkap dalam format PDF untuk belajar offline.
                         </Typography>
                       </div>
                     </div>
@@ -434,9 +202,9 @@ function LearningDetailPage() {
                       href={course.pdfUrl}
                       target='_blank'
                       rel='noopener noreferrer'
-                      className='bg-primary-blue hover:bg-primary-orange text-white px-6 py-2.5 rounded-lg text-sm font-semibold transition-colors whitespace-nowrap flex-shrink-0'
+                      className='bg-[#FB991A] hover:bg-orange-500 text-white px-10 py-5 rounded-[1.5rem] text-sm font-black transition-all shadow-xl shadow-orange-900/20 active:scale-95 whitespace-nowrap'
                     >
-                      Download
+                      DOWNLOAD MATERI
                     </a>
                   </div>
                 </div>
@@ -445,80 +213,81 @@ function LearningDetailPage() {
           </div>
 
           {/* Sidebar */}
-          <div className='lg:col-span-1 space-y-6'>
-            {/* Course Topics */}
-            <div className='bg-white rounded-xl shadow-lg p-6'>
-              <Typography className='text-xl font-semibold text-primary-blue mb-4'>
-                Ringkasan Materi
+          <div className='lg:col-span-1 space-y-8'>
+            {/* Course Summary Card */}
+            <div className='bg-white rounded-[2.5rem] shadow-xl shadow-blue-900/5 p-8 border border-gray-50'>
+              <Typography className='text-xl font-black text-gray-900 mb-6 flex items-center gap-3'>
+                <div className='w-8 h-1 bg-[#1B7691] rounded-full' /> Ringkasan
               </Typography>
-              <div className='space-y-3'>
-                <div className='flex items-center gap-3 pb-3 border-b border-gray-100'>
-                  <div className='w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0'>
-                    <Typography className='text-primary-blue font-bold text-lg'>
+              <div className='space-y-4'>
+                <div className='flex items-center gap-4 p-4 rounded-2xl bg-blue-50/50 border border-blue-100'>
+                  <div className='w-12 h-12 bg-white rounded-xl flex items-center justify-center text-[#1B7691] shadow-sm'>
+                    <FiCheck size={24} />
+                  </div>
+                  <div>
+                    <Typography className='text-lg font-black text-[#1B7691] leading-none mb-1'>
                       {course.topics.length}
                     </Typography>
-                  </div>
-                  <div>
-                    <Typography className='text-sm font-semibold text-gray-900'>
-                      Topik Pembahasan
-                    </Typography>
-                    <Typography className='text-xs text-gray-500'>
-                      Materi lengkap & terstruktur
+                    <Typography className='text-[10px] uppercase font-bold text-gray-500 tracking-wider'>
+                      Materi Utama
                     </Typography>
                   </div>
                 </div>
-                <div className='flex items-center gap-3 pb-3 border-b border-gray-100'>
-                  <div className='w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0'>
-                    <svg className='w-5 h-5 text-red-600' fill='currentColor' viewBox='0 0 20 20'>
-                      <path d='M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z' />
-                    </svg>
+                <div className='flex items-center gap-4 p-4 rounded-2xl bg-red-50/50 border border-red-100'>
+                  <div className='w-12 h-12 bg-white rounded-xl flex items-center justify-center text-red-500 shadow-sm'>
+                    <FiPlay size={24} />
                   </div>
                   <div>
-                    <Typography className='text-sm font-semibold text-gray-900'>
-                      Video Tutorial
+                    <Typography className='text-lg font-black text-red-500 leading-none mb-1'>
+                      Unlimited
                     </Typography>
-                    <Typography className='text-xs text-gray-500'>
-                      Pembelajaran interaktif
+                    <Typography className='text-[10px] uppercase font-bold text-gray-500 tracking-wider'>
+                      Akses Video
                     </Typography>
                   </div>
                 </div>
-                <div className='flex items-center gap-3'>
-                  <div className='w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0'>
-                    <svg className='w-5 h-5 text-green-600' fill='currentColor' viewBox='0 0 20 20'>
-                      <path fillRule='evenodd' d='M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z' clipRule='evenodd' />
-                    </svg>
+                <div className='flex items-center gap-4 p-4 rounded-2xl bg-orange-50/50 border border-orange-100'>
+                  <div className='w-12 h-12 bg-white rounded-xl flex items-center justify-center text-[#FB991A] shadow-sm'>
+                    <FiDownload size={24} />
                   </div>
                   <div>
-                    <Typography className='text-sm font-semibold text-gray-900'>
-                      E-book Pendukung
+                    <Typography className='text-lg font-black text-[#FB991A] leading-none mb-1'>
+                      E-Book
                     </Typography>
-                    <Typography className='text-xs text-gray-500'>
-                      Materi PDF dapat diunduh
+                    <Typography className='text-[10px] uppercase font-bold text-gray-500 tracking-wider'>
+                      Materi Download
                     </Typography>
                   </div>
                 </div>
               </div>
             </div>
 
+            {/* Support Message */}
+            <div className='bg-gradient-to-br from-indigo-600 to-blue-700 rounded-[2.5rem] shadow-xl p-8 text-white'>
+              <Typography className='text-xl font-black mb-4 leading-tight'>Ada Pertanyaan Mengenai Materi?</Typography>
+              <p className='text-blue-100 text-sm mb-6 opacity-80'>Mentor kami siap membantu menjelaskan bagian yang membingungkan.</p>
+              <ButtonLink
+                href='https://wa.me/yourwhatsapp'
+                className='w-full bg-white text-indigo-700 px-6 py-4 rounded-2xl transition-all text-center font-black text-sm shadow-xl'
+              >
+                TANYA MENTOR
+              </ButtonLink>
+            </div>
+
             {/* Navigation */}
-            <div className='bg-white rounded-xl shadow-lg p-6'>
-              <Typography className='text-xl font-semibold text-primary-blue mb-4'>
-                Navigation
-              </Typography>
-              <div className='space-y-3'>
+            <div className='flex flex-col gap-3'>
                 <ButtonLink
                   href='/dashboard/bisa-learning'
-                  className='w-full bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-3 rounded-lg transition-colors text-center font-medium'
+                  className='w-full bg-white hover:bg-gray-50 text-gray-600 px-6 py-4 rounded-2xl transition-all text-center font-bold text-sm border border-gray-100'
                 >
-                  ← Back to Courses
+                  KEMBALI KE LIST KELAS
                 </ButtonLink>
                 <ButtonLink
                   href='/dashboard'
-                  className='w-full bg-primary-blue hover:bg-primary-orange text-white px-4 py-3 rounded-lg transition-colors text-center font-medium'
+                  className='w-full bg-[#1B7691] hover:bg-[#15627a] text-white px-6 py-4 rounded-2xl transition-all text-center font-bold text-sm shadow-lg shadow-blue-900/10'
                 >
-                  Main Dashboard
+                  DASHBOARD UTAMA
                 </ButtonLink>
-              </div>
             </div>
           </div>
         </div>
@@ -526,3 +295,4 @@ function LearningDetailPage() {
     </AdminDashboard>
   );
 }
+

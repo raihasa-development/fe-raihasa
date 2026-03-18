@@ -27,7 +27,7 @@ export default function Sidebar() {
     if (pathName.includes('scholra') || pathName.includes('dreamshub') || pathName.includes('bisa-learning')) {
       setIsServicesOpen(true);
       setActiveSection('services');
-    } else if (pathName.includes('users') || pathName.includes('payments') || pathName.includes('manajemen-beasiswa')) {
+    } else if (pathName.includes('users') || pathName.includes('payments') || pathName.includes('manajemen-beasiswa') || pathName.includes('courses') || pathName.includes('pricing')) {
       setIsManagementOpen(true);
       setActiveSection('management');
     }
@@ -53,16 +53,22 @@ export default function Sidebar() {
           paths: ['/admin/users']
         },
         {
-          title: 'Payment Monitor',
+          title: 'Manage Courses',
+          href: '/admin/courses',
+          icon: FaBookReader,
+          paths: ['/admin/courses']
+        },
+        {
+          title: 'Manage Pricing',
+          href: '/admin/pricing',
+          icon: HiCurrencyDollar,
+          paths: ['/admin/pricing']
+        },
+        {
+          title: 'Payment Monitoring',
           href: '/admin/payments',
           icon: HiCurrencyDollar,
           paths: ['/admin/payments']
-        },
-        {
-          title: 'LMS Content',
-          href: '/admin/lms',
-          icon: FaBookReader,
-          paths: ['/admin/lms']
         },
         {
           title: 'Manajemen Beasiswa',

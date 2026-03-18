@@ -53,7 +53,7 @@ export default function EnhancedChatbox({ onRecommendation }: ChatboxProps) {
         {
             id: '1',
             type: 'bot',
-            content: 'Halo! Saya Scholra, AI yang akan membantu menemukan beasiswa yang tepat untukmu. Mari mulai dengan data dirimu.',
+            content: 'Halo! Saya Scholra, panduan pintar yang akan membantu menemukan beasiswa yang tepat untukmu. Mari mulai dengan data dirimu.',
             timestamp: new Date()
         }
     ]);
@@ -312,8 +312,8 @@ export default function EnhancedChatbox({ onRecommendation }: ChatboxProps) {
                         <HiSparkles className="w-5 h-5" />
                     </div>
                     <div className="flex-1">
-                        <Typography className="font-bold text-white text-lg">Scholra AI</Typography>
-                        <Typography className="text-white/80 text-sm">Asisten Beasiswa Cerdas</Typography>
+                        <Typography className="font-bold text-white text-lg">Scholra Guide</Typography>
+                        <Typography className="text-white/80 text-sm">Temukan Beasiswa Impianmu</Typography>
                     </div>
                     {/* <div className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>

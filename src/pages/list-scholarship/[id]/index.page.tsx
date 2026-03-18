@@ -105,9 +105,18 @@ export default function ScholarshipDetailPage() {
                 const fullUrl = `${apiUrl}/scholarship/${id}`;
 
                 const response = await fetch(fullUrl);
-                if (!response.ok) throw new Error('Gagal mengambil data beasiswa.');
+                let responseData;
+                
+                if (!response.ok) {
+                    // Fallback to Scholra specific detail endpoint if standard fails
+                    const scholraUrl = `${apiUrl}/scholarship/scholra/${id}`;
+                    const scholraRes = await fetch(scholraUrl);
+                    if (!scholraRes.ok) throw new Error('Gagal mengambil data beasiswa.');
+                    responseData = await scholraRes.json();
+                } else {
+                    responseData = await response.json();
+                }
 
-                const responseData = await response.json();
                 let rawData: any;
 
                 if (responseData.data?.data?.scholarship) {
@@ -128,36 +137,67 @@ export default function ScholarshipDetailPage() {
                 const closeDate = parseIndonesianDate(rawData.close_registration) || new Date();
                 const formattedEligibility = `Periode Pendaftaran: ${openDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })} - ${closeDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}`;
 
-                // Handle Requirements parsing
-                let parsedRequirements = rawData.persyaratan || rawData.requirements || [];
-                if (Array.isArray(parsedRequirements) && parsedRequirements.length === 1 && typeof parsedRequirements[0] === 'string' && parsedRequirements[0].startsWith('[')) {
-                    try {
-                        const innerStr = parsedRequirements[0].replace(/'/g, '"');
-                        parsedRequirements = JSON.parse(innerStr);
-                    } catch (e) {
-                        parsedRequirements = [parsedRequirements[0]];
+                // Improved Array Ensurer to handle "['item']" or "['a' 'b']" weirdness
+                const ensurerArray = (val: any): string[] => {
+                    if (!val) return [];
+                    let target = val;
+                    
+                    // Unwrap if it's a single-item array with a stringified list
+                    if (Array.isArray(target) && target.length === 1 && typeof target[0] === 'string' && target[0].trim().startsWith('[')) {
+                        target = target[0];
                     }
-                }
+
+                    if (Array.isArray(target)) {
+                        return target.map(i => String(i).replace(/[\[\]'"]/g, '').trim()).filter(Boolean);
+                    }
+
+                    if (typeof target === 'string') {
+                        let cleaned = target.trim();
+                        // Recursive unwrap if still looks like array
+                        while (cleaned.startsWith('[') && cleaned.endsWith(']')) {
+                            cleaned = cleaned.slice(1, -1).trim();
+                        }
+                        // Split by comma, pipe, or newline
+                        return cleaned.split(/[,|\n]/).map(v => v.replace(/['"]/g, '').trim()).filter(Boolean);
+                    }
+
+                    return [];
+                };
+
+                const isUnknown = (p: string) => !p || 
+                    p.toLowerCase().includes('unknown') || 
+                    p.toLowerCase().includes('tidak diketahui') || 
+                    p === '-' || p === 'Unknown';
+
+                const finalRequirements = ensurerArray(rawData.persyaratan || rawData.requirements);
+                const finalBenefits = ensurerArray(rawData.benefits || rawData.benefit);
+                const finalDocuments = ensurerArray(rawData.documents || rawData.lainnya);
+                
+                // For description, join array if it is one, or clean string
+                const descItems = ensurerArray(rawData.benefit || rawData.description);
+                const finalDescription = descItems.length > 0 
+                    ? descItems.join('. ') 
+                    : `Program ${scholarshipName} ini dirancang untuk mendukung mahasiswa berprestasi.`;
 
                 setScholarshipDetail({
                     ...rawData,
                     id: rawData.id,
                     nama: scholarshipName,
-                    penyelenggara: providerName,
+                    penyelenggara: isUnknown(providerName) ? '' : providerName,
                     jenis: scholarshipType,
-                    description: rawData.benefit || rawData.description || `Program ${scholarshipName} ini dirancang untuk mendukung mahasiswa berprestasi.`,
-                    requirements: parsedRequirements.length > 0 ? parsedRequirements : [
+                    description: finalDescription,
+                    requirements: finalRequirements.length > 0 ? finalRequirements : [
                         'Mahasiswa aktif / Lulusan baru',
                         'Memiliki prestasi akademik baik',
                         'Tidak sedang menerima beasiswa lain',
                         'Sehat jasmani dan rohani'
                     ],
-                    benefits: Array.isArray(rawData.benefits) ? rawData.benefits : [
+                    benefits: finalBenefits.length > 0 ? finalBenefits : [
                         'Bantuan Biaya Pendidikan',
                         'Uang Saku Bulanan',
                         'Program Pengembangan Diri'
                     ],
-                    documents: Array.isArray(rawData.documents) ? rawData.documents : [
+                    documents: finalDocuments.length > 0 ? finalDocuments : [
                         'CV / Resume Terbaru',
                         'Transkrip Nilai',
                         'Surat Rekomendasi'

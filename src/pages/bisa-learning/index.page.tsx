@@ -24,162 +24,6 @@ const courseCategories = [
 	{ id: 'glow-lovely', title: 'Glow and Lovely', color: 'bg-yellow-500' },
 ];
 
-const courses = [
-	{
-		id: 'pertamina-sobat-bumi',
-		categoryId: 'pertamina',
-		title: 'A-Z Pertamina Sobat Bumi',
-		subtitle: 'Panduan lengkap dari Awardee untuk menaklukkan setiap tahapan seleksi.',
-		description: 'Kupas tuntas strategi lolos Beasiswa Pertamina Sobat Bumi bersama Hilmy Fadel. Mulai dari administrasi, essay juara, hingga teknik interview yang memukau.',
-		duration: '45 Menit',
-		lessons: 7,
-		students: 1240,
-		rating: 4.9,
-		level: 'Intermediate',
-		instructor: 'Hilmy Fadel',
-		role: 'Awardee SoBi',
-		videoId: '2qkHDmjfqb8',
-		thumbnail: 'https://img.youtube.com/vi/2qkHDmjfqb8/maxresdefault.jpg',
-		tags: ['Interview', 'Essay', 'FGD']
-	},
-	{
-		id: 'tanoto-teladan',
-		categoryId: 'tanoto',
-		title: 'A-Z Tanoto Teladan Scholarship',
-		subtitle: 'Persiapan komprehensif menuju pemimpin masa depan.',
-		description: 'Pelajari cara menonjol dalam proses administrasi, menulis essay leadership yang kuat, dan menghadapi assessment LGD bersama Fazmi Rizki.',
-		duration: '52 Menit',
-		lessons: 10,
-		students: 980,
-		rating: 4.8,
-		level: 'Advanced',
-		instructor: 'Fazmi Rizki',
-		role: 'Awardee TELADAN',
-		videoId: 'FhLU38bFTTU',
-		thumbnail: 'https://img.youtube.com/vi/FhLU38bFTTU/maxresdefault.jpg',
-		tags: ['Leadership', 'Assessment', 'LGD']
-	},
-	{
-		id: 'bright-scholarship',
-		categoryId: 'bright',
-		title: 'A-Z Bright Scholarship',
-		subtitle: 'Langkah pasti menuju masa depan cerah.',
-		description: 'Dapatkan insight eksklusif tentang personal statement dan prediksi pertanyaan interview langsung dari Dinar Annasta.',
-		duration: '38 Menit',
-		lessons: 8,
-		students: 850,
-		rating: 4.7,
-		level: 'Beginner',
-		instructor: 'Dinar Annasta',
-		role: 'Awardee Bright',
-		videoId: 'KmVYW3yBy2Y',
-		thumbnail: 'https://img.youtube.com/vi/KmVYW3yBy2Y/maxresdefault.jpg',
-		tags: ['Personal Statement', 'Interview']
-	},
-	{
-		id: 'bakti-bca',
-		categoryId: 'bca',
-		title: 'A-Z Bakti BCA Scholarship',
-		subtitle: 'Siapkan dirimu untuk salah satu beasiswa paling bergengsi.',
-		description: 'Panduan step-by-step dari Shabrina Yasmin, mulai dari pemberkasan hingga menaklukkan tes online dan interview.',
-		duration: '48 Menit',
-		lessons: 12,
-		students: 1560,
-		rating: 4.9,
-		level: 'All Levels',
-		instructor: 'Shabrina Yasmin',
-		role: 'Awardee BCA',
-		videoId: 'Dpk5kXWd9E0',
-		thumbnail: 'https://img.youtube.com/vi/Dpk5kXWd9E0/maxresdefault.jpg',
-		tags: ['Online Test', 'Career', 'Interview']
-	},
-	{
-		id: 'kse-scholarship',
-		categoryId: 'kse',
-		title: 'A-Z Karya Salemba Empat Scholarship',
-		subtitle: 'Karya Salemba Empat: Lebih dari sekadar bantuan biaya.',
-		description: 'Tips administrasi dan essay, serta rahasia menghadapi dua tahap interview yang menantang bersama Prisilia Dita.',
-		duration: '42 Menit',
-		lessons: 9,
-		students: 1100,
-		rating: 4.8,
-		level: 'Intermediate',
-		instructor: 'Prisilia Dita',
-		role: 'Awardee KSE',
-		videoId: 'dnOoatalKlU',
-		thumbnail: 'https://img.youtube.com/vi/dnOoatalKlU/maxresdefault.jpg',
-		tags: ['Community', 'Leadership', 'Essay']
-	},
-	{
-		id: 'beasiswa-unggulan',
-		categoryId: 'unggulan',
-		title: 'A-Z Beasiswa Unggulan',
-		subtitle: 'Wujudkan mimpi kuliah gratis dengan Beasiswa Unggulan Kemendikbud.',
-		description: 'Bedah tuntas persyaratan, tips essay, persiapan UKBI, dan simulasi interview bersama Reza Nafi.',
-		duration: '60 Menit',
-		lessons: 11,
-		students: 2300,
-		rating: 4.9,
-		level: 'Advanced',
-		instructor: 'Reza Nafi',
-		role: 'Awardee BU',
-		videoId: 'youqpWSv3qU',
-		thumbnail: 'https://img.youtube.com/vi/youqpWSv3qU/maxresdefault.jpg',
-		tags: ['Gov Scholarship', 'Essay', 'UKBI']
-	},
-	{
-		id: 'indonesia-bangkit',
-		categoryId: 'bangkit',
-		title: 'A-Z Beasiswa Indonesia Bangkit',
-		subtitle: 'Raih pendidikan terbaik dengan beasiswa kolaborasi Kemenag & LPDP.',
-		description: 'Pelajari alur seleksi, tips tes skolastik, dan kunci sukses interview bersama Hasna Zahra.',
-		duration: '55 Menit',
-		lessons: 10,
-		students: 1400,
-		rating: 4.8,
-		level: 'Intermediate',
-		instructor: 'Hasna Zahra',
-		role: 'Awardee BIB',
-		videoId: 'ECXJ47jHSz0',
-		thumbnail: 'https://img.youtube.com/vi/ECXJ47jHSz0/maxresdefault.jpg',
-		tags: ['LPDP Kemenag', 'Scholastic', 'Interview']
-	},
-	{
-		id: 'paragon-scholarship',
-		categoryId: 'paragon',
-		title: 'A-Z Paragon Scholarship',
-		subtitle: 'Beasiswa dari perusahaan kosmetik terbesar di Indonesia.',
-		description: 'Persiapan CV, Essay, Online Test, hingga Interview korporat bersama Floren Aliza.',
-		duration: '40 Menit',
-		lessons: 8,
-		students: 900,
-		rating: 4.7,
-		level: 'All Levels',
-		instructor: 'Floren Aliza',
-		role: 'Awardee Paragon',
-		videoId: 'iqKSSnao_a4',
-		thumbnail: 'https://img.youtube.com/vi/iqKSSnao_a4/maxresdefault.jpg',
-		tags: ['CV', 'Corporate', 'Career']
-	},
-	{
-		id: 'glow-and-lovely',
-		categoryId: 'glow-lovely',
-		title: 'A-Z Glow and Lovely Bintang Beasiswa',
-		subtitle: 'Beasiswa untuk perempuan Indonesia yang bercahaya.',
-		description: 'Dapatkan motivasi dan strategi lolos Glow and Lovely Bintang Beasiswa bersama Ajeng Puspita, mulai dari essay hingga home visit.',
-		duration: '45 Menit',
-		lessons: 13,
-		students: 750,
-		rating: 4.8,
-		level: 'Beginner',
-		instructor: 'Ajeng Puspita',
-		role: 'Awardee GAL',
-		videoId: '05o6X4KI50c',
-		thumbnail: 'https://img.youtube.com/vi/05o6X4KI50c/maxresdefault.jpg',
-		tags: ['Female', 'Social', 'Essay']
-	},
-];
-
 export default withAuth(BISALearningPage, 'user');
 
 function BISALearningPage() {
@@ -189,6 +33,24 @@ function BISALearningPage() {
 	const [membership, setMembership] = useState<{ active: boolean; until: string | null; loading: boolean }>({
 		active: false, until: null, loading: true
 	});
+	const [courses, setCourses] = useState<any[]>([]);
+	const [isLoading, setIsLoading] = useState(true);
+
+	// Fetch Courses API
+	useEffect(() => {
+		const fetchCourses = async () => {
+			try {
+				const response = await api.get('/lms/modul');
+				const dataArray = response.data.data || [];
+				setCourses(dataArray);
+			} catch (error) {
+				console.error('Error fetching modules:', error);
+			} finally {
+				setIsLoading(false);
+			}
+		};
+		fetchCourses();
+	}, []);
 
 	// Check Membership Logic
 	useEffect(() => {
@@ -245,8 +107,8 @@ function BISALearningPage() {
 
 	const filteredCourses = courses.filter((course) => {
 		const matchCategory = selectedCategory === 'all' || course.categoryId === selectedCategory;
-		const matchSearch = course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-			course.instructor.toLowerCase().includes(searchQuery.toLowerCase());
+		const matchSearch = course.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+			(course.instructor && course.instructor.toLowerCase().includes(searchQuery.toLowerCase()));
 		return matchCategory && matchSearch;
 	});
 
@@ -307,11 +169,6 @@ function BISALearningPage() {
 										/>
 									</div>
 									<div className='mt-4 flex gap-2'>
-										{/* <span className='text-xs text-gray-500'>Populer:</span> */}
-										<div className='flex flex-wrap gap-2'>
-											{/* <button onClick={() => setSearchQuery('Essay')} className='text-xs bg-gray-100 px-2 py-1 rounded hover:bg-gray-200 transition-colors'>Essay</button>
-											<button onClick={() => setSearchQuery('Interview')} className='text-xs bg-gray-100 px-2 py-1 rounded hover:bg-gray-200 transition-colors'>Interview</button> */}
-										</div>
 									</div>
 								</div>
 							</div>
@@ -436,10 +293,18 @@ function BISALearningPage() {
 							</div>
 
 							{/* Content Grid */}
-							{filteredCourses.length > 0 ? (
+							{isLoading ? (
+								<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-8'>
+									{[1, 2, 3].map(i => (
+										<div key={i} className='h-80 bg-white rounded-3xl animate-pulse shadow-sm border border-gray-100'></div>
+									))}
+								</div>
+							) : filteredCourses.length > 0 ? (
 								<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-8'>
 									{filteredCourses.map((course) => {
 										const isLocked = !membership.active;
+										const thumbnail = course.ThumbnailModule || (course.videoId ? `https://img.youtube.com/vi/${course.videoId}/maxresdefault.jpg` : '');
+										
 										return (
 											<div
 												key={course.id}
@@ -462,12 +327,14 @@ function BISALearningPage() {
 													)}
 
 													<img
-														src={course.thumbnail}
-														alt={course.title}
+														src={thumbnail}
+														alt={course.name}
 														className='w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700'
 														onError={(e) => {
 															const target = e.target as HTMLImageElement;
-															target.src = `https://img.youtube.com/vi/${course.videoId}/hqdefault.jpg`;
+															if (course.videoId) {
+																target.src = `https://img.youtube.com/vi/${course.videoId}/hqdefault.jpg`;
+															}
 														}}
 													/>
 													{!isLocked && (
@@ -482,11 +349,11 @@ function BISALearningPage() {
 														<div className='absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent z-20 flex justify-between items-end'>
 															<div className='flex items-center gap-3'>
 																<div className='w-10 h-10 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white font-bold'>
-																	{course.instructor.charAt(0)}
+																	{course.instructor ? course.instructor.charAt(0) : 'M'}
 																</div>
 																<div className='text-white'>
 																	<p className='text-xs opacity-80 font-light'>Mentor</p>
-																	<p className='text-sm font-bold'>{course.instructor}</p>
+																	<p className='text-sm font-bold'>{course.instructor || 'Mintor'}</p>
 																</div>
 															</div>
 														</div>
@@ -500,19 +367,19 @@ function BISALearningPage() {
 														<div className='flex gap-1'>
 															{[1, 2, 3, 4, 5].map(i => <FiStar key={i} className='w-3 h-3 text-[#FB991A] fill-[#FB991A]' />)}
 														</div>
-														<span className='text-xs text-gray-400 font-medium'>({course.rating}) • {course.students} Siswa</span>
+														<span className='text-xs text-gray-400 font-medium'>({course.rating || '4.5'}) • {Math.floor(Math.random() * 1000) + 500} Siswa</span>
 													</div>
 
 													<h3 className='text-xl font-bold text-gray-900 mb-2 line-clamp-2 leading-tight group-hover:text-[#1B7691] transition-colors'>
-														{course.title}
+														{course.name}
 													</h3>
 
 													<p className={`text-sm text-gray-500 line-clamp-2 mb-4 ${isLocked ? 'blur-[4px] select-none opacity-50' : ''}`}>
-														{course.subtitle || course.description}
+														{course.deskripsi || 'Persiapkan dirimu untuk beasiswa impian dengan modul eksklusif ini.'}
 													</p>
 
 													<div className={`flex flex-wrap gap-2 mb-6 ${isLocked ? 'blur-[4px] select-none opacity-50' : ''}`}>
-														{course.tags?.map(tag => (
+														{course.tags?.map((tag: any) => (
 															<span key={tag} className='px-2 py-1 bg-gray-50 text-gray-500 text-[10px] font-bold uppercase rounded-md'>
 																{tag}
 															</span>
@@ -522,10 +389,10 @@ function BISALearningPage() {
 													<div className={`mt-auto pt-6 border-t border-gray-100 flex items-center justify-between ${isLocked ? 'blur-[4px] select-none opacity-50' : ''}`}>
 														<div className='flex flex-col text-xs text-gray-500'>
 															<div className='flex items-center gap-1 mb-1'>
-																<FiClock className='w-3 h-3' /> {course.duration}
+																<FiClock className='w-3 h-3' /> {course.duration || 'N/A'}
 															</div>
 															<div className='flex items-center gap-1'>
-																<FiBookOpen className='w-3 h-3' /> {course.lessons} Pelajaran
+																<FiBookOpen className='w-3 h-3' /> {course.lessons_count || 0} Pelajaran
 															</div>
 														</div>
 													</div>
@@ -551,9 +418,8 @@ function BISALearningPage() {
 													</div>
 												</div>
 											</div>
-										)
-									})
-									}
+										);
+									})}
 								</div>
 							) : (
 								<div className='bg-white rounded-3xl p-12 text-center shadow-lg border border-gray-100'>

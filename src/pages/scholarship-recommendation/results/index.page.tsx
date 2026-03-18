@@ -51,10 +51,7 @@ type ViewMode = 'deck' | 'list';
 
 export const getServerSideProps: GetServerSideProps = async () => {
   return {
-    redirect: {
-      destination: '/coming-soon',
-      permanent: false,
-    },
+    props: {},
   };
 };
 
