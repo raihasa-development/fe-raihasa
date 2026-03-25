@@ -19,6 +19,12 @@ const nextConfig: NextConfig = {
       { source: "/reset-password", destination: "/auth/reset-password", permanent: false },
       { source: "/verify-email", destination: "/auth/verify-email", permanent: false },
       { source: "/profile", destination: "/profile/notification", permanent: false },
+      { source: "/scholarship-recommendation/:path*", destination: "/maintenance", permanent: false },
+      { source: "/scholarship-recommendation", destination: "/maintenance", permanent: false },
+      { source: "/scholra/:path*", destination: "/maintenance", permanent: false },
+      { source: "/scholra", destination: "/maintenance", permanent: false },
+      { source: "/rekomendasi-beasiswa/:path*", destination: "/maintenance", permanent: false },
+      { source: "/rekomendasi-beasiswa", destination: "/maintenance", permanent: false },
     ];
   },
 };
