@@ -1,8 +1,7 @@
-import FingerprintJS from '@fingerprintjs/fingerprintjs';
 import React, { useState, useEffect } from 'react';
-import { X, Check, MessageCircle } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { X, Check } from 'lucide-react';
 import { useRouter } from 'next/router';
-import Image from 'next/image';
 import useAuthStore from '@/store/useAuthStore';
 import { User } from '@/types/entities/user';
 import { getToken } from '@/lib/cookies';
@@ -10,47 +9,58 @@ import { FaWhatsapp } from 'react-icons/fa';
 
 import api from '@/lib/api';
 
+type PricingPlan = {
+  id: string;
+  slug: string;
+  name: string;
+  price: number;
+  original_price: number | null;
+  duration_months: number;
+  description: string | null;
+  features: string[];
+  tag: string | null;
+  is_popular: boolean;
+  is_enterprise: boolean;
+};
 
-const CountdownTimer = () => {
-  // Set end time to 24 hours from now (or end of day)
-  // For demo/engagement purposes, let's just make a countdown that always shows something urgent (e.g., ends in X hours)
-  // or use a fixed end time if stored.
-  // Here we'll simulate a "End of Day" or "Next 4 hours" timer for urgency
-  const [timeLeft, setTimeLeft] = useState({ h: 0, m: 0, s: 0 });
+type NewUserOfferMeta = {
+  code?: string;
+  is_active: boolean;
+  expires_at: string | null;
+  remaining_seconds: number;
+  discount_percent: number;
+  discount_amount: number;
+  plan_discounts?: Record<string, number>;
+};
+
+type PricingPlansResponse = {
+  plans: PricingPlan[];
+  is_new_user: boolean;
+  new_user_offer?: NewUserOfferMeta | null;
+};
+
+const CountdownTimer: React.FC<{ expiresAt?: string | null }> = ({ expiresAt }) => {
+  const [now, setNow] = useState(new Date());
 
   useEffect(() => {
-    // Target time: End of current day or +4 hours?
-    // Let's do a simple countdown from 4 hours to simulate urgency whenever the user visits
-    // Or, for consistency, end of day.
-    const now = new Date();
-    const endOfDay = new Date();
-    endOfDay.setHours(23, 59, 59, 999);
-
-    const calculateTimeLeft = () => {
-      const difference = endOfDay.getTime() - new Date().getTime();
-
-      if (difference > 0) {
-        return {
-          h: Math.floor((difference / (1000 * 60 * 60)) % 24),
-          m: Math.floor((difference / 1000 / 60) % 60),
-          s: Math.floor((difference / 1000) % 60)
-        };
-      }
-      return { h: 0, m: 0, s: 0 };
-    };
-
-    setTimeLeft(calculateTimeLeft());
-
-    const timer = setInterval(() => {
-      setTimeLeft(calculateTimeLeft());
-    }, 1000);
-
+    const timer = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
 
+  const rawSeconds = expiresAt
+    ? Math.max(0, Math.floor((new Date(expiresAt).getTime() - now.getTime()) / 1000))
+    : 0;
+
+  // Product decision: visual countdown is always shown as a 1-hour urgency window.
+  const totalSeconds = Math.min(3600, rawSeconds);
+
+  const h = Math.floor(totalSeconds / 3600);
+  const m = Math.floor((totalSeconds % 3600) / 60);
+  const s = totalSeconds % 60;
+
   return (
     <span className="tabular-nums font-mono">
-      {String(timeLeft.h).padStart(2, '0')}:{String(timeLeft.m).padStart(2, '0')}:{String(timeLeft.s).padStart(2, '0')}
+      {String(h).padStart(2, '0')}:{String(m).padStart(2, '0')}:{String(s).padStart(2, '0')}
     </span>
   );
 };
@@ -60,9 +70,24 @@ const PromoPopup: React.FC = () => {
   const router = useRouter();
   const user = useAuthStore.useUser() as User | null;
 
+  const { data: pricingData, isLoading: isLoadingPlans } = useQuery<PricingPlansResponse>({
+    queryKey: ['pricing-plans-popup', user?.id || 'guest'],
+    queryFn: async () => {
+      const response = await api.get('/pricing/plans');
+      return response.data?.data || { plans: [], is_new_user: false, new_user_offer: null };
+    },
+    staleTime: 5 * 60 * 1000,
+    retry: false,
+  });
+
+  const plans = pricingData?.plans || [];
+  const newUserOffer = pricingData?.new_user_offer;
+
   useEffect(() => {
+    const sessionKey = `promoPopupShown:${user?.id || 'guest'}`;
+
     // Check if already shown in this session
-    const alreadyShown = sessionStorage.getItem('promoPopupShown');
+    const alreadyShown = sessionStorage.getItem(sessionKey);
     if (alreadyShown) return;
 
     let timer: NodeJS.Timeout;
@@ -70,21 +95,12 @@ const PromoPopup: React.FC = () => {
     const checkPremiumAndShow = async () => {
       try {
         const token = getToken();
-        // If logged in, check premium status
         if (token) {
-          const payload = JSON.parse(atob(token.split('.')[1]));
-          const userId = payload.user_id || payload.id || payload.sub;
-
-          if (userId) {
-            const res = await api.get(`/lms/user/${userId}`);
-            const lmsData = res.data?.data;
-
-            // If user has active subscription, don't show popup
-            if (lmsData?.end && new Date(lmsData.end) > new Date()) {
-              // Mark as shown so we don't check again this session
-              sessionStorage.setItem('promoPopupShown', 'true');
-              return;
-            }
+          // If already active member, do not show popup.
+          const subRes = await api.get('/pricing/subscription/status');
+          if (subRes.data?.data?.active) {
+            sessionStorage.setItem(sessionKey, 'true');
+            return;
           }
         }
       } catch (error) {
@@ -92,18 +108,22 @@ const PromoPopup: React.FC = () => {
         // On error, we proceed to show popup (safer to show than not)
       }
 
+      if (!newUserOffer?.is_active || !newUserOffer?.expires_at) {
+        return;
+      }
+
       // If not premium (or not logged in), show popup after delay
       timer = setTimeout(() => {
         setShowPopup(true);
         document.body.style.overflow = 'hidden';
-        sessionStorage.setItem('promoPopupShown', 'true');
+        sessionStorage.setItem(sessionKey, 'true');
       }, 2000);
     };
 
     checkPremiumAndShow();
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [newUserOffer?.is_active, newUserOffer?.expires_at, user?.id]);
 
   const handleClose = () => {
     setShowPopup(false);
@@ -135,10 +155,6 @@ Terima kasih!`);
       <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
         .font-poppins { font-family: 'Poppins', sans-serif; }
-        @keyframes popupScaleIn {
-          from { opacity: 0; transform: scale(0.95); }
-          to { opacity: 1; transform: scale(1); }
-        }
       `}</style>
 
       <div
@@ -146,7 +162,7 @@ Terima kasih!`);
         style={{ backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(5px)' }}
       >
         <div
-          className="relative bg-white rounded-3xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-y-auto overflow-x-hidden p-6 md:p-8 animate-[popupScaleIn_0.3s_ease-out_forwards]"
+          className="relative bg-white rounded-3xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-y-auto overflow-x-hidden p-6 md:p-8"
         >
           <button
             onClick={handleClose}
@@ -157,16 +173,13 @@ Terima kasih!`);
 
 
           <div className="absolute top-4 right-12 z-10 hidden md:flex items-center gap-2 bg-red-50 px-3 py-1.5 rounded-full border border-red-100">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
-            </span>
-            <span className="text-xs font-medium text-red-600">Promo ends in: <CountdownTimer /></span>
+            <span className="inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+            <span className="text-xs font-medium text-red-600">Promo berakhir dalam: <CountdownTimer expiresAt={newUserOffer?.expires_at} /></span>
           </div>
 
           <div className="text-center max-w-3xl mx-auto mb-8 md:mb-10 pt-4">
             <span className="inline-block py-1 px-3 rounded-full bg-gradient-to-r from-[#FB991A]/10 to-[#DB4B24]/10 text-[#DB4B24] text-xs font-bold tracking-wider uppercase mb-3 border border-[#FB991A]/20">
-              Special Offer
+              Penawaran Akun Baru
             </span>
             <h2 className="text-2xl md:text-4xl font-bold text-gray-900 mb-4 leading-tight">
               Awali langkah   <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FB991A] to-[#DB4B24]">#JadiBisa </span>
@@ -174,129 +187,127 @@ Terima kasih!`);
             </h2>
             <div className="md:hidden flex justify-center mb-4">
               <div className="flex items-center gap-2 bg-red-50 px-3 py-1.5 rounded-full border border-red-100 inline-flex">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
-                </span>
-                <span className="text-xs font-medium text-red-600">Promo ends in: <CountdownTimer /></span>
+                <span className="inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                <span className="text-xs font-medium text-red-600">Promo berakhir dalam: <CountdownTimer expiresAt={newUserOffer?.expires_at} /></span>
               </div>
             </div>
             <p className="text-gray-500 text-sm md:text-base">
-              Pilih paket membership yang sesuai dengan target beasiswamu. Akses materi eksklusif dan mentoring langsung dari ahlinya.
+              Penawaran spesial akun baru berlaku terbatas 1 jam sejak akun aktif. Pilih paket membership yang paling sesuai dengan target beasiswamu.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
+            {isLoadingPlans ? (
+              [1, 2, 3].map((item) => (
+                <div key={item} className="h-[420px] rounded-2xl border border-gray-100 bg-gray-50 animate-pulse" />
+              ))
+            ) : (
+              plans.map((plan) => {
+                const isPopular = plan.is_popular;
+                const isEnterprise = plan.is_enterprise;
 
-            {/* BISA Basic Package */}
-            <div className="flex flex-col p-6 rounded-2xl border border-gray-100 bg-white hover:border-[#FB991A]/30 hover:shadow-xl hover:shadow-orange-500/5 transition-all duration-300 relative group">
-              <div className="mb-4">
-                <h3 className="text-xl font-bold text-gray-900 group-hover:text-[#FB991A] transition-colors">BISA Basic</h3>
-                <p className="text-xs text-gray-500 mt-1">Start your journey</p>
-              </div>
-              <div className="mb-6">
-                <div className="flex items-baseline gap-1">
-                  <span className="text-sm text-gray-400 line-through mr-1">79k</span>
-                  <span className="text-3xl font-bold text-gray-900">49k</span>
-                  <span className="text-gray-400 text-sm font-medium">/ 3 bulan</span>
-                </div>
-                <div className="mt-1">
-                  <span className="inline-block bg-green-100 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded-full">Save 38%</span>
-                </div>
-              </div>
+                return (
+                  <div
+                    key={plan.id}
+                    className={`flex flex-col p-6 rounded-2xl transition-all duration-300 relative h-full ${
+                      isPopular
+                        ? 'border-2 border-[#FB991A] bg-[#FFFBF5] shadow-lg z-20'
+                        : isEnterprise
+                        ? 'border border-gray-100 bg-white hover:border-[#1B7691]/30 hover:shadow-md'
+                        : 'border border-gray-100 bg-white hover:border-[#FB991A]/30 hover:shadow-md'
+                    }`}
+                  >
+                    {plan.tag && (
+                      <div className={`absolute -top-4 left-1/2 -translate-x-1/2 ${isPopular ? 'bg-gradient-to-r from-[#FB991A] to-[#DB4B24] text-white' : 'bg-gray-100 text-gray-700'} text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider shadow-md whitespace-nowrap`}>
+                        {plan.tag}
+                      </div>
+                    )}
 
-              <ul className="space-y-3 mb-8 flex-1">
-                {[
-                  "Akses Seluruh Tutorial Beasiswa Dalam Negeri dan Luar Negeri",
-                  "Exclusive E-Book",
-                  "5x Dreamshub Consultation"
-                ].map((feat, i) => (
-                  <li key={i} className="flex gap-3 text-sm text-gray-600">
-                    <Check className="w-4 h-4 text-[#FB991A] mt-0.5 flex-shrink-0" />
-                    <span>{feat}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <button
-                onClick={() => handleSelectPlan('new-card')}
-                className="w-full py-3 rounded-xl font-semibold text-[#FB991A] bg-[#FB991A]/10 hover:bg-[#FB991A] hover:text-white transition-all duration-300"
-              >
-                Pilih BISA Basic
-              </button>
-            </div>
-
-            {/* BISA Plus+ Package (Highlighted) */}
-            <div className="flex flex-col p-6 rounded-2xl border-2 border-[#FB991A] bg-[#FFFBF5] shadow-xl relative scale-[1.02] z-10">
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#FB991A] to-[#DB4B24] text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider shadow-md">
-                Most Popular
-              </div>
-              <div className="mb-4 mt-2">
-                <h3 className="text-xl font-bold text-[#DB4B24]">BISA Plus+</h3>
-                <p className="text-xs text-[#d97706]/80 mt-1">Best value for serious learners</p>
-              </div>
-              <div className="mb-6">
-                <div className="flex items-baseline gap-1">
-                  <span className="text-base text-gray-400 line-through mr-1">249k</span>
-                  <span className="text-4xl font-bold text-gray-900">169k</span>
-                  <span className="text-gray-500 text-sm font-medium">/ 12 bulan</span>
-                </div>
-                <div className="mt-1">
-                  <span className="inline-block bg-red-100 text-red-600 text-[10px] font-bold px-2 py-0.5 rounded-full animate-pulse">Save 32% • Limited Time</span>
-                </div>
-              </div>
-
-              <ul className="space-y-3 mb-8 flex-1">
-                {[
-                  "Akses Seluruh Tutorial Beasiswa Dalam Negeri dan Luar Negeri",
-                  "Exclusive E-Book",
-                  "10x Dreamshub Consultation"
-                ].map((feat, i) => (
-                  <li key={i} className="flex gap-3 text-sm text-gray-800">
-                    <div className="mt-0.5 w-4 h-4 rounded-full bg-[#FB991A] flex items-center justify-center shrink-0">
-                      <Check className="w-3 h-3 text-white" />
+                    <div className={`mb-4 ${plan.tag ? 'mt-2' : ''}`}>
+                      <h3 className={`text-xl font-bold ${isPopular ? 'text-[#DB4B24]' : 'text-gray-900'}`}>
+                        {plan.name}
+                      </h3>
+                      <p className={`text-xs mt-1 ${isPopular ? 'text-[#d97706]/80' : 'text-gray-500'}`}>
+                        {plan.description || (isEnterprise ? 'Untuk Sekolah, Yayasan, & Komunitas' : 'Paket membership Raih Asa')}
+                      </p>
                     </div>
-                    <span className="font-medium">{feat}</span>
-                  </li>
-                ))}
-              </ul>
 
-              <button
-                onClick={() => handleSelectPlan('ideal-plan')}
-                className="w-full py-3.5 rounded-xl font-bold text-white bg-gradient-to-r from-[#FB991A] to-[#DB4B24] hover:shadow-lg hover:shadow-orange-500/30 hover:-translate-y-0.5 transition-all duration-300"
-              >
-                Pilih BISA Plus+
-              </button>
-            </div>
+                    <div className="mb-6">
+                      <div className="flex items-baseline gap-1">
+                        {isEnterprise ? (
+                          <span className="text-2xl font-bold text-gray-900">Custom</span>
+                        ) : (
+                          <>
+                            {plan.original_price && plan.original_price > plan.price && (
+                              <span className="text-sm text-gray-400 line-through mr-1">
+                                {Math.floor(plan.original_price / 1000)}k
+                              </span>
+                            )}
+                            <span className={`font-bold text-gray-900 ${isPopular ? 'text-4xl' : 'text-3xl'}`}>
+                              {Math.floor(plan.price / 1000)}k
+                            </span>
+                            <span className="text-gray-400 text-sm font-medium">/ {plan.duration_months} bulan</span>
+                          </>
+                        )}
+                      </div>
 
-            {/* For Enterprise & Partners Package */}
-            <div className="flex flex-col p-6 rounded-2xl border border-gray-100 bg-white hover:border-[#1B7691]/30 hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-300 relative">
-              <div className="mb-4">
-                <h3 className="text-xl font-bold text-gray-900">For Enterprise & Partners</h3>
-                <p className="text-xs text-gray-500 mt-1">Untuk Sekolah, Yayasan, & Komunitas</p>
-              </div>
-              <div className="mb-6">
-                <div className="flex items-baseline gap-1">
-                  <span className="text-2xl font-bold text-gray-900">Custom</span>
-                </div>
-                <p className="text-xs text-gray-400 mt-1">Harga menyesuaikan kebutuhan</p>
-              </div>
+                      {!isEnterprise && plan.original_price && plan.original_price > plan.price && (
+                        <div className="mt-1">
+                          <span className={`inline-block text-[10px] font-bold px-2 py-0.5 rounded-full ${isPopular ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-700'}`}>
+                            Hemat {Math.round(((plan.original_price - plan.price) / plan.original_price) * 100)}%
+                          </span>
+                        </div>
+                      )}
 
-              <div className="flex-1 mb-6 space-y-4">
-                <p className="text-sm text-gray-600 leading-relaxed">
-                  Berikan akses pendidikan beasiswa terbaik untuk seluruh siswa atau anak didik Anda secara terintegrasi. Solusi tepat untuk sekolah dan komunitas yang ingin mencetak lebih banyak peraih beasiswa dengan pemantauan terukur.
-                </p>
-              </div>
+                      {isEnterprise && (
+                        <p className="text-xs text-gray-400 mt-1">Harga menyesuaikan kebutuhan</p>
+                      )}
+                    </div>
 
-              <button
-                onClick={handleConsultation}
-                className="w-full py-3 rounded-xl font-semibold text-[#1B7691] border border-[#1B7691]/20 bg-[#1B7691]/5 hover:bg-[#1B7691] hover:text-white transition-all duration-300 flex items-center justify-center gap-2"
-              >
-                <FaWhatsapp className="w-5 h-5" />
-                Hubungi Kami
-              </button>
-            </div>
+                    {isEnterprise ? (
+                      <div className="flex-1 mb-6 space-y-4">
+                        <p className="text-sm text-gray-600 leading-relaxed">
+                          Berikan akses pendidikan beasiswa terbaik untuk seluruh siswa atau anak didik Anda secara terintegrasi.
+                        </p>
+                      </div>
+                    ) : (
+                      <ul className="space-y-3 mb-8 flex-1">
+                        {(plan.features || []).map((feature, index) => (
+                          <li key={index} className={`flex gap-3 text-sm ${isPopular ? 'text-gray-800' : 'text-gray-600'}`}>
+                            <div className={`mt-0.5 shrink-0 ${isPopular ? 'w-4 h-4 rounded-full bg-[#FB991A] flex items-center justify-center' : ''}`}>
+                              {isPopular ? (
+                                <Check className="w-3 h-3 text-white" />
+                              ) : (
+                                <Check className="w-4 h-4 text-[#FB991A]" />
+                              )}
+                            </div>
+                            <span className={isPopular ? 'font-medium' : ''}>{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
 
+                    <button
+                      onClick={() => (isEnterprise ? handleConsultation() : handleSelectPlan(plan.id))}
+                      className={isEnterprise
+                        ? 'w-full py-3 rounded-xl font-semibold text-[#1B7691] border border-[#1B7691]/20 bg-[#1B7691]/5 hover:bg-[#1B7691] hover:text-white transition-all duration-300 flex items-center justify-center gap-2'
+                        : isPopular
+                        ? 'w-full py-3.5 rounded-xl font-bold text-white bg-gradient-to-r from-[#FB991A] to-[#DB4B24] hover:shadow-md transition-all duration-300'
+                        : 'w-full py-3 rounded-xl font-semibold text-[#FB991A] bg-[#FB991A]/10 hover:bg-[#FB991A] hover:text-white transition-all duration-300'}
+                    >
+                      {isEnterprise ? (
+                        <>
+                          <FaWhatsapp className="w-5 h-5" />
+                          Hubungi Kami
+                        </>
+                      ) : (
+                        `Pilih ${plan.name}`
+                      )}
+                    </button>
+                  </div>
+                );
+              })
+            )}
           </div>
 
           <p className="mt-8 text-center text-xs text-gray-400">

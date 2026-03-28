@@ -36,6 +36,8 @@ export default function Navbar() {
   const [boosterOpen, setBoosterOpen] = useState<boolean>(false);
   const authStore = useAuthStore();
   const user = authStore.user;
+  const isAuthenticatedUser = isLogin && user?.role !== 'ADMIN';
+  const homeHref = isAuthenticatedUser ? '/home' : '/';
 
   useEffect(() => {
     if (user && token) {
@@ -93,7 +95,7 @@ export default function Navbar() {
       )}>
         <div className='flex flex-row items-center justify-between h-16 px-6'>
           <UnstyledLink
-            href='/'
+            href={homeHref}
             className='flex flex-row items-center gap-2 md:gap-4'
           >
             <NextImage
@@ -110,10 +112,10 @@ export default function Navbar() {
             <ul className='flex flex-row items-center gap-1'>
               <li>
                 <UnstyledLink
-                  href='/'
+                  href={homeHref}
                   className={clsxm(
                     'relative px-4 py-2 text-sm font-medium rounded-full transition-all duration-300',
-                    router.pathname === '/'
+                    router.pathname === homeHref
                       ? 'text-[#1B7691] bg-[#1B7691]/10 font-bold shadow-sm ring-1 ring-[#1B7691]/20'
                       : 'text-gray-700 hover:text-[#1B7691] hover:bg-[#1B7691]/5'
                   )}
@@ -298,7 +300,7 @@ export default function Navbar() {
         )}
       >
         <UnstyledLink
-          href='/'
+          href={homeHref}
           className='flex flex-row items-center gap-2 md:gap-4'
         >
           <NextImage
@@ -314,7 +316,7 @@ export default function Navbar() {
           <ul className='space-y-2'>
             <li>
               <UnstyledLink
-                href='/'
+                href={homeHref}
                 className='flex rounded-xl hover:bg-[#1B7691]/5 hover:text-[#1B7691] transition-colors'
                 onClick={toggleShowNav}
               >

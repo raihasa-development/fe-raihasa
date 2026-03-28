@@ -42,7 +42,12 @@ function BISALearningPage() {
 			try {
 				const response = await api.get('/lms/modul');
 				const dataArray = response.data.data || [];
-				setCourses(dataArray);
+				const sortedCourses = [...dataArray].sort((a: any, b: any) => {
+					const aFree = Number(Boolean(a?.is_free));
+					const bFree = Number(Boolean(b?.is_free));
+					return bFree - aFree;
+				});
+				setCourses(sortedCourses);
 			} catch (error) {
 				console.error('Error fetching modules:', error);
 			} finally {
@@ -66,13 +71,12 @@ function BISALearningPage() {
 				const userId = payload.user_id || payload.id || payload.sub;
 
 				if (userId) {
-					// Use the new LMS User endpoint
-					const res = await api.get(`/lms/user/${userId}`);
-					const lmsData = res.data?.data;
+					// Use the new Subscription Status endpoint
+					const res = await api.get(`/pricing/subscription/status`);
+					const data = res.data?.data;
 
-					if (lmsData?.end) {
-						const endDate = new Date(lmsData.end);
-						// Check if date is in the future
+					if (data?.active && data?.ends_at) {
+						const endDate = new Date(data.ends_at);
 						if (endDate > new Date()) {
 							setMembership({
 								active: true,
@@ -302,7 +306,7 @@ function BISALearningPage() {
 							) : filteredCourses.length > 0 ? (
 								<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-8'>
 									{filteredCourses.map((course) => {
-										const isLocked = !membership.active;
+										const isLocked = !course.is_authorize;
 										const thumbnail = course.ThumbnailModule || (course.videoId ? `https://img.youtube.com/vi/${course.videoId}/maxresdefault.jpg` : '');
 										
 										return (
@@ -341,6 +345,14 @@ function BISALearningPage() {
 														<div className='absolute top-4 left-4 z-20'>
 															<span className='px-3 py-1 bg-white/90 backdrop-blur rounded-lg text-xs font-bold text-[#1B7691] flex items-center gap-1 shadow-sm'>
 																<FiPlay className='fill-[#1B7691]' /> Video Course
+															</span>
+														</div>
+													)}
+
+													{course.is_free && (
+														<div className='absolute top-4 right-4 z-20'>
+															<span className='px-3 py-1 bg-emerald-500/95 backdrop-blur rounded-lg text-[10px] font-bold text-white uppercase tracking-wider shadow-sm'>
+																Free Access
 															</span>
 														</div>
 													)}
