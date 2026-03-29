@@ -79,10 +79,7 @@ export default function PaymentComponent({
       // Handle response
       const paymentData = response.data.data || response.data;
       
-      if (paymentData.redirect_url) {
-        // console.log('🔗 Redirecting to:', paymentData.redirect_url);
-        window.location.href = paymentData.redirect_url;
-      } else if (paymentData.token) {
+      if (paymentData.token) {
         // console.log('💳 Opening Snap with token');
         // Check if Snap is loaded
         if (typeof window.snap === 'undefined') {

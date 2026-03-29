@@ -8,7 +8,11 @@ import { getToken } from '@/lib/cookies';
 
 export default function PaymentSuccessPage() {
   const router = useRouter();
-  const { orderId, amount } = router.query;
+  const getQueryValue = (value: string | string[] | undefined) =>
+    Array.isArray(value) ? value[0] : value;
+
+  const orderId = getQueryValue(router.query.orderId) || getQueryValue(router.query.order_id);
+  const amount = getQueryValue(router.query.amount) || getQueryValue(router.query.gross_amount);
   const [activeUntil, setActiveUntil] = useState<string | null>(null);
   const [statusText, setStatusText] = useState<string>('Memverifikasi...');
   const [retryCount, setRetryCount] = useState(0);
@@ -78,7 +82,7 @@ export default function PaymentSuccessPage() {
           <div className="bg-gray-50 rounded-xl p-5 mb-8 text-left space-y-4">
             <div className="flex justify-between items-center">
               <span className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold">ID Transaksi</span>
-              <span className="text-xs font-mono text-gray-600 truncate max-w-[150px]" title={orderId as string}>{orderId}</span>
+              <span className="text-xs font-mono text-gray-600 truncate max-w-[150px]" title={orderId}>{orderId || '-'}</span>
             </div>
 
             <div className="flex justify-between items-center">

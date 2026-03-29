@@ -203,7 +203,7 @@ export default function CheckoutPage() {
             setErrorMessage(midtransMessage || 'Pembayaran gagal/dibatalkan.');
             setPaymentStatus('failed');
           },
-          onClose: () => { console.log('Popup closed'); setPaymentStatus('idle'); },
+          onClose: () => { setPaymentStatus('idle'); },
         });
       }
     },
@@ -495,7 +495,7 @@ export default function CheckoutPage() {
 
                   {/* Secure Badge */}
                   <div className="mt-6 flex justify-center items-center gap-2 opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/Logo_midtrans.png/1200px-Logo_midtrans.png" alt="Midtrans" className="h-4" />
+                    <img src="/images/midtanslogo.svg" alt="Midtrans" className="h-4" />
                     <Typography className="text-[10px] text-gray-400">Secured Payment Gateway</Typography>
                   </div>
 

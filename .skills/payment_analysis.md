@@ -1,48 +1,52 @@
-# Payment and Pricing Analysis - Raih Asa (Updated)
+# Analisis Payment dan Pricing - Raih Asa (Pembaruan)
 
-Last updated: 2026-03-29
+Terakhir diperbarui: 2026-03-29
 
-## 1. Executive Summary
+## 1. Ringkasan Eksekutif
 
-This document is updated to reflect the current codebase, not the initial migration proposal.
+Dokumen ini merefleksikan kondisi implementasi terkini setelah stabilisasi payment dan rollout LMS free-access.
 
-What is already implemented:
-- v2 pricing schema is active in Prisma (`PricingPlan`, `Subscription`, `PaymentV2`, `PromoCode`, `PromoRedemption`).
-- Main pricing and checkout flow already uses `/pricing/*` endpoints.
-- Admin promo management supports create, edit, activate/deactivate, and delete with guard rails.
-- Admin pricing page already uses admin pricing endpoint and supports inactive plans + delete guard.
+Yang sudah terimplementasi dan tervalidasi di kode:
+- Stack pricing v2 aktif di Prisma dan service layer (`PricingPlan`, `Subscription`, `PaymentV2`, `PromoCode`, `PromoRedemption`).
+- Checkout sudah memakai endpoint v2 dan mendukung:
+   - validasi promo dari backend,
+   - penawaran otomatis user baru berbasis promo code,
+   - perhitungan diskon bertingkat dengan guard rails.
+- Hardening webhook sudah diterapkan:
+   - jalur webhook legacy diteruskan ke handler v2,
+   - ada idempotency gate untuk callback berulang,
+   - alur update side effect payment/subscription berbasis transaksi.
+- Mitigasi race promo sudah aktif dengan pending reservation window (60 menit).
+- LMS free-access sudah end-to-end (`Modules.is_free`) dengan toggle admin dan otorisasi di sisi user.
 
-What is still incomplete/risky:
-- Some frontend pages still call deprecated `/products/lms` endpoint (now `410 Gone`).
-- Legacy payment webhook route is still active and still has old scaling risks.
-- v2 webhook processing is not fully idempotent/transactional.
-- Promo `max_uses` can race under concurrent settlements.
+Risiko residual saat ini:
+- Workflow migrasi lokal bisa drift jika file migration yang sudah pernah applied diubah lagi.
+- Script deployment masih memiliki `db pull` di pre-migrate prod, yang berpotensi menimbulkan drift schema pada source file.
 
-## 2. Current Architecture Reality
+## 2. Kondisi Arsitektur Saat Ini
 
-### 2.1 Database Status
+### 2.1 Status Model Data
 
-The new payment architecture is already present and being used:
+Entitas payment/pricing v2 yang aktif:
 - `PricingPlan`
 - `Subscription`
 - `PaymentV2`
 - `PromoCode`
 - `PromoRedemption`
 
-Legacy payment-related entities still exist and are still referenced in parts of the app:
+Model akses LMS sekarang sudah mendukung free access per modul:
+- `Modules.is_free` (boolean, default false)
+
+Tabel legacy masih ada untuk kompatibilitas dan migrasi bertahap:
 - `Program`
 - `ProductProgram`
 - `PaketLMS`
-- `Diskon`
 - `UserProgram`
 - `Pembayaran`
 
-Conclusion:
-- This is now a hybrid state (v2 live + legacy remnants), not a pure legacy state.
+### 2.2 Permukaan Route Aktif
 
-### 2.2 Active v2 Routes
-
-Backend route status for v2 is complete for core pricing/payment/admin promo use cases:
+Route inti v2 pricing/payment/admin yang aktif:
 - `GET /pricing/plans`
 - `GET /pricing/plans/:id`
 - `POST /pricing/validate-promo`
@@ -54,137 +58,268 @@ Backend route status for v2 is complete for core pricing/payment/admin promo use
 - `GET/POST/PATCH/DELETE /pricing/admin/promos` (admin)
 - `GET /pricing/admin/affiliates` (admin)
 
-Reference:
-- `be-raihasa/src/router/pricing.router.ts`
+Perilaku route webhook legacy:
+- `POST /payments/notification` dipertahankan sebagai entrypoint kompatibilitas dan diteruskan ke alur notifikasi v2.
 
-### 2.3 Deprecated Route Status
+## 3. Rollout LMS Free Access (Baru)
 
-Legacy product LMS endpoint is explicitly deprecated and returns 410:
-- `GET /products/lms` -> `410 Gone`
+### 3.1 Ruang Lingkup Implementasi
 
-Reference:
-- `be-raihasa/src/router/product.router.ts`
+Backend:
+- Menambahkan `Modules.is_free` pada Prisma schema dan migration.
+- Otorisasi LMS service kini mengizinkan akses jika modul ditandai free.
+- API create/update modul menerima field `is_free` dari form admin.
 
-## 3. Gaps That Are Still Open
+Frontend admin:
+- Form kursus admin punya checkbox free-access.
+- List kursus admin menampilkan badge free.
 
-### 3.1 Frontend still consuming deprecated endpoint (Critical)
+Frontend user:
+- Halaman list dan detail learning memakai `is_authorize` plus `is_free`.
+- State lock sekarang berbasis modul, bukan hanya membership global.
+- Chip free-access tampil pada card/detail user dan modul free diprioritaskan di urutan atas.
 
-These pages still call `/products/lms` and are at risk/broken behavior:
-- `fe-raihasa/src/pages/payment/index.page.tsx`
-- `fe-raihasa/src/pages/lms/index.page.tsx`
-- `fe-raihasa/src/pages/programs/lms/invoice-detail/index.page.tsx`
+### 3.2 Aturan Bisnis
 
-Impact:
-- User can hit dead endpoint paths despite v2 already available.
-- UX inconsistency between pages that already use v2 and pages still on legacy.
+- Jika `is_free = true`: dapat diakses user non-member.
+- Jika `is_free = false`: membutuhkan otorisasi valid (membership aktif atau jalur schema access yang diizinkan).
 
-### 3.2 Legacy webhook still active (Critical)
+## 4. Rekap Pengiriman (Pekerjaan Selesai)
 
-Legacy route remains active:
-- `POST /payments/notification`
+Payment dan promo:
+- Perbaikan kompatibilitas amount checkout (`final_amount` dan fallback field legacy).
+- Penambahan hardening promo CRUD dan sanitasi payload di sisi admin.
+- Penambahan fitur activate/deactivate dan edit/delete promo di admin.
+- Implementasi dynamic new-user promo (tidak hardcoded), plus guard anti double-apply.
 
-Reference:
-- `be-raihasa/src/router/payment.router.ts`
+Webhook dan konsistensi:
+- Route webhook legacy kini bridge ke alur v2.
+- Idempotency gate webhook v2 ditambahkan (mencegah side effect ganda).
+- Side effect dikonsolidasikan dalam jalur transaksi.
+- Race kuota promo ditekan via logika pending reservation window.
 
-Risk:
-- Old service path still contains non-scalable behavior (`getAllUserPrograms` scan).
-- Operational confusion: 2 webhook pipelines can coexist.
+Akses kontrol dan UX:
+- `/home` dan route learning kini menghormati otorisasi level modul.
+- Akses direct URL non-member ke modul berbayar diblokir.
+- Modul free diprioritaskan tampil lebih awal dengan chip/badge yang jelas.
 
-### 3.3 v2 webhook idempotency and atomicity (High)
+Perbaikan operasional:
+- Menangani mismatch runtime Prisma client (`no-engine` generation side effect).
+- Memulihkan status migrasi lokal tanpa wajib reset lewat migrate resolve + deploy.
 
-In v2 webhook processing, side effects happen sequentially:
-- update payment status
-- activate/extend subscription
-- create redemption
-- increment promo usage
-- add forum tokens
+## 5. Item Terbuka dan Rekomendasi Lanjutan
 
-References:
-- `be-raihasa/src/services/pricing.service.ts`
+1. Hapus `db pull` dari script pre-migrate production untuk mencegah schema source tertimpa.
+2. Jadikan file migration immutable setelah applied di environment bersama.
+3. Standarisasi proses migrasi lokal untuk menghindari drift (resolve/deploy dulu, lalu migration baru di baseline DB bersih bila perlu).
+4. Tambahkan automated test untuk idempotency webhook dan race pending reservation promo.
 
-Current risks:
-- Duplicate Midtrans callbacks may cause repeat side effects.
-- No explicit early guard for already-paid payment before side effects.
-- Side effects are not wrapped in one DB transaction boundary.
+## 6. Test Case QA Detail (Dalam File yang Sama)
 
-### 3.4 Promo `max_uses` race (High)
+### 6.1 Payment dan Checkout
 
-Flow now checks `max_uses` pre-payment, but increments only on settlement.
+TC-PAY-001: Checkout sukses dasar
+- Prasyarat: user belum punya subscription aktif, plan yang dipilih aktif.
+- Langkah:
+   1. Buka halaman checkout dari list plan.
+   2. Klik bayar dan selesaikan settlement Midtrans.
+   3. Tunggu callback webhook diproses.
+- Hasil yang diharapkan:
+   - Status PaymentV2 menjadi `PAID`.
+   - Subscription menjadi aktif dengan start/end yang benar.
+   - User bisa mengakses modul premium.
 
-Risk:
-- Concurrent settlements can oversubscribe beyond `max_uses`.
+TC-PAY-002: Idempotency callback duplikat
+- Prasyarat: ada satu payment yang sudah selesai.
+- Langkah:
+   1. Replay payload notifikasi Midtrans yang sama (order ID sama) beberapa kali.
+- Hasil yang diharapkan:
+   - Tidak ada duplikasi extension subscription/penambahan token/redemption row.
+   - Handler mengembalikan perilaku sukses/no-op untuk callback berulang.
 
-## 4. What Was Correct in the Old Analysis, and What Is Now Outdated
+TC-PAY-003: Guard subscription aktif
+- Prasyarat: user sudah punya subscription aktif.
+- Langkah:
+   1. Coba buat payment baru untuk user yang sama.
+- Hasil yang diharapkan:
+   - API menolak dengan pesan conflict yang jelas.
+   - Tidak ada subscription/payment pending baru.
 
-Still correct:
-- Legacy flow complexity concerns are valid.
-- Old webhook scaling issue is valid while legacy webhook route still exists.
-- Midtrans discount should remain backend-driven (still good recommendation).
+TC-PAY-004: Kompatibilitas webhook legacy
+- Prasyarat: server berjalan dengan dua route webhook.
+- Langkah:
+   1. Kirim notifikasi ke route legacy `/payments/notification`.
+- Hasil yang diharapkan:
+   - Request diteruskan ke jalur pemrosesan v2.
+   - Hasil konsisten dengan perilaku route v2.
 
-Outdated statements (must be revised):
-- "No voucher/coupon system" is no longer true (promo system exists in v2).
-- "Products page uses hardcoded + name matching" is no longer globally true.
-  - Products main page has moved to `/pricing/plans`.
-  - But some legacy pages still rely on `/products/lms`.
-- "Need to add admin promo edit/delete" is no longer true.
-  - Admin promos now support edit/delete and active toggle.
+### 6.2 Promo dan Diskon
 
-## 5. Updated Refactor Priority
+TC-PROMO-001: Validasi promo tambahan
+- Prasyarat: promo code aktif dan kuota masih tersedia.
+- Langkah:
+   1. Masukkan promo di checkout.
+   2. Terapkan promo.
+- Hasil yang diharapkan:
+   - Preview diskon tampil.
+   - Final amount dihitung benar.
 
-### Priority 1 (Immediate)
-1. Migrate remaining FE pages away from `/products/lms` to v2 endpoints.
-2. Disable/deprecate legacy payment webhook route once migration verification is complete.
+TC-PROMO-002: Stack auto offer + promo tambahan
+- Prasyarat: akun user baru eligible dalam window offer.
+- Langkah:
+   1. Buka checkout dan pastikan auto offer aktif.
+   2. Terapkan promo referral/general tambahan.
+- Hasil yang diharapkan:
+   - Diskon auto dan diskon promo tampil terpisah.
+   - Final amount mematuhi batas cap dan floor.
 
-### Priority 2 (Stability)
-1. Make v2 webhook idempotent:
-   - Skip processing if payment already `PAID`.
-2. Make webhook side effects atomic:
-   - Use single transaction for payment/subscription/redemption/counter updates.
-3. Add safer promo usage increment strategy to reduce race conditions.
+TC-PROMO-003: Blokir kode auto-offer dipakai ulang
+- Prasyarat: auto offer aktif untuk user.
+- Langkah:
+   1. Input kode auto-offer yang sama di field promo manual.
+- Hasil yang diharapkan:
+   - Validasi ditolak dengan pesan penjelasan.
 
-### Priority 3 (Cleanup)
-1. Remove dead legacy adapters/fallback catalogs after FE migration.
-2. Decommission legacy payment tables from active business paths (phased).
+TC-PROMO-004: Penanganan race max uses saat pending reservation
+- Prasyarat: promo dengan `max_uses` rendah.
+- Langkah:
+   1. Buat payment pending konkuren memakai promo yang sama.
+   2. Dorong hingga melewati batas kuota.
+- Hasil yang diharapkan:
+   - Attempt baru setelah batas reservation ditolak.
+   - Tidak ada over-allocation di luar batas yang ditentukan.
 
-## 6. Suggested Acceptance Criteria (Current Sprint)
+### 6.3 LMS Free Access dan Otorisasi
 
-### FE Migration Complete When
-- No production page calls `/products/lms`.
-- Payment, LMS landing, and invoice detail use v2 pricing sources.
+TC-LMS-001: Modul free untuk non-member
+- Prasyarat: modul memiliki `is_free = true`, user uji tidak punya membership aktif.
+- Langkah:
+   1. Buka list learning.
+   2. Buka detail modul free secara langsung.
+- Hasil yang diharapkan:
+   - Card modul ditandai chip Free Access.
+   - Halaman detail terbuka dan konten dapat diakses.
 
-### Webhook Hardening Complete When
-- Duplicate callback for same order does not duplicate side effects.
-- Promo redemption + usage increment are consistent under concurrent callbacks.
-- Subscription activation/extension behavior remains correct and deterministic.
+TC-LMS-002: Modul paid terkunci untuk non-member
+- Prasyarat: modul memiliki `is_free = false`, user uji tidak punya membership aktif.
+- Langkah:
+   1. Buka modul paid dari list atau direct URL.
+- Hasil yang diharapkan:
+   - User melihat state lock/upsell prompt.
+   - Video/konten tidak dapat diakses.
 
-### Decommission Ready When
-- Legacy webhook no longer receives traffic.
-- Monitoring dashboards show v2-only payment flow healthy for agreed soak period.
+TC-LMS-003: Admin toggle free on/off
+- Prasyarat: admin login, modul tersedia.
+- Langkah:
+   1. Buka admin courses.
+   2. Toggle checkbox free lalu simpan.
+   3. Buka ulang sebagai user non-member.
+- Hasil yang diharapkan:
+   - `is_free` tersimpan.
+   - Perilaku akses berubah sesuai nilai terbaru.
 
-## 7. Revised Effort Estimate
+TC-LMS-004: Modul free diprioritaskan di list
+- Prasyarat: terdapat kombinasi modul free dan paid.
+- Langkah:
+   1. Muat rekomendasi home dan list learning.
+- Hasil yang diharapkan:
+   - Modul free muncul di urutan atas.
+   - Chip terlihat jelas di UI user.
 
-Given current progress (v2 mostly live):
-- FE remaining migration from `/products/lms`: 0.5-1.5 days
-- Webhook idempotency + transaction hardening: 1-2 days
-- Legacy route sunset + validation: 0.5-1 day
+### 6.4 Operasional Admin
 
-Total remaining to stabilize and close migration: about 2-4.5 working days.
+TC-ADM-001: Buat modul dengan flag free
+- Prasyarat: role admin.
+- Langkah:
+   1. Buat modul dengan checkbox free aktif.
+- Hasil yang diharapkan:
+   - Simpan API berhasil.
+   - Modul tersimpan dengan `is_free = true`.
 
-## 8. Immediate Action List
+TC-ADM-002: Ubah modul dari free ke paid
+- Prasyarat: sudah ada modul free.
+- Langkah:
+   1. Edit modul dan nonaktifkan free.
+- Hasil yang diharapkan:
+   - Simpan berhasil.
+   - User non-member tidak bisa lagi mengakses modul tersebut.
 
-1. Update these FE pages to v2 plan source:
-   - `fe-raihasa/src/pages/payment/index.page.tsx`
-   - `fe-raihasa/src/pages/lms/index.page.tsx`
-   - `fe-raihasa/src/pages/programs/lms/invoice-detail/index.page.tsx`
-2. Harden v2 webhook in:
-   - `be-raihasa/src/services/pricing.service.ts`
-3. Plan legacy webhook sunset in:
-   - `be-raihasa/src/router/payment.router.ts`
+TC-ADM-003: Promo CRUD dan toggle status
+- Prasyarat: role admin.
+- Langkah:
+   1. Buat promo.
+   2. Edit field.
+   3. Deactivate lalu reactivate.
+   4. Hapus promo jika tidak diblokir constraint.
+- Hasil yang diharapkan:
+   - UI dan API konsisten sesuai guard rails.
 
----
+## 7. Checklist Eksekusi QA (Siap Pakai)
 
-If needed, this document can be split next into:
-- `payment_analysis_state.md` (what is true today)
-- `payment_analysis_plan.md` (target architecture and migration plan)
+Gunakan format berikut untuk mengeksekusi seluruh test case di atas.
 
-That separation avoids mixing current state with future design proposal.
+Kolom yang dipakai:
+- `Test ID`
+- `Modul`
+- `PIC QA`
+- `Environment`
+- `Tanggal Uji`
+- `Status` (PASS/FAIL/BLOCKED)
+- `Evidence` (link screenshot/video/log)
+- `Bug ID` (jika FAIL)
+- `Catatan`
+
+Template tabel:
+
+| Test ID | Modul | PIC QA | Environment | Tanggal Uji | Status | Evidence | Bug ID | Catatan |
+|---|---|---|---|---|---|---|---|---|
+| TC-PAY-001 | Payment |  |  |  |  |  |  |  |
+| TC-PAY-002 | Payment |  |  |  |  |  |  |  |
+| TC-PAY-003 | Payment |  |  |  |  |  |  |  |
+| TC-PAY-004 | Payment |  |  |  |  |  |  |  |
+| TC-PROMO-001 | Promo |  |  |  |  |  |  |  |
+| TC-PROMO-002 | Promo |  |  |  |  |  |  |  |
+| TC-PROMO-003 | Promo |  |  |  |  |  |  |  |
+| TC-PROMO-004 | Promo |  |  |  |  |  |  |  |
+| TC-LMS-001 | LMS |  |  |  |  |  |  |  |
+| TC-LMS-002 | LMS |  |  |  |  |  |  |  |
+| TC-LMS-003 | LMS |  |  |  |  |  |  |  |
+| TC-LMS-004 | LMS |  |  |  |  |  |  |  |
+| TC-ADM-001 | Admin |  |  |  |  |  |  |  |
+| TC-ADM-002 | Admin |  |  |  |  |  |  |  |
+| TC-ADM-003 | Admin |  |  |  |  |  |  |  |
+
+## 8. Template Laporan Bug QA
+
+Gunakan template ini ketika status test case = FAIL.
+
+- `Bug ID`: (mis. RAIHASA-123)
+- `Test ID Terkait`: (mis. TC-LMS-002)
+- `Judul`: ringkas dan jelas
+- `Severity`: Critical/High/Medium/Low
+- `Priority`: P1/P2/P3/P4
+- `Environment`: staging/production/local
+- `Akun Uji`: role + kondisi akun
+- `Langkah Reproduksi`:
+   1. ...
+   2. ...
+   3. ...
+- `Expected Result`: ...
+- `Actual Result`: ...
+- `Evidence`: link screenshot/video/network log
+- `Dampak Bisnis`: ...
+- `Owner`: ...
+- `Status`: Open/In Progress/Ready to Retest/Closed
+
+## 9. UAT Sign-off Ringkas
+
+Gunakan bagian ini saat seluruh regression selesai diuji.
+
+- `Total Test Case`: 15
+- `PASS`: ...
+- `FAIL`: ...
+- `BLOCKED`: ...
+- `Open Bug Critical/High`: ...
+- `Kesimpulan Rilis`: Layak Rilis / Tunda Rilis
+- `Disetujui Oleh`: ...
+- `Tanggal Sign-off`: ...
