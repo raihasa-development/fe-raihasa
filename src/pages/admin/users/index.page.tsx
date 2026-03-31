@@ -37,6 +37,10 @@ function AdminUsersPage() {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [tokenAmount, setTokenAmount] = useState<number>(0);
 
+  const blurOnWheel = (e: React.WheelEvent<HTMLInputElement>) => {
+    (e.target as HTMLInputElement).blur();
+  };
+
   const fetchUsers = async () => {
     setLoading(true);
     try {
@@ -246,6 +250,7 @@ function AdminUsersPage() {
             <input
               type="number"
               value={tokenAmount}
+              onWheel={blurOnWheel}
               onChange={(e) => setTokenAmount(Number(e.target.value))}
               className="w-full border p-2 rounded mb-4 focus:ring-2 focus:ring-[#E58941]"
               placeholder="Amount"
@@ -272,6 +277,10 @@ function AdminUsersPage() {
 function MembershipModal({ isOpen, onClose, user, onSuccess }: { isOpen: boolean, onClose: () => void, user: User | null, onSuccess: () => void }) {
   const [days, setDays] = useState(30);
   const [loading, setLoading] = useState(false);
+
+  const blurOnWheel = (e: React.WheelEvent<HTMLInputElement>) => {
+    (e.target as HTMLInputElement).blur();
+  };
 
   if (!isOpen || !user) return null;
 
@@ -315,6 +324,7 @@ function MembershipModal({ isOpen, onClose, user, onSuccess }: { isOpen: boolean
           <input
             type="number"
             value={days}
+            onWheel={blurOnWheel}
             onChange={(e) => setDays(Number(e.target.value))}
             className="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none"
             placeholder="Custom days..."

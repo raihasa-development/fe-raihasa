@@ -58,10 +58,12 @@ const AdminCourseManagement = () => {
         }
     };
 
-    const filteredCourses = courses.filter(c =>
-        c.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (c.instructor && c.instructor.toLowerCase().includes(searchQuery.toLowerCase()))
-    );
+    const filteredCourses = courses
+        .filter(c =>
+            c.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            (c.instructor && c.instructor.toLowerCase().includes(searchQuery.toLowerCase()))
+        )
+        .sort((a, b) => Number(Boolean(b?.is_free)) - Number(Boolean(a?.is_free)));
 
     return (
         <AdminDashboard withSidebar>
@@ -152,7 +154,7 @@ const AdminCourseManagement = () => {
                                         </button>
                                     </div>
                                     <div className="absolute bottom-4 left-4">
-                                        <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm ${course.schema_type === 'DALAM_NEGERI' ? 'bg-green-500 text-white' : 'bg-orange-500 text-white'}`}>
+                                            <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm ${course.schema_type === 'DALAM_NEGERI' ? 'bg-green-500 text-white' : 'bg-orange-500 text-white'}`}>
                                             {course.schema_type === 'DALAM_NEGERI' ? 'Dalam Negeri' : 'Luar Negeri'}
                                         </span>
                                     </div>
@@ -161,6 +163,9 @@ const AdminCourseManagement = () => {
                                 <div className="p-6 flex-1 flex flex-col">
                                     <div className="flex items-center gap-2 mb-3">
                                         <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md uppercase tracking-wide">{course.categoryId || 'Uncategorized'}</span>
+                                        {course.is_free && (
+                                            <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md uppercase tracking-wide">Free</span>
+                                        )}
                                     </div>
                                     <h3 className="font-bold text-gray-900 line-clamp-2 mb-2 group-hover:text-blue-600 transition-colors uppercase tracking-tight">{course.name}</h3>
                                     
@@ -221,6 +226,7 @@ const CourseForm = ({ isEdit, data, onClose }: any) => {
         lessons_count: data?.lessons_count || 0,
         tags: data?.tags ? (Array.isArray(data.tags) ? data.tags.join(', ') : data.tags) : '',
         schema_type: data?.schema_type || 'DALAM_NEGERI',
+        is_free: Boolean(data?.is_free),
         categoryId: data?.categoryId || '',
         videoUrl: data?.videoId ? `https://youtube.com/watch?v=${data.videoId}` : '',
         deskripsi: data?.deskripsi || '',
@@ -244,6 +250,7 @@ const CourseForm = ({ isEdit, data, onClose }: any) => {
             lessons_count: Number(formData.lessons_count),
             tags: formData.tags.split(',').map((t: string) => t.trim()).filter(Boolean),
             schema_type: formData.schema_type,
+            is_free: Boolean(formData.is_free),
             categoryId: formData.categoryId,
             videoId: videoId,
             deskripsi: formData.deskripsi,
@@ -261,9 +268,10 @@ const CourseForm = ({ isEdit, data, onClose }: any) => {
                 alert('Kursus baru berhasil ditambahkan!');
             }
             onClose();
-        } catch (error) {
+        } catch (error: any) {
             console.error('Failed to save course:', error);
-            alert('Gagal menyimpan kursus. Silakan coba lagi.');
+            const backendMessage = error?.response?.data?.message || error?.message;
+            alert(backendMessage ? `Gagal menyimpan kursus: ${backendMessage}` : 'Gagal menyimpan kursus. Silakan coba lagi.');
         } finally {
             setIsSaving(false);
         }
@@ -325,6 +333,20 @@ const CourseForm = ({ isEdit, data, onClose }: any) => {
                                 <option value="DALAM_NEGERI">Dalam Negeri</option>
                                 <option value="LUAR_NEGERI">Luar Negeri</option>
                             </select>
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-sm font-bold text-gray-700 ml-1">Akses Kursus</label>
+                            <div className="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-2xl">
+                                <label className="inline-flex items-center gap-3 cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        checked={Boolean(formData.is_free)}
+                                        onChange={(e) => setFormData({ ...formData, is_free: e.target.checked })}
+                                        className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                    />
+                                    <span className="text-sm font-semibold text-gray-700">Buka gratis untuk semua user (tanpa membership)</span>
+                                </label>
+                            </div>
                         </div>
                     </div>
                 </section>

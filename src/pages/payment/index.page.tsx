@@ -53,8 +53,15 @@ export default function PaymentPage() {
     Aos.init({ once: true });
 
     // Load Midtrans Snap script
-    const snapScript = 'https://app.sandbox.midtrans.com/snap/snap.js';
-    const clientKey = process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY || 'Mid-client-_ChFuuaZr9CUeQbO';
+    const isProduction = process.env.NEXT_PUBLIC_MIDTRANS_IS_PRODUCTION === 'true';
+    const snapScript = isProduction
+      ? 'https://app.midtrans.com/snap/snap.js'
+      : 'https://app.sandbox.midtrans.com/snap/snap.js';
+    const clientKey = process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY || '';
+
+    if (!clientKey) {
+      return;
+    }
 
     const script = document.createElement('script');
     script.src = snapScript;

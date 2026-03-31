@@ -10,6 +10,7 @@ import Typography from '@/components/Typography';
 import Layout from '@/layouts/Layout';
 import SEO from '@/components/SEO';
 import api from '@/lib/api';
+import { getToken } from '@/lib/cookies';
 
 export default withAuth(LearningDetailPage, 'user');
 
@@ -33,18 +34,67 @@ function LearningDetailPage() {
   // Course Data State
   const [course, setCourse] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [canAccessModule, setCanAccessModule] = useState(false);
+  const [membership, setMembership] = useState<{
+    active: boolean;
+    until: string | null;
+    loading: boolean;
+  }>({
+    active: false,
+    until: null,
+    loading: true,
+  });
+
+  useEffect(() => {
+    const checkMembership = async () => {
+      try {
+        const token = getToken();
+        if (!token) {
+          setMembership({ active: false, until: null, loading: false });
+          return;
+        }
+
+        const res = await api.get('/pricing/subscription/status');
+        const data = res.data?.data;
+
+        if (data?.active && data?.ends_at) {
+          const endDate = new Date(data.ends_at);
+          if (endDate > new Date()) {
+            setMembership({
+              active: true,
+              until: endDate.toLocaleDateString('id-ID', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+              }),
+              loading: false,
+            });
+            return;
+          }
+        }
+
+        setMembership({ active: false, until: null, loading: false });
+      } catch {
+        setMembership({ active: false, until: null, loading: false });
+      }
+    };
+
+    checkMembership();
+  }, []);
 
   // Fetch Course Detail
   useEffect(() => {
     const fetchCourse = async () => {
-      if (!learningId) return;
+      if (!learningId || membership.loading) return;
       try {
         const response = await api.get(`/lms/modul/${learningId}`);
         const data = response.data.data;
+        setCanAccessModule(Boolean(data?.is_authorize));
         
         // Transform data to match required UI structure
         const transformed = {
           id: data.id,
+          is_free: Boolean(data.is_free),
           title: data.name,
           subtitle: data.instructor_role || 'Scholarship Preparation',
           description: data.deskripsi || '',
@@ -63,12 +113,13 @@ function LearningDetailPage() {
         setCourse(transformed);
       } catch (error) {
         console.error('Error fetching course detail:', error);
+        setCanAccessModule(false);
       } finally {
         setIsLoading(false);
       }
     };
     fetchCourse();
-  }, [learningId]);
+  }, [learningId, membership.loading, membership.active]);
 
   // Listen to YouTube Iframe Message for Progress
   useEffect(() => {
@@ -123,7 +174,7 @@ function LearningDetailPage() {
     }
   };
 
-  if (isLoading) {
+  if (membership.loading || isLoading) {
     return (
         <Layout withNavbar={true} withFooter={true}>
             <div className='container mx-auto px-4 py-20 text-center min-h-[60vh] flex flex-col items-center justify-center'>
@@ -131,6 +182,41 @@ function LearningDetailPage() {
                 <Typography>Loading Lesson...</Typography>
             </div>
         </Layout>
+    );
+  }
+
+  if (!canAccessModule) {
+    return (
+      <Layout withNavbar={true} withFooter={true}>
+        <SEO title='Akses Terkunci - BISA Learning' />
+        <main className='min-h-screen bg-[#F8FAFC] pt-28 pb-16 px-4'>
+          <div className='max-w-4xl mx-auto'>
+            <div className='bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm'>
+              <div className='relative rounded-2xl overflow-hidden mb-6'>
+                <div className='h-[260px] bg-gradient-to-r from-[#1B7691]/70 to-[#0F4C61]/70 blur-[1px]' />
+                <div className='absolute inset-0 bg-black/40 backdrop-blur-[2px] flex flex-col items-center justify-center text-center px-6'>
+                  <div className='w-14 h-14 rounded-full bg-white/15 border border-white/25 flex items-center justify-center mb-4'>
+                    <FiLock className='w-7 h-7 text-white' />
+                  </div>
+                  <Typography className='text-white text-xl md:text-2xl font-bold mb-2'>Konten Premium Terkunci</Typography>
+                  <Typography className='text-white/85 text-sm md:text-base max-w-xl'>
+                    Modul ini hanya tersedia untuk member aktif. Aktifkan membership untuk membuka seluruh materi dan video belajar.
+                  </Typography>
+                </div>
+              </div>
+
+              <div className='flex flex-wrap items-center gap-3'>
+                <ButtonLink href='/products' className='px-5 py-3 rounded-xl bg-[#FB991A] text-white font-semibold hover:bg-orange-600 transition-colors'>
+                  Aktifkan Membership
+                </ButtonLink>
+                <ButtonLink href='/bisa-learning' className='px-5 py-3 rounded-xl border border-gray-200 text-gray-700 font-semibold hover:bg-gray-50 transition-colors'>
+                  Kembali ke Learning Center
+                </ButtonLink>
+              </div>
+            </div>
+          </div>
+        </main>
+      </Layout>
     );
   }
 
@@ -207,6 +293,13 @@ function LearningDetailPage() {
                 <span className='text-[#1B7691] font-medium max-w-[200px] truncate'>{course.title}</span>
               </div>
               <h1 className='text-2xl md:text-3xl font-bold text-gray-900'>{course.title}</h1>
+              {course.is_free && (
+                <div className='mt-3'>
+                  <span className='inline-flex items-center px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold uppercase tracking-wide border border-emerald-200'>
+                    Free Access
+                  </span>
+                </div>
+              )}
               <p className='text-gray-500 mt-2 max-w-3xl'>{course.subtitle}</p>
             </div>
           </div>

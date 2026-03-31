@@ -161,8 +161,6 @@ export const forumApi = {
       headers: getHeaders(),
     });
 
-    console.log('[Forum API] Response status:', response.status, response.statusText);
-
     if (!response.ok) {
       const errorText = await response.text();
       console.error('[Forum API] Error response:', errorText);
@@ -170,7 +168,6 @@ export const forumApi = {
     }
 
     const result = await response.json();
-    console.log('[Forum API] Posts fetched successfully:', result);
     return result;
   },
 

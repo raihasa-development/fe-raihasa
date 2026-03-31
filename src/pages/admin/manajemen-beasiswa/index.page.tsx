@@ -23,8 +23,7 @@ function AdminScholarshipPage() {
     try {
       const { data } = await api.get('/scholarship?limit=1000'); // Ensure fetch all for admin
       setScholarships(data?.data || []);
-    } catch (error) {
-      console.log('Error fetching scholarships:', error);
+    } catch {
       toast.error('Gagal mengambil data beasiswa');
     } finally {
       setLoading(false);

@@ -27,7 +27,7 @@ export default function Sidebar() {
     if (pathName.includes('scholra') || pathName.includes('dreamshub') || pathName.includes('bisa-learning')) {
       setIsServicesOpen(true);
       setActiveSection('services');
-    } else if (pathName.includes('users') || pathName.includes('payments') || pathName.includes('manajemen-beasiswa') || pathName.includes('courses') || pathName.includes('pricing')) {
+    } else if (pathName.includes('users') || pathName.includes('payments') || pathName.includes('manajemen-beasiswa') || pathName.includes('courses') || pathName.includes('pricing') || pathName.includes('promos')) {
       setIsManagementOpen(true);
       setActiveSection('management');
     }
@@ -63,6 +63,12 @@ export default function Sidebar() {
           href: '/admin/pricing',
           icon: HiCurrencyDollar,
           paths: ['/admin/pricing']
+        },
+        {
+          title: 'Manage Promos',
+          href: '/admin/promos',
+          icon: HiCurrencyDollar,
+          paths: ['/admin/promos']
         },
         {
           title: 'Payment Monitoring',
