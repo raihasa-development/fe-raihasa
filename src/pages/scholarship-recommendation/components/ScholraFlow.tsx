@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-    FiArrowRight, FiCheck, FiRefreshCw, FiChevronLeft, FiAward,
-    FiStar, FiChevronRight, FiCheckCircle, FiTrendingUp, FiTarget, FiActivity
+    FiArrowRight, FiCheck, FiChevronLeft,
+    FiStar, FiChevronRight, FiCheckCircle, FiTarget, FiActivity
 } from 'react-icons/fi';
 import api from '@/lib/api';
 import { useRouter } from 'next/router';
@@ -29,6 +29,9 @@ interface ScholarshipResult {
     matchLabel?: string;
     img_path?: string;
     jenis?: string;
+    deadline_status?: 'open' | 'soon' | 'urgent' | 'closed' | 'unknown';
+    days_left?: number | null;
+    dims?: Record<string, number>;
 }
 
 export default function ScholraFlow() {
@@ -40,42 +43,65 @@ export default function ScholraFlow() {
     const [isLoading, setIsLoading] = useState(true);
     const [inputValue, setInputValue] = useState('');
     const [history, setHistory] = useState<Record<string, any>[]>([]);
-    const [mascotState, setMascotState] = useState(1);
+    const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
     const getMascotDialogue = () => {
-        if (isLoading) return "Tenang... Scholra lagi hitung skor kecocokan berdasarkan profilmu.";
-        if (!currentQuestion) return "Wuihh! Analisis beres. Scholra udah kumpulin 20 beasiswa paling pas buatmu!";
+        if (isLoading) return 'Scholra sedang menghitung skor kecocokan berdasarkan profilmu.';
+        if (!currentQuestion) return 'Analisis selesai. Rekomendasi beasiswa siap ditinjau.';
 
         const qId = currentQuestion.id;
         const dialogs: Record<string, string> = {
-            jenjang: "Halo! Aku Haira. Pertama, Scholra perlu tahu jenjang pendidikanmu sekarang.",
-            ipk: "Wuih, mantap! Kalau boleh tahu, berapa nih IPK terakhirmu? Scholra mau cari yang sesuai nilaimu.",
-            is_sktm: "Oke! Apakah kamu punya SKTM? Banyak program bantuan ekonomi yang keren-keren lho!",
-            asal_daerah: "Wah seru! Kamu asalnya dari daerah mana? Scholra mau cariin yang khusus buat putra daerah.",
-            gender: "Hampir beres! Jenis kelaminmu apa ya? Ada beberapa beasiswa yang khusus untuk kamu.",
-            semester: "Sekarang kamu lagi di semester berapa? Biar makin akurat pilihannya!",
-            funding: "Tipe pendanaan itu penting. Kamu cari yang Full-Funded atau bantuan parsial?",
-            english: "Psst! Skor Bahasa Inggris bisa jadi kunci pembuka banyak pintu lho. Bagaimana kemampuanmu?",
-            age_val: "Berapa usiamu saat ini? Ada beberapa beasiswa yang punya batasan umur lho."
+            jenjang: 'Silakan pilih jenjang pendidikanmu saat ini untuk memulai penyaringan dasar.',
+            tujuan_negara: 'Pilihan tujuan studi membantu menyesuaikan beasiswa dalam negeri atau luar negeri.',
+            jenis_bantuan: 'Silakan pilih tipe pendanaan yang paling sesuai dengan preferensimu.',
+            umur: 'Informasi usia dipakai untuk mengecek syarat batas usia pada beasiswa tertentu.',
+            ipk: 'Jika sudah tersedia, isi IPK untuk meningkatkan akurasi penilaian kecocokan.',
+            semester: 'Semester saat ini membantu menilai kesesuaian pada program dengan syarat semester.',
+            ekonomi: 'Informasi ini digunakan untuk memprioritaskan program afirmasi ekonomi secara tepat.',
+            disabilitas: 'Jika relevan, sistem akan memprioritaskan program dengan dukungan kebutuhan khusus.',
+            agama: 'Pertanyaan ini digunakan hanya untuk mencocokkan beasiswa berbasis lembaga keagamaan.',
+            gender_khusus: 'Jawaban ini dipakai untuk menilai kecocokan pada program khusus perempuan.',
+            bahasa: 'Sertifikat bahasa menjadi faktor penting terutama untuk beasiswa luar negeri.',
+            double: 'Informasi ini membantu memastikan rekomendasi sesuai kebijakan rangkap beasiswa.'
         };
 
-        return dialogs[qId] || "Ayo isi datamu agar Scholra bisa kasih rekomendasi terbaik!";
+        return dialogs[qId] || 'Lengkapi profil agar sistem dapat memberikan rekomendasi yang akurat.';
     };
 
     const ensurerArray = (val: any): string[] => {
         if (!val) return [];
+
+        const normalizeNarrative = (input: string): string[] => {
+            if (!input) return [];
+
+            let normalized = input.replace(/\r/g, '\n').trim();
+
+            // Add virtual line breaks before common section markers to avoid one giant paragraph.
+            normalized = normalized.replace(
+                /(Syarat\s*&\s*Ketentuan|Benefit\s*Beasiswa|Dokumen\s*yang\s*Dibutuhkan|Persyaratan\s*:|Lainnya|Booklet|Informasi\s*Selengkapnya)/gi,
+                '\n$1'
+            );
+
+            return normalized
+                .split(/\n+|\|+/)
+                .map(part => part.trim())
+                .filter(Boolean);
+        };
+
         let target = val;
         // Unwrap single-item array containing a stringified list
         if (Array.isArray(target) && target.length === 1 && typeof target[0] === 'string' && target[0].trim().startsWith('[')) {
             target = target[0];
         }
         if (Array.isArray(target)) {
-            return target.map(i => String(i).replace(/[\[\]'"]/g, '').trim()).filter(Boolean);
+            return target
+                .flatMap(i => normalizeNarrative(String(i).replace(/[\[\]'"]/g, '').trim()))
+                .filter(Boolean);
         }
         if (typeof target === 'string') {
             let cleaned = target.trim();
             if (cleaned.startsWith('[') && cleaned.endsWith(']')) cleaned = cleaned.slice(1, -1);
-            return cleaned.split(/[,|\n]/).map(v => v.replace(/['"]/g, '').trim()).filter(Boolean);
+            return normalizeNarrative(cleaned.replace(/['"]/g, ''));
         }
         return [];
     };
@@ -93,27 +119,34 @@ export default function ScholraFlow() {
         match_score: raw.matchScore ? Math.round(raw.matchScore) : 0,
         matchLabel: raw.matchLabel || 'Cukup Cocok',
         img_path: raw.img_path,
-        jenis: raw.jenis
+        jenis: raw.jenis,
+        deadline_status: raw.deadline_status,
+        days_left: raw.days_left,
+        dims: raw.dims,
     });
 
     const fetchNextStep = async (updatedAnswers: Record<string, any>) => {
         setIsLoading(true);
         try {
             const response = await api.post('/scholarship/scholra', { answers: updatedAnswers });
-            const { nextQuestion, results: rawResults, remainingCount } = response.data;
+            const {
+                nextQuestion,
+                results: rawResults,
+                remainingCount,
+                validationErrors: backendValidationErrors,
+            } = response.data;
 
             const mappedResults = (rawResults || []).map(mapToResult);
 
             setCurrentQuestion(nextQuestion);
             setResults(mappedResults);
             setRemainingCount(remainingCount);
+            setValidationErrors(Array.isArray(backendValidationErrors) ? backendValidationErrors : []);
 
             if (mappedResults.length > 0) {
                 localStorage.setItem('scholarship_recommendations', JSON.stringify(mappedResults));
             }
 
-            const nextMascot = ((history.length + Date.now()) % 7) + 1;
-            setMascotState(nextMascot);
         } catch (error) {
             console.error('Scholra Error:', error);
         } finally {
@@ -145,79 +178,60 @@ export default function ScholraFlow() {
         setAnswers({});
         setHistory([]);
         setResults([]);
-        setMascotState(1);
+        setValidationErrors([]);
         fetchNextStep({});
     };
 
     return (
-        <div className="w-full max-w-6xl mx-auto flex flex-col md:flex-row gap-8 items-start mt-12 px-4">
+        <div className="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-8 mt-10 px-4">
 
-            {/* LEFT: CHARACTER & STATUS */}
-            <div className="w-full md:w-[320px] shrink-0 sticky top-32 flex flex-col gap-6">
-                <div className="relative pt-20">
-                    <AnimatePresence mode="wait">
-                        <motion.div
-                            key={getMascotDialogue()}
-                            initial={{ opacity: 0, y: 10, scale: 0.9 }}
-                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, y: -10 }}
-                            className="absolute top-0 left-1/2 -translate-x-1/2 w-[280px] bg-white p-6 rounded-[2.5rem] shadow-xl border border-blue-50 z-20"
-                        >
-                            <div className="relative">
-                                <Typography className="text-sm font-bold text-gray-800 leading-relaxed text-center">
-                                    {getMascotDialogue()}
-                                </Typography>
-                                <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent border-t-[12px] border-t-white" />
-                            </div>
-                        </motion.div>
-                    </AnimatePresence>
-
-                    <div className="bg-white rounded-[3rem] p-8 border border-gray-100 shadow-sm flex flex-col items-center relative z-10">
-                        <motion.img
-                            key={mascotState}
-                            initial={{ scale: 0.9, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            src={`/images/rekomendasi/haira-${mascotState}.png`}
-                            className="w-56 h-auto object-contain drop-shadow-2xl mb-8"
-                            alt="Haira Mascot"
-                        />
-
-                        <div className="w-full space-y-3">
-                            <div className="bg-blue-50/50 p-4 rounded-3xl flex items-center justify-between px-6 border border-blue-50">
-                                <div>
-                                    <Typography className="text-[10px] font-black text-blue-400 uppercase tracking-widest">Opsi Tersedia</Typography>
-                                    <Typography className="text-2xl font-black text-[#1B7691]">{remainingCount}</Typography>
-                                </div>
-                                <div className="p-3 bg-white rounded-2xl shadow-sm text-[#1B7691]">
-                                    <FiActivity size={20} />
-                                </div>
-                            </div>
+            <aside className="space-y-5 lg:sticky lg:top-28 h-fit">
+                <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+                    <Typography className="text-[11px] font-bold uppercase tracking-widest text-gray-500 mb-3">
+                        Ringkasan Profil
+                    </Typography>
+                    <div className="flex items-center justify-between mb-4">
+                        <Typography className="text-sm text-gray-600">Kandidat Tersedia</Typography>
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-[#1B7691]/10 text-[#1B7691] font-bold text-sm">
+                            <FiActivity size={15} /> {remainingCount}
+                        </div>
+                    </div>
+                    <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                            <Typography className="text-sm text-gray-600">Progress Profil</Typography>
+                            <Typography className="text-sm font-bold text-gray-900">
+                                {Math.min(100, Math.round((history.length / 12) * 100))}%
+                            </Typography>
+                        </div>
+                        <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
+                            <motion.div
+                                initial={{ width: 0 }}
+                                animate={{ width: `${(history.length / 12) * 100}%` }}
+                                className="h-full bg-[#1B7691]"
+                            />
                         </div>
                     </div>
                 </div>
 
-                <div className="bg-[#1B7691] p-8 rounded-[2.5rem] text-white shadow-2xl shadow-blue-900/20">
-                    <div className="flex items-center gap-3 mb-4">
-                        <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center">
-                            <FiTarget className="text-orange-400" />
-                        </div>
-                        <Typography className="text-xs font-black uppercase tracking-widest text-blue-100">Profil Accuracy</Typography>
-                    </div>
-                    <div className="flex items-end gap-2 mb-3">
-                        <Typography className="text-4xl font-black leading-none">{Math.min(100, Math.round((history.length / 6) * 100))}%</Typography>
-                    </div>
-                    <div className="h-2 w-full bg-white/10 rounded-full overflow-hidden">
-                        <motion.div
-                            initial={{ width: 0 }}
-                            animate={{ width: `${(history.length / 6) * 100}%` }}
-                            className="h-full bg-orange-400"
-                        />
-                    </div>
-                </div>
-            </div>
+                <AnimatePresence mode="wait">
+                    <motion.div
+                        key={getMascotDialogue()}
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm"
+                    >
+                        <Typography className="text-[11px] font-bold uppercase tracking-widest text-gray-500 mb-2">
+                            Panduan Langkah
+                        </Typography>
+                        <Typography className="text-sm leading-relaxed text-gray-700">
+                            {getMascotDialogue()}
+                        </Typography>
+                    </motion.div>
+                </AnimatePresence>
+            </aside>
 
-            {/* RIGHT: INTERACTIVE CARD */}
-            <div className="flex-1 w-full h-[650px] flex flex-col">
+            <section className="w-full min-h-[640px]">
                 <AnimatePresence mode="wait">
                     {isLoading ? (
                         <motion.div
@@ -225,10 +239,10 @@ export default function ScholraFlow() {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            className="flex-1 bg-white rounded-[4rem] shadow-xl border border-gray-100 p-12 flex flex-col items-center justify-center"
+                            className="h-full bg-white rounded-2xl shadow-sm border border-gray-200 p-12 flex flex-col items-center justify-center"
                         >
                             <div className="w-16 h-16 border-8 border-gray-100 border-t-[#1B7691] rounded-full animate-spin mb-6" />
-                            <Typography className="text-gray-400 font-black uppercase tracking-widest text-xs">Analyzing Database...</Typography>
+                            <Typography className="text-gray-400 font-black uppercase tracking-widest text-xs">Memproses Data Beasiswa...</Typography>
                         </motion.div>
                     ) : currentQuestion ? (
                         <motion.div
@@ -236,37 +250,66 @@ export default function ScholraFlow() {
                             initial={{ opacity: 0, x: 20 }}
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: -20 }}
-                            className="flex-1 bg-white rounded-[4rem] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.08)] border border-gray-100 overflow-hidden flex flex-col"
+                            className="h-full bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden flex flex-col"
                         >
-                            <div className="p-12 md:p-16 flex-1 flex flex-col">
-                                <div className="mb-12">
-                                    <div className="inline-flex items-center gap-2 bg-orange-50 px-4 py-2 rounded-2xl text-[#FB991A] mb-8 shadow-sm">
+                            <div className="p-8 md:p-10 flex-1 flex flex-col">
+                                <div className="mb-8">
+                                    <div className="inline-flex items-center gap-2 bg-[#1B7691]/10 px-3 py-1.5 rounded-lg text-[#1B7691] mb-5">
                                         <FiStar size={14} className="fill-current" />
-                                        <Typography className="text-[10px] font-black uppercase tracking-[0.2em]">Step {history.length + 1}</Typography>
+                                        <Typography className="text-[10px] font-black uppercase tracking-[0.2em]">Langkah {history.length + 1}</Typography>
                                     </div>
-                                    <Typography className="text-4xl md:text-5xl font-black text-gray-900 leading-[1.05] tracking-tighter">
+                                    <Typography className="text-3xl md:text-4xl font-black text-gray-900 leading-tight tracking-tight">
                                         {currentQuestion.text}
                                     </Typography>
                                 </div>
 
-                                <div className="grid grid-cols-1 gap-4 max-w-xl mt-auto">
+                                {validationErrors.length > 0 && (
+                                    <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 px-6 py-4">
+                                        <Typography className="text-xs font-black uppercase tracking-widest text-red-700 mb-2">
+                                            Periksa Data Profil
+                                        </Typography>
+                                        {validationErrors.map((message, index) => (
+                                            <Typography key={index} className="text-sm text-red-700 leading-relaxed">
+                                                {message}
+                                            </Typography>
+                                        ))}
+                                    </div>
+                                )}
+
+                                <div className="grid grid-cols-1 gap-4 max-w-2xl mt-auto">
                                     {currentQuestion.type === 'input_number' ? (
-                                        <div className="flex gap-4">
+                                        <div className="flex flex-col gap-4">
+                                            <div className="flex gap-4">
                                             <input
                                                 type="number"
-                                                step="0.01"
+                                                step={currentQuestion.id === 'umur' ? '1' : '0.01'}
                                                 value={inputValue}
                                                 onChange={(e) => setInputValue(e.target.value)}
-                                                className="flex-1 px-10 py-6 bg-gray-50 border-2 border-transparent focus:border-[#1B7691] focus:bg-white rounded-[2.5rem] outline-none font-black text-4xl transition-all shadow-inner"
-                                                placeholder="0.00"
+                                                onWheel={(e) => (e.currentTarget as HTMLInputElement).blur()}
+                                                className="flex-1 px-6 py-4 bg-gray-50 border border-gray-200 focus:border-[#1B7691] focus:bg-white rounded-xl outline-none font-bold text-2xl transition-all"
+                                                placeholder={currentQuestion.id === 'umur' ? 'Contoh: 21' : 'Contoh: 3.45'}
                                                 autoFocus
                                             />
                                             <button
-                                                onClick={() => inputValue && handleAnswer(currentQuestion.id, inputValue)}
-                                                className="w-24 bg-[#1B7691] text-white rounded-[2.5rem] font-black flex items-center justify-center shadow-2xl shadow-blue-900/30 hover:bg-[#FB991A] hover:scale-105 active:scale-95 transition-all"
+                                                onClick={() => {
+                                                    if (!inputValue) return;
+                                                    const parsed = Number.parseFloat(inputValue);
+                                                    if (Number.isNaN(parsed)) return;
+                                                    handleAnswer(currentQuestion.id, parsed);
+                                                }}
+                                                className="w-20 bg-[#1B7691] text-white rounded-xl font-black flex items-center justify-center hover:bg-[#15627a] transition-all"
                                             >
-                                                <FiCheck size={40} />
+                                                <FiCheck size={28} />
                                             </button>
+                                            </div>
+                                            {currentQuestion.id === 'ipk' && (
+                                                <button
+                                                    onClick={() => handleAnswer(currentQuestion.id, 'skip')}
+                                                    className="w-full py-3 border border-gray-200 text-gray-600 rounded-xl text-sm font-bold hover:border-[#1B7691] hover:text-[#1B7691] transition-all"
+                                                >
+                                                    Lewati untuk saat ini
+                                                </button>
+                                            )}
                                         </div>
                                     ) : (
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -277,10 +320,10 @@ export default function ScholraFlow() {
                                                     <button
                                                         key={idx}
                                                         onClick={() => handleAnswer(currentQuestion.id, value)}
-                                                        className="group w-full text-left px-8 py-5 bg-white border border-gray-100 rounded-3xl hover:border-[#1B7691] hover:bg-blue-50/10 transition-all flex items-center justify-between shadow-sm hover:shadow-xl"
+                                                        className="group w-full text-left px-5 py-4 bg-white border border-gray-200 rounded-xl hover:border-[#1B7691] hover:bg-[#1B7691]/5 transition-all flex items-center justify-between"
                                                     >
-                                                        <Typography className="font-bold text-gray-700 group-hover:text-[#1B7691] text-lg">{label}</Typography>
-                                                        <FiChevronRight size={24} className="text-gray-200 group-hover:text-[#1B7691] transition-all transform group-hover:translate-x-1" />
+                                                        <Typography className="font-bold text-gray-700 group-hover:text-[#1B7691] text-base">{label}</Typography>
+                                                        <FiChevronRight size={20} className="text-gray-300 group-hover:text-[#1B7691] transition-all transform group-hover:translate-x-1" />
                                                     </button>
                                                 );
                                             })}
@@ -288,11 +331,11 @@ export default function ScholraFlow() {
                                     )}
                                 </div>
                             </div>
-                            <div className="px-12 py-8 bg-gray-50/50 border-t border-gray-100 flex items-center justify-between">
+                            <div className="px-8 py-6 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
                                 <button
                                     onClick={handleBack}
                                     disabled={history.length === 0}
-                                    className="flex items-center gap-2 text-gray-400 hover:text-[#1B7691] font-black uppercase text-[10px] tracking-widest transition-all disabled:opacity-0"
+                                    className="flex items-center gap-2 text-gray-500 hover:text-[#1B7691] font-bold uppercase text-[11px] tracking-wider transition-all disabled:opacity-40"
                                 >
                                     <FiChevronLeft size={16} /> Kembali
                                 </button>
@@ -309,27 +352,27 @@ export default function ScholraFlow() {
                             key="final"
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
-                            className="flex-1 bg-white rounded-[4rem] shadow-2xl border border-gray-100 p-12 md:p-20 text-center flex flex-col items-center justify-center"
+                            className="h-full bg-white rounded-2xl shadow-sm border border-gray-200 p-10 md:p-14 text-center flex flex-col items-center justify-center"
                         >
-                            <div className="w-24 h-24 bg-green-50 rounded-full flex items-center justify-center mb-10 text-green-500 shadow-inner">
+                            <div className="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center mb-8 text-emerald-600">
                                 <FiCheckCircle size={56} />
                             </div>
-                            <Typography className="text-5xl font-black text-gray-900 mb-6 tracking-tighter">
-                                Analisis Berhasil!
+                            <Typography className="text-4xl font-black text-gray-900 mb-4 tracking-tight">
+                                Analisis Selesai
                             </Typography>
-                            <Typography className="text-gray-500 mb-12 max-w-sm leading-relaxed text-lg font-medium">
-                                Scholra telah berhasil menyaring database dan mengurasi 20 beasiswa paling relevan untukmu.
+                            <Typography className="text-gray-600 mb-10 max-w-lg leading-relaxed text-base font-medium">
+                                Sistem telah menyiapkan rekomendasi beasiswa berdasarkan profil yang kamu isi.
                             </Typography>
                             <div className="flex flex-col md:flex-row gap-4 w-full max-w-md">
                                 <button
                                     onClick={() => router.push('/scholra/results')}
-                                    className="flex-1 py-6 bg-[#1B7691] text-white rounded-[2.5rem] font-black text-sm uppercase tracking-[0.2em] shadow-2xl shadow-blue-900/40 hover:-translate-y-2 transition-all flex items-center justify-center gap-3 group"
+                                    className="flex-1 py-4 bg-[#1B7691] text-white rounded-xl font-black text-sm uppercase tracking-[0.15em] transition-all flex items-center justify-center gap-3 group hover:bg-[#15627a]"
                                 >
                                     Lihat Beasiswa Pilihan <FiArrowRight className="group-hover:translate-x-1 transition-transform" />
                                 </button>
                                 <button
                                     onClick={reset}
-                                    className="w-full md:w-auto px-10 py-6 bg-gray-100 text-gray-500 rounded-[2.5rem] font-black text-xs uppercase tracking-widest hover:bg-gray-200 transition-all"
+                                    className="w-full md:w-auto px-8 py-4 bg-gray-100 text-gray-600 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-gray-200 transition-all"
                                 >
                                     Ulangi
                                 </button>
@@ -337,7 +380,7 @@ export default function ScholraFlow() {
                         </motion.div>
                     )}
                 </AnimatePresence>
-            </div>
+            </section>
         </div>
     );
 }

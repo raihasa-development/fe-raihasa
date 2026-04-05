@@ -21,8 +21,6 @@ const nextConfig: NextConfig = {
       { source: "/profile", destination: "/profile/notification", permanent: false },
       { source: "/scholarship-recommendation/:path*", destination: "/maintenance", permanent: false },
       { source: "/scholarship-recommendation", destination: "/maintenance", permanent: false },
-      { source: "/scholra/:path*", destination: "/maintenance", permanent: false },
-      { source: "/scholra", destination: "/maintenance", permanent: false },
       { source: "/rekomendasi-beasiswa/:path*", destination: "/maintenance", permanent: false },
       { source: "/rekomendasi-beasiswa", destination: "/maintenance", permanent: false },
     ];

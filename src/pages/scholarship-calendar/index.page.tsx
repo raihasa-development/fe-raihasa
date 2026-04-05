@@ -1,5 +1,6 @@
 
 import 'react-big-calendar/lib/css/react-big-calendar.css';
+import 'leaflet/dist/leaflet.css';
 
 import { useQuery } from '@tanstack/react-query';
 import moment from 'moment';
@@ -8,8 +9,8 @@ import { useRouter } from 'next/router';
 import React, { useMemo, useState } from 'react';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import {
-  FiCalendar, FiChevronLeft, FiChevronRight, FiFilter, FiDownload,
-  FiSearch, FiX, FiInfo, FiClock, FiMapPin, FiLayers, FiFlag
+  FiChevronLeft, FiChevronRight, FiFilter, FiDownload,
+  FiSearch, FiX, FiClock, FiLayers, FiFlag, FiGlobe
 } from 'react-icons/fi';
 
 import SEO from '@/components/SEO';
@@ -17,7 +18,6 @@ import Typography from '@/components/Typography';
 import api from '@/lib/api';
 import Layout from '@/layouts/Layout';
 import { ApiReturn } from '@/types/api';
-import { GetServerSideProps } from 'next';
 
 moment.locale('id'); // Set locale to Indonesian
 const localizer = momentLocalizer(moment);
@@ -36,6 +36,8 @@ type ScholarshipData = {
   img_path: string | null;
   benefit: string;
   is_pinned: boolean;
+  asal_daerah?: string | null;
+  schema_type?: 'DALAM_NEGERI' | 'LUAR_NEGERI';
 };
 
 type CalendarEvent = {
@@ -47,6 +49,14 @@ type CalendarEvent = {
   isClosingSoon?: boolean;
 };
 
+type GlobePoint = {
+  key: string;
+  label: string;
+  lat: number;
+  lon: number;
+  count: number;
+};
+
 const months = [
   'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
   'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
@@ -55,14 +65,107 @@ const months = [
 const currentYear = new Date().getFullYear();
 const years = Array.from({ length: 5 }, (_, i) => currentYear - 1 + i);
 
-export const getServerSideProps: GetServerSideProps = async () => {
-  return {
-    redirect: {
-      destination: '/coming-soon',
-      permanent: false,
-    },
-  };
-};
+const REGION_REFERENCE = [
+  { key: 'indonesia', label: 'Indonesia', lat: -2.5, lon: 118, matches: ['indonesia', 'jakarta', 'jawa', 'sumatera', 'kalimantan', 'sulawesi', 'papua'] },
+  { key: 'asia', label: 'Asia', lat: 28, lon: 102, matches: ['china', 'jepang', 'korea', 'singapura', 'malaysia', 'arab', 'emirat', 'turki', 'asean'] },
+  { key: 'oceania', label: 'Australia/Oceania', lat: -26, lon: 135, matches: ['australia', 'new zealand', 'manaaki'] },
+  { key: 'europe', label: 'Eropa', lat: 51, lon: 12, matches: ['inggris', 'uk', 'belanda', 'jerman', 'prancis', 'hungaria', 'europe', 'eropa'] },
+  { key: 'americas', label: 'Amerika', lat: 38, lon: -98, matches: ['amerika', 'usa', 'canada'] },
+  { key: 'global', label: 'Global/Multinegara', lat: 10, lon: 0, matches: ['global', 'internasional', 'asing', 'dunia'] },
+];
+
+function ScholarshipRegionPanel({ points }: { points: GlobePoint[] }) {
+  const mapRef = React.useRef<HTMLDivElement | null>(null);
+  const mapInstanceRef = React.useRef<any>(null);
+  const markerLayerRef = React.useRef<any>(null);
+
+  const total = points.reduce((sum, point) => sum + point.count, 0);
+  const top = points.slice(0, 6);
+  const maxCount = Math.max(...top.map((point) => point.count), 1);
+
+  React.useEffect(() => {
+    let destroyed = false;
+
+    async function renderMap() {
+      if (!mapRef.current) return;
+
+      const L = await import('leaflet');
+      if (destroyed || !mapRef.current) return;
+
+      if (!mapInstanceRef.current) {
+        mapInstanceRef.current = L.map(mapRef.current, {
+          center: [10, 108],
+          zoom: 2,
+          minZoom: 2,
+          maxZoom: 5,
+          worldCopyJump: true,
+          maxBoundsViscosity: 0.8,
+          zoomControl: false,
+          attributionControl: false,
+        });
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19,
+        }).addTo(mapInstanceRef.current);
+      }
+
+      const map = mapInstanceRef.current;
+
+      if (!markerLayerRef.current) {
+        markerLayerRef.current = L.layerGroup().addTo(map);
+      }
+      markerLayerRef.current.clearLayers();
+
+      top.forEach((point) => {
+        if (!Number.isFinite(point.lat) || !Number.isFinite(point.lon)) return;
+
+        const radius = Math.min(22, 8 + point.count * 1.3);
+        const pct = total > 0 ? Math.round((point.count / total) * 100) : 0;
+
+        L.circleMarker([point.lat, point.lon], {
+          radius,
+          color: '#0f5b73',
+          weight: 1,
+          fillColor: '#1B7691',
+          fillOpacity: 0.65,
+        })
+          .bindTooltip(`<strong>${point.label}</strong><br/>${point.count} beasiswa (${pct}%)`, {
+            direction: 'top',
+            sticky: true,
+          })
+          .addTo(markerLayerRef.current);
+      });
+
+      map.setView([10, 108], 2);
+    }
+
+    renderMap();
+
+    return () => {
+      destroyed = true;
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+        markerLayerRef.current = null;
+      }
+    };
+  }, [top, total]);
+
+  return (
+    <div className="space-y-4">
+      <div className="rounded-2xl border border-gray-100 bg-gradient-to-b from-slate-50 to-white p-4">
+        <Typography className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-3">
+          Peta Distribusi Beasiswa
+        </Typography>
+        <div className="relative mx-auto h-[360px] w-[360px] max-w-full rounded-full border border-slate-200 overflow-hidden shadow-[0_20px_45px_rgba(11,52,70,0.2)] bg-sky-50">
+          <div ref={mapRef} className="absolute inset-0" />
+          <div className="pointer-events-none absolute inset-0 rounded-full bg-[radial-gradient(circle_at_35%_30%,rgba(255,255,255,0.4),rgba(255,255,255,0)_45%),radial-gradient(circle_at_65%_70%,rgba(2,132,199,0.16),rgba(15,23,42,0.22))]" />
+          <div className="pointer-events-none absolute -bottom-8 left-1/2 h-12 w-3/4 -translate-x-1/2 rounded-full bg-slate-900/20 blur-lg" />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function ScholarshipCalendarPage() {
   const router = useRouter();
@@ -170,8 +273,40 @@ export default function ScholarshipCalendarPage() {
     };
   }, [events, selectedMonth, selectedYear]);
 
+  const globePoints: GlobePoint[] = useMemo(() => {
+    if (!scholarshipData?.data?.length) return [];
+
+    const counts = new Map<string, GlobePoint>();
+
+    scholarshipData.data.forEach((item) => {
+      const rawSource = `${item.asal_daerah || ''} ${item.penyelenggara || ''}`.toLowerCase();
+      const fallbackKey = item.schema_type === 'LUAR_NEGERI' ? 'global' : 'indonesia';
+
+      const matchedRegion = REGION_REFERENCE.find((region) =>
+        region.matches.some((keyword) => rawSource.includes(keyword)),
+      ) || REGION_REFERENCE.find((region) => region.key === fallbackKey);
+
+      if (!matchedRegion) return;
+
+      const existing = counts.get(matchedRegion.key);
+      if (existing) {
+        existing.count += 1;
+      } else {
+        counts.set(matchedRegion.key, {
+          key: matchedRegion.key,
+          label: matchedRegion.label,
+          lat: matchedRegion.lat,
+          lon: matchedRegion.lon,
+          count: 1,
+        });
+      }
+    });
+
+    return Array.from(counts.values()).sort((a, b) => b.count - a.count);
+  }, [scholarshipData]);
+
   const handleSelectEvent = (event: CalendarEvent) => {
-    router.push(`/scholarship-recommendation/${event.id}`);
+    router.push(`/list-scholarship/${event.id}`);
   };
 
   const eventStyleGetter = (event: CalendarEvent) => {
@@ -667,6 +802,34 @@ export default function ScholarshipCalendarPage() {
               </div>
             </div>
           </div>
+
+          <section className="mt-12 bg-white rounded-3xl border border-gray-200 shadow-sm p-8">
+            <div className="flex flex-col lg:flex-row gap-10 items-start">
+              <div className="lg:w-1/3">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-[#1B7691]/10 text-[#1B7691] text-xs font-bold uppercase tracking-wider mb-4">
+                  <FiGlobe /> Distribusi Asal Beasiswa
+                </div>
+                <Typography className="text-2xl font-black text-gray-900 mb-3 leading-tight">
+                  Cakupan Geografis Database
+                </Typography>
+                <Typography className="text-sm text-gray-600 leading-relaxed mb-5">
+                  Visual ini menampilkan persebaran asal penyelenggara atau wilayah sasaran beasiswa berdasarkan data yang tersedia di database saat ini.
+                </Typography>
+                <div className="space-y-2">
+                  {globePoints.map((point) => (
+                    <div key={point.key} className="flex items-center justify-between text-sm border border-gray-100 rounded-lg px-3 py-2">
+                      <span className="text-gray-700 font-medium">{point.label}</span>
+                      <span className="text-[#1B7691] font-bold">{point.count}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="lg:w-2/3 w-full">
+                <ScholarshipRegionPanel points={globePoints} />
+              </div>
+            </div>
+          </section>
 
           {/* Hover Tooltip (Portal Lookalike) */}
           {hoveredEvent && (
