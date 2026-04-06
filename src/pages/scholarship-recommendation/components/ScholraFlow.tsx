@@ -32,6 +32,7 @@ interface ScholarshipResult {
     deadline_status?: 'open' | 'soon' | 'urgent' | 'closed' | 'unknown';
     days_left?: number | null;
     dims?: Record<string, number>;
+    insights?: string[];
 }
 
 export default function ScholraFlow() {
@@ -123,6 +124,7 @@ export default function ScholraFlow() {
         deadline_status: raw.deadline_status,
         days_left: raw.days_left,
         dims: raw.dims,
+        insights: raw.insights || [],
     });
 
     const fetchNextStep = async (updatedAnswers: Record<string, any>) => {

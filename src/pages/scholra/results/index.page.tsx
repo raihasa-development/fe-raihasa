@@ -25,6 +25,7 @@ interface Scholarship {
     deadline_status?: 'open' | 'soon' | 'urgent' | 'closed' | 'unknown';
     days_left?: number | null;
     dims?: Record<string, number>;
+    insights?: string[];
 }
 
 const DIMENSION_LABELS: Record<string, string> = {
@@ -39,6 +40,9 @@ const DIMENSION_LABELS: Record<string, string> = {
     bahasa_match: 'Kesesuaian Sertifikat Bahasa',
     benefit_level: 'Tingkat Benefit',
     double_penalty: 'Kebijakan Beasiswa Rangkap',
+    deadline_urgency: 'Urgensi Deadline',
+    semester_match: 'Kesesuaian Semester',
+    benefit_richness: 'Kelengkapan Benefit',
 };
 
 const getDeadlineBadge = (status?: Scholarship['deadline_status'], daysLeft?: number | null) => {
@@ -163,7 +167,21 @@ const ScholraResultsPage = () => {
                                             {item.title}
                                         </Typography>
                                         {item.provider && !['unknown', 'tidak diketahui', '-', 'Unknown'].includes(item.provider.toLowerCase()) && (
-                                            <p className="text-xs text-gray-500 font-semibold mb-5 line-clamp-1">{item.provider}</p>
+                                            <p className="text-xs text-gray-500 font-semibold mb-3 line-clamp-1">{item.provider}</p>
+                                        )}
+
+                                        {/* Personalized Insights */}
+                                        {item.insights && item.insights.length > 0 && (
+                                            <div className="flex flex-wrap gap-1.5 mb-4">
+                                                {item.insights.map((insight, i) => (
+                                                    <span
+                                                        key={i}
+                                                        className="inline-flex items-center px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 text-[10px] font-bold border border-emerald-100"
+                                                    >
+                                                        {insight}
+                                                    </span>
+                                                ))}
+                                            </div>
                                         )}
 
                                         <div className="mt-auto space-y-4">
@@ -197,7 +215,7 @@ const ScholraResultsPage = () => {
                                             {item.dims && Object.keys(item.dims).length > 0 && (
                                                 <div className="rounded-2xl border border-gray-100 bg-white p-4">
                                                     <Typography className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-3">
-                                                        Breakdown 11 Dimensi
+                                                        Breakdown {Object.keys(DIMENSION_LABELS).length} Dimensi
                                                     </Typography>
                                                     <div className="space-y-2 max-h-52 overflow-auto pr-1">
                                                         {Object.entries(DIMENSION_LABELS).map(([key, label]) => {
