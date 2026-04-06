@@ -55,6 +55,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.13",
     "@types/aos": "^3.0.7",
+    "@types/leaflet": "^1.9.21",
     "@types/lodash.get": "^4.4.9",
     "@types/next-seo": "^2.1.2",
     "@types/node": "^20",
