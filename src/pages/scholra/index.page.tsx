@@ -43,54 +43,8 @@ const ScholraTestingPage = () => {
                     </div>
 
                     {/* The Interactive Flow Area */}
-                    <div className="mb-32">
+                    <div className="mb-10">
                         <ScholraFlow />
-                    </div>
-
-                    {/* Information Sections - Moved to the very bottom as requested */}
-                    <div className="max-w-5xl mx-auto">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 border-t border-gray-100 pt-20">
-                            <div className="space-y-4">
-                                <div className="w-12 h-12 bg-blue-50 text-[#1B7691] rounded-2xl flex items-center justify-center text-xl shadow-inner">
-                                    <FiTarget />
-                                </div>
-                                <h4 className="font-black text-gray-900 text-base uppercase tracking-wider">Jawab Singkat</h4>
-                                <p className="text-sm text-gray-500 leading-relaxed font-medium">
-                                    Scholra akan menanyakan hal-hal krusial tentang profilmu. Cukup beberapa klik untuk hasil akurat.
-                                </p>
-                            </div>
-                            <div className="space-y-4">
-                                <div className="w-12 h-12 bg-orange-50 text-[#FB991A] rounded-2xl flex items-center justify-center text-xl shadow-inner">
-                                    <FiDatabase />
-                                </div>
-                                <h4 className="font-black text-gray-900 text-base uppercase tracking-wider">Filtering Otomatis</h4>
-                                <p className="text-sm text-gray-500 leading-relaxed font-medium">
-                                    Setiap jawaban akan menyaring ribuan data beasiswa di database kami secara instan.
-                                </p>
-                            </div>
-                            <div className="space-y-4">
-                                <div className="w-12 h-12 bg-green-50 text-green-600 rounded-2xl flex items-center justify-center text-xl shadow-inner">
-                                    <FiAward />
-                                </div>
-                                <h4 className="font-black text-gray-900 text-base uppercase tracking-wider">Hasil Akurat</h4>
-                                <p className="text-sm text-gray-500 leading-relaxed font-medium">
-                                    Dapatkan daftar beasiswa yang paling relevan dan segera daftarkan dirimu.
-                                </p>
-                            </div>
-                        </div>
-
-                        {/* Fun Fact Area - Subtle at the bottom */}
-                        <div className="mt-20 p-8 rounded-3xl bg-gray-50 border border-gray-100 flex flex-col md:flex-row items-center justify-between gap-6">
-                            <div className="flex items-center gap-4">
-                                <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm text-[#FB991A]">
-                                    💡
-                                </div>
-                                <p className="text-xs text-gray-500 font-bold uppercase tracking-widest leading-relaxed">
-                                    Tahukah kamu? Database Raihasa memiliki lebih dari 1000+ beasiswa aktif.
-                                </p>
-                            </div>
-                            <Typography className="text-[10px] font-black text-gray-400">UPDATED WEEKLY • VERIFIED SOURCES</Typography>
-                        </div>
                     </div>
                 </div>
             </main>
