@@ -11,7 +11,11 @@ interface Question {
     id: string;
     text: string;
     options?: any[];
-    type?: 'input_number' | 'select' | 'text';
+    type?: 'input_number' | 'input_text' | 'select' | 'text';
+    placeholder?: string;
+    hint?: string;
+    skipLabel?: string;
+    skipValue?: string;
 }
 
 interface ScholarshipResult {
@@ -55,10 +59,10 @@ const ScholraMascot = ({ isThinking }: { isThinking: boolean }) => {
                     className="w-full h-full object-contain"
                 />
             </AnimatePresence>
-            
+
             {/* Thinking particles */}
             {isThinking && (
-                <motion.div 
+                <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
@@ -150,11 +154,11 @@ export default function ScholraFlow() {
         <div className="w-full max-w-5xl mx-auto px-4 mt-8 pb-10" style={{ fontFamily: '"Poppins", sans-serif' }}>
             {/* Gamified Workspace Area */}
             <div className="flex flex-col md:flex-row items-center md:items-start justify-center gap-10 md:gap-16">
-                
+
                 {/* Visual Mascot */}
                 <div className="w-full md:w-5/12 flex flex-col items-center justify-center md:sticky md:top-24">
                     <ScholraMascot isThinking={isLoading} />
-                    
+
                     {/* Back Button positioned casually under the mascot */}
                     <AnimatePresence>
                         {history.length > 0 && currentQuestion && !isLoading && (
@@ -197,7 +201,7 @@ export default function ScholraFlow() {
                                 <div className="relative bg-white rounded-3xl p-8 md:p-10 shadow-[0_10px_40px_rgb(0,0,0,0.06)] border border-gray-100">
                                     {/* Triangle pointer to Mascot */}
                                     <div className="hidden md:block absolute top-[50%] left-[-18px] w-0 h-0 border-y-[16px] border-y-transparent border-r-[18px] border-r-white -translate-y-1/2 drop-shadow-[-2px_0px_2px_rgba(0,0,0,0.02)]" />
-                                    
+
                                     <Typography className="text-2xl md:text-3xl font-black text-[#1B7691] leading-tight text-center md:text-left">
                                         "{currentQuestion.text}"
                                     </Typography>
@@ -206,32 +210,93 @@ export default function ScholraFlow() {
                                 {/* Gamified Options */}
                                 <div className="grid grid-cols-1 gap-3 md:pl-6 w-full">
                                     {currentQuestion.type === 'input_number' ? (
-                                        <div className="flex flex-col sm:flex-row gap-3">
-                                            <input
-                                                type="text"
-                                                inputMode="decimal"
-                                                value={inputValue}
-                                                onChange={(e) => {
-                                                    // Allow only digits and optional decimal point
-                                                    if (/^[0-9.]*$/.test(e.target.value)) {
-                                                        setInputValue(e.target.value);
-                                                    }
-                                                }}
-                                                className="flex-1 px-8 py-5 bg-white/60 backdrop-blur-md border border-gray-200/60 rounded-2xl text-2xl font-black text-center text-gray-800 outline-none focus:ring-4 focus:ring-[#1B7691]/20 focus:bg-white shadow-sm transition-all"
-                                                placeholder={currentQuestion.id === 'umur' ? 'Contoh: 21' : 'Contoh: 3.45'}
-                                                autoFocus
-                                            />
-                                            <button
-                                                onClick={() => {
-                                                    if (!inputValue) return;
-                                                    const parsed = Number.parseFloat(inputValue);
-                                                    if (Number.isNaN(parsed)) return;
-                                                    handleAnswer(currentQuestion.id, parsed);
-                                                }}
-                                                className="px-10 py-5 bg-gradient-to-r from-[#1B7691] to-[#15627a] text-white rounded-2xl font-black hover:scale-105 active:scale-95 transition-all shadow-[0_10px_20px_rgba(27,118,145,0.3)] flex justify-center items-center"
-                                            >
-                                                <FiCheck size={32} />
-                                            </button>
+                                        <div className="flex flex-col gap-3">
+                                            {currentQuestion.hint && (
+                                                <p className="text-xs text-gray-400 font-medium px-1">{currentQuestion.hint}</p>
+                                            )}
+                                            <div className="flex flex-col sm:flex-row gap-3">
+                                                <input
+                                                    type="text"
+                                                    inputMode="decimal"
+                                                    value={inputValue}
+                                                    onChange={(e) => {
+                                                        if (/^[0-9.]*$/.test(e.target.value)) {
+                                                            setInputValue(e.target.value);
+                                                        }
+                                                    }}
+                                                    className="flex-1 px-8 py-5 bg-white/60 backdrop-blur-md border border-gray-200/60 rounded-2xl text-2xl font-black text-center text-gray-800 outline-none focus:ring-4 focus:ring-[#1B7691]/20 focus:bg-white shadow-sm transition-all"
+                                                    placeholder={currentQuestion.placeholder || (currentQuestion.id === 'umur' ? 'Contoh: 21' : 'Contoh: 3.45')}
+                                                    autoFocus
+                                                />
+                                                <button
+                                                    onClick={() => {
+                                                        if (!inputValue) return;
+                                                        const parsed = Number.parseFloat(inputValue);
+                                                        if (Number.isNaN(parsed)) return;
+                                                        handleAnswer(currentQuestion.id, parsed);
+                                                    }}
+                                                    className="px-10 py-5 bg-gradient-to-r from-[#1B7691] to-[#15627a] text-white rounded-2xl font-black hover:scale-105 active:scale-95 transition-all shadow-[0_10px_20px_rgba(27,118,145,0.3)] flex justify-center items-center"
+                                                >
+                                                    <FiCheck size={32} />
+                                                </button>
+                                            </div>
+                                            {/* Skip button for optional number fields */}
+                                            {currentQuestion.skipLabel && (
+                                                <button
+                                                    onClick={() => handleAnswer(currentQuestion.id, currentQuestion.skipValue || 'skip')}
+                                                    className="mt-1 px-6 py-3 text-gray-400 font-bold hover:text-gray-700 hover:bg-white/50 rounded-xl transition-all text-sm"
+                                                >
+                                                    {currentQuestion.skipLabel}
+                                                </button>
+                                            )}
+                                            {/* Legacy IPK skip */}
+                                            {currentQuestion.id === 'ipk' && !currentQuestion.skipLabel && (
+                                                <button
+                                                    onClick={() => handleAnswer(currentQuestion.id, 'skip')}
+                                                    className="mt-1 px-6 py-3 text-gray-400 font-bold hover:text-gray-700 hover:bg-white/50 rounded-xl transition-all"
+                                                >
+                                                    Lewati (Belum Ada IPK)
+                                                </button>
+                                            )}
+                                        </div>
+                                    ) : currentQuestion.type === 'input_text' ? (
+                                        <div className="flex flex-col gap-3">
+                                            {currentQuestion.hint && (
+                                                <p className="text-xs text-gray-400 font-medium px-1">{currentQuestion.hint}</p>
+                                            )}
+                                            <div className="flex flex-col sm:flex-row gap-3">
+                                                <input
+                                                    type="text"
+                                                    value={inputValue}
+                                                    onChange={(e) => setInputValue(e.target.value)}
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === 'Enter' && inputValue.trim()) {
+                                                            handleAnswer(currentQuestion.id, inputValue.trim());
+                                                        }
+                                                    }}
+                                                    className="flex-1 px-8 py-5 bg-white/60 backdrop-blur-md border border-gray-200/60 rounded-2xl text-xl font-bold text-gray-800 outline-none focus:ring-4 focus:ring-[#1B7691]/20 focus:bg-white shadow-sm transition-all"
+                                                    placeholder={currentQuestion.placeholder || 'Ketik jawabanmu...'}
+                                                    autoFocus
+                                                />
+                                                <button
+                                                    onClick={() => {
+                                                        if (!inputValue.trim()) return;
+                                                        handleAnswer(currentQuestion.id, inputValue.trim());
+                                                    }}
+                                                    className="px-10 py-5 bg-gradient-to-r from-[#1B7691] to-[#15627a] text-white rounded-2xl font-black hover:scale-105 active:scale-95 transition-all shadow-[0_10px_20px_rgba(27,118,145,0.3)] flex justify-center items-center"
+                                                >
+                                                    <FiCheck size={32} />
+                                                </button>
+                                            </div>
+                                            {/* Skip button for optional text fields */}
+                                            {currentQuestion.skipLabel && (
+                                                <button
+                                                    onClick={() => handleAnswer(currentQuestion.id, currentQuestion.skipValue || 'skip')}
+                                                    className="mt-1 px-6 py-3 text-gray-400 font-bold hover:text-gray-700 hover:bg-white/50 rounded-xl transition-all text-sm"
+                                                >
+                                                    {currentQuestion.skipLabel}
+                                                </button>
+                                            )}
                                         </div>
                                     ) : (
                                         currentQuestion.options?.map((opt: any, idx: number) => {
@@ -249,16 +314,6 @@ export default function ScholraFlow() {
                                                 </button>
                                             );
                                         })
-                                    )}
-
-                                    {/* Skip option nicely styled */}
-                                    {currentQuestion.id === 'ipk' && (
-                                        <button
-                                            onClick={() => handleAnswer(currentQuestion.id, 'skip')}
-                                            className="mt-3 px-6 py-3 text-gray-400 font-bold hover:text-gray-700 hover:bg-white/50 rounded-xl transition-all"
-                                        >
-                                            Lewati (Belum Ada IPK)
-                                        </button>
                                     )}
                                 </div>
                             </motion.div>
@@ -279,7 +334,7 @@ export default function ScholraFlow() {
                                 <Typography className="text-white/90 max-w-md mx-auto leading-relaxed text-lg font-medium mb-10">
                                     Berdasarkan jawabanmu, kami menemukan kandidat unggulan dari database beasiswa.
                                 </Typography>
-                                
+
                                 <button
                                     onClick={() => router.push('/scholra/results')}
                                     className="w-full sm:w-auto px-10 py-5 bg-white text-[#1B7691] rounded-2xl font-black text-base uppercase tracking-widest shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-3 relative z-10"
@@ -290,15 +345,15 @@ export default function ScholraFlow() {
                         )}
                     </AnimatePresence>
 
-                     {/* Dot Progress Indicator at bottom of the column */}
+                    {/* Dot Progress Indicator at bottom of the column */}
                     {currentQuestion && !isLoading && (
                         <div className="absolute -bottom-16 left-0 right-0 flex justify-center gap-2">
-                             {Array.from({ length: 12 }).map((_, i) => (
-                                 <div 
-                                    key={i} 
-                                    className={`h-2 rounded-full transition-all duration-500 ${i < history.length ? 'w-6 bg-[#1B7691]' : i === history.length ? 'w-8 bg-[#FB991A]' : 'w-2 bg-gray-200'}`} 
-                                 />
-                             ))}
+                            {Array.from({ length: 17 }).map((_, i) => (
+                                <div
+                                    key={i}
+                                    className={`h-2 rounded-full transition-all duration-500 ${i < history.length ? 'w-6 bg-[#1B7691]' : i === history.length ? 'w-8 bg-[#FB991A]' : 'w-2 bg-gray-200'}`}
+                                />
+                            ))}
                         </div>
                     )}
                 </div>

@@ -43,7 +43,11 @@ const DIMENSION_LABELS: Record<string, string> = {
     deadline_urgency: 'Urgensi Pendaftaran',
     semester_match: 'Kesesuaian Semester',
     benefit_richness: 'Kelengkapan Benefit',
+    kampus_match: 'Eligibilitas Kampus',
+    daerah_match: 'Prioritas Daerah',
+    skor_bahasa_match: 'Skor Bahasa',
 };
+
 
 const getDeadlineBadge = (status?: Scholarship['deadline_status'], daysLeft?: number | null) => {
     if (status === 'urgent' && typeof daysLeft === 'number') {
