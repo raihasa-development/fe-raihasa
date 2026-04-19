@@ -9,7 +9,7 @@ import { useRouter } from 'next/router';
 import React, { useMemo, useState } from 'react';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import {
-  FiChevronLeft, FiChevronRight, FiFilter, FiDownload,
+  FiChevronLeft, FiChevronRight, FiFilter,
   FiSearch, FiX, FiClock, FiLayers, FiFlag, FiGlobe
 } from 'react-icons/fi';
 
@@ -589,14 +589,6 @@ export default function ScholarshipCalendarPage() {
                 <FiLayers />
                 Lihat Daftar
               </button>
-              <button
-                onClick={handleExportCalendar}
-                className="flex items-center gap-2 px-6 py-2.5 rounded-xl font-medium text-sm transition-all duration-300 bg-white text-gray-700 border border-gray-200 hover:border-[#1B7691] hover:text-[#1B7691] shadow-sm hover:shadow-md hidden md:flex"
-              >
-                <FiDownload />
-                Ekspor Kalender
-              </button>
-              <div className="h-8 w-[1px] bg-gray-300 mx-1 hidden md:block"></div>
               <div className="bg-white p-1 rounded-xl border border-gray-200 shadow-sm flex items-center">
                 <button
                   onClick={() => setShowPinnedOnly(false)}

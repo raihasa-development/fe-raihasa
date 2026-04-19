@@ -4,13 +4,10 @@ import {
   FiBookOpen,
   FiCheckCircle,
   FiClock,
-  FiEdit3,
   FiLock,
-  FiMessageCircle,
   FiSearch,
-  FiTrendingUp,
   FiUnlock,
-  FiUsers,
+  FiCalendar,
 } from 'react-icons/fi';
 
 import withAuth from '@/components/hoc/withAuth';
@@ -19,7 +16,6 @@ import SEO from '@/components/SEO';
 import Typography from '@/components/Typography';
 import Layout from '@/layouts/Layout';
 import api from '@/lib/api';
-import { forumApi } from '@/lib/api/forum';
 import { getToken } from '@/lib/cookies';
 import useAuthStore from '@/store/useAuthStore';
 
@@ -59,8 +55,6 @@ function UserHomePage() {
     loading: true,
   });
 
-  const [userTokens, setUserTokens] = useState<number | null>(null);
-  const [forumSummary, setForumSummary] = useState({ posts: 0, categories: 0 });
   const [lastViewed, setLastViewed] = useState<any>(null);
 
   useEffect(() => {
@@ -118,45 +112,8 @@ function UserHomePage() {
       }
     };
 
+
     checkMembership();
-  }, []);
-
-  useEffect(() => {
-    const fetchDreamshubSummary = async () => {
-      try {
-        const [posts, categories] = await Promise.all([
-          forumApi.getPosts({ page: 1, limit: 1 }),
-          forumApi.getCategories(),
-        ]);
-
-        setForumSummary({
-          posts: posts.metadata?.total || 0,
-          categories: categories.length,
-        });
-      } catch {
-        setForumSummary({ posts: 0, categories: 0 });
-      }
-
-      try {
-        const token = getToken();
-        if (!token) return;
-
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_API_URL}/posts/tokens/me`,
-          { headers: { Authorization: `Bearer ${token}` } },
-        );
-
-        if (response.ok) {
-          const json = await response.json();
-          const count = json.data?.forum_tokens ?? json.data?.token ?? 0;
-          setUserTokens(Number(count));
-        }
-      } catch {
-        setUserTokens(null);
-      }
-    };
-
-    fetchDreamshubSummary();
   }, []);
 
   useEffect(() => {
@@ -197,7 +154,7 @@ function UserHomePage() {
                 Selamat datang, {firstName}!
               </Typography>
               <Typography className='text-blue-100 text-base md:text-lg max-w-3xl leading-relaxed'>
-                Pusat aktivitas Raihasa untuk lanjut belajar di BISA Learning dan membangun koneksi di Dreamshub.
+                Pantau perkembangan belajarmu di BISA Learning dan temukan beasiswa yang sesuai dengan profilmu.
               </Typography>
             </div>
           </section>
@@ -251,31 +208,25 @@ function UserHomePage() {
             </div>
           </section>
 
-          <section className='grid grid-cols-2 md:grid-cols-4 gap-4 mb-8'>
+          <section className='grid grid-cols-2 md:grid-cols-3 gap-4 mb-8'>
             {[
               {
                 icon: FiBookOpen,
-                label: 'Total Modul',
+                label: 'Total Modul Belajar',
                 value: String(courses.length),
                 tone: 'bg-blue-50 text-[#1B7691]',
               },
               {
-                icon: FiTrendingUp,
-                label: 'Forum Post',
-                value: String(forumSummary.posts),
+                icon: FiSearch,
+                label: 'Total Beasiswa',
+                value: '92+',
                 tone: 'bg-emerald-50 text-emerald-700',
               },
               {
-                icon: FiUsers,
-                label: 'Kategori Forum',
-                value: String(forumSummary.categories),
-                tone: 'bg-indigo-50 text-indigo-700',
-              },
-              {
                 icon: membership.active ? FiUnlock : FiLock,
-                label: 'Dreamshub Token',
-                value: userTokens !== null ? String(userTokens) : '-',
-                tone: 'bg-amber-50 text-amber-700',
+                label: 'Status Membership',
+                value: membership.loading ? '...' : membership.active ? 'Aktif' : 'Belum Aktif',
+                tone: membership.active ? 'bg-green-50 text-green-700' : 'bg-amber-50 text-amber-700',
               },
             ].map((item) => (
               <article key={item.label} className='bg-white border border-gray-200 rounded-2xl p-4 shadow-sm'>
@@ -293,26 +244,26 @@ function UserHomePage() {
           <section className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
             <div className='space-y-6'>
               <article className='bg-white border border-gray-200 rounded-2xl p-6 shadow-sm'>
-                <Typography className='text-xl font-bold text-gray-900 mb-4'>Aksi Cepat</Typography>
+                <Typography className='text-xl font-bold text-gray-900 mb-4'>Akses Cepat</Typography>
                 <div className='space-y-3'>
                   <ButtonLink href={learningLandingHref} className='w-full flex items-center justify-between rounded-xl border border-gray-200 px-4 py-3 hover:border-[#1B7691]/30 hover:bg-[#1B7691]/5 transition-colors'>
                     <span className='inline-flex items-center gap-2 text-sm font-semibold text-gray-800'>
                       {learningLocked ? <FiLock className='w-4 h-4 text-amber-600' /> : <FiBookOpen className='w-4 h-4 text-[#1B7691]' />}
-                      {learningLocked ? 'BISA Learning (Terkunci)' : 'Buka BISA Learning'}
+                      {learningLocked ? 'BISA Learning (Terkunci)' : 'BISA Learning'}
                     </span>
                     <FiArrowRight className='w-4 h-4 text-gray-400' />
                   </ButtonLink>
 
-                  <ButtonLink href='/dreamshub' className='w-full flex items-center justify-between rounded-xl border border-gray-200 px-4 py-3 hover:border-[#1B7691]/30 hover:bg-[#1B7691]/5 transition-colors'>
+                  <ButtonLink href='/scholra' className='w-full flex items-center justify-between rounded-xl border border-gray-200 px-4 py-3 hover:border-[#1B7691]/30 hover:bg-[#1B7691]/5 transition-colors'>
                     <span className='inline-flex items-center gap-2 text-sm font-semibold text-gray-800'>
-                      <FiMessageCircle className='w-4 h-4 text-[#1B7691]' /> Masuk Dreamshub
+                      <FiSearch className='w-4 h-4 text-[#1B7691]' /> Cari Beasiswa (Scholra)
                     </span>
                     <FiArrowRight className='w-4 h-4 text-gray-400' />
                   </ButtonLink>
 
-                  <ButtonLink href='/dreamshub/create' className='w-full flex items-center justify-between rounded-xl border border-gray-200 px-4 py-3 hover:border-[#1B7691]/30 hover:bg-[#1B7691]/5 transition-colors'>
+                  <ButtonLink href='/scholarship-calendar' className='w-full flex items-center justify-between rounded-xl border border-gray-200 px-4 py-3 hover:border-[#1B7691]/30 hover:bg-[#1B7691]/5 transition-colors'>
                     <span className='inline-flex items-center gap-2 text-sm font-semibold text-gray-800'>
-                      <FiEdit3 className='w-4 h-4 text-[#1B7691]' /> Buat Diskusi Baru
+                      <FiCalendar className='w-4 h-4 text-[#1B7691]' /> Kalender Beasiswa
                     </span>
                     <FiArrowRight className='w-4 h-4 text-gray-400' />
                   </ButtonLink>
@@ -323,7 +274,7 @@ function UserHomePage() {
                 <article className='bg-white border border-gray-200 rounded-2xl p-6 shadow-sm'>
                   <Typography className='text-xl font-bold text-gray-900 mb-3'>Lanjutkan Belajar</Typography>
                   <Typography className='text-sm text-gray-600 mb-2'>{lastViewed.title}</Typography>
-                  <Typography className='text-xs text-gray-500 mb-4'>Terakhir: {lastViewed.lastLesson}</Typography>
+                  <Typography className='text-xs text-gray-500 mb-4'>Terakhir dibuka: {lastViewed.lastLesson}</Typography>
                   <div className='w-full bg-gray-100 rounded-full h-2 mb-4 overflow-hidden'>
                     <div className='h-full bg-gradient-to-r from-[#1B7691] to-[#2ecc71]' style={{ width: `${lastViewed.progress || 0}%` }} />
                   </div>
@@ -338,8 +289,8 @@ function UserHomePage() {
               <article className='bg-white border border-gray-200 rounded-2xl p-6 shadow-sm'>
                 <div className='flex items-center justify-between mb-4 gap-3'>
                   <div>
-                    <Typography className='text-2xl font-bold text-gray-900'>Rekomendasi BISA Learning</Typography>
-                    <Typography className='text-gray-600 text-sm'>Modul pilihan untuk persiapan beasiswa Anda.</Typography>
+                    <Typography className='text-2xl font-bold text-gray-900'>Modul BISA Learning</Typography>
+                    <Typography className='text-gray-600 text-sm'>Modul pilihan untuk mempersiapkan perjalanan beasiswamu.</Typography>
                   </div>
                   <ButtonLink href={learningLandingHref} className='text-sm font-semibold text-[#1B7691] hover:text-[#15627a] whitespace-nowrap'>
                     {learningLocked ? 'Aktifkan akses' : 'Lihat semua'}
@@ -404,34 +355,6 @@ function UserHomePage() {
                 )}
               </article>
 
-              <article className='bg-white border border-gray-200 rounded-2xl p-6 shadow-sm'>
-                <div className='flex items-center justify-between gap-3 mb-4'>
-                  <div>
-                    <Typography className='text-2xl font-bold text-gray-900'>Dreamshub Snapshot</Typography>
-                    <Typography className='text-sm text-gray-600'>Ikuti forum komunitas untuk berbagi strategi dan insight beasiswa.</Typography>
-                  </div>
-                  <ButtonLink href='/dreamshub' className='text-sm font-semibold text-[#1B7691] hover:text-[#15627a] whitespace-nowrap'>
-                    Kunjungi Dreamshub
-                  </ButtonLink>
-                </div>
-
-                <div className='grid grid-cols-1 md:grid-cols-3 gap-3'>
-                  <div className='rounded-xl bg-[#F0F9FF] border border-[#d8eeff] p-4'>
-                    <Typography className='text-xs uppercase font-bold tracking-wide text-[#1B7691] mb-1'>Diskusi</Typography>
-                    <Typography className='text-2xl font-extrabold text-[#0f172a]'>{forumSummary.posts}</Typography>
-                  </div>
-                  <div className='rounded-xl bg-[#ECFDF5] border border-[#d5f5e7] p-4'>
-                    <Typography className='text-xs uppercase font-bold tracking-wide text-emerald-700 mb-1'>Kategori</Typography>
-                    <Typography className='text-2xl font-extrabold text-[#0f172a]'>{forumSummary.categories}</Typography>
-                  </div>
-                  <div className='rounded-xl bg-[#FFF7ED] border border-[#ffe6cc] p-4'>
-                    <Typography className='text-xs uppercase font-bold tracking-wide text-amber-700 mb-1'>Token Anda</Typography>
-                    <Typography className='text-2xl font-extrabold text-[#0f172a]'>
-                      {userTokens !== null ? userTokens : '-'}
-                    </Typography>
-                  </div>
-                </div>
-              </article>
             </div>
           </section>
         </div>

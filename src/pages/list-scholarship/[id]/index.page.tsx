@@ -1,10 +1,8 @@
-'use client';
-
 import { useRouter } from 'next/router';
 import React, { useState, useEffect } from 'react';
 import {
     FiArrowLeft, FiCalendar, FiDollarSign, FiHeart, FiMapPin, FiSend,
-    FiTrash2, FiClock, FiCheckCircle, FiFileText, FiAward, FiShare2
+    FiTrash2, FiClock, FiCheckCircle, FiFileText, FiAward, FiShare2, FiLock
 } from 'react-icons/fi';
 import { FaGraduationCap } from 'react-icons/fa';
 
@@ -12,6 +10,7 @@ import ButtonLink from '@/components/links/ButtonLink';
 import SEO from '@/components/SEO';
 import Typography from '@/components/Typography';
 import Layout from '@/layouts/Layout';
+import api from '@/lib/api';
 import { getToken } from '@/lib/cookies';
 
 interface ScholarshipDetail {
@@ -40,7 +39,6 @@ export default function ScholarshipDetailPage() {
     const router = useRouter();
     const { id } = router.query;
 
-    // State
     const [isWishlisted, setIsWishlisted] = useState(false);
     const [wishlistLoading, setWishlistLoading] = useState(false);
     const [manifestation, setManifestation] = useState('');
@@ -51,7 +49,46 @@ export default function ScholarshipDetailPage() {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    // Get auth token
+    // Membership state
+    const [membership, setMembership] = useState<{
+        active: boolean;
+        loading: boolean;
+    }>({
+        active: false,
+        loading: true,
+    });
+
+    // Check membership — same pattern as bisa-learning
+    useEffect(() => {
+        const checkMembership = async () => {
+            const token = getToken();
+            if (!token) {
+                // Not logged in — redirect to login
+                router.replace(`/login?returnUrl=${encodeURIComponent(`/list-scholarship/${id || ''}`)}`);
+                return;
+            }
+
+            try {
+                const res = await api.get('/pricing/subscription/status');
+                const data = res.data?.data;
+
+                if (data?.active && data?.ends_at) {
+                    const endDate = new Date(data.ends_at);
+                    if (endDate > new Date()) {
+                        setMembership({ active: true, loading: false });
+                        return;
+                    }
+                }
+                setMembership({ active: false, loading: false });
+            } catch {
+                setMembership({ active: false, loading: false });
+            }
+        };
+
+        checkMembership();
+    }, []);
+
+    // Get auth token (still needed for wishlist / manifestation API calls)
     const getAuthToken = () => {
         if (typeof window === 'undefined') return null;
 
@@ -94,10 +131,13 @@ export default function ScholarshipDetailPage() {
         }
     };
 
-    // Fetch Logic
+    // Fetch Logic — only run after membership check passes
     useEffect(() => {
         const fetchScholarshipDetail = async () => {
-            if (!id) return;
+            if (!id || membership.loading) return;
+
+            // Membership guard — only fetch if active
+            if (!membership.active) return;
 
             try {
                 setIsLoading(true);
@@ -221,7 +261,7 @@ export default function ScholarshipDetailPage() {
         };
 
         fetchScholarshipDetail();
-    }, [id]);
+    }, [id, membership.loading, membership.active]);
 
     // Wishlist & Manifestation Handlers
     const fetchWishlistStatus = async (beasiswaId: string) => {
@@ -341,6 +381,66 @@ export default function ScholarshipDetailPage() {
     };
 
     // Rendering
+    // Membership/auth loading
+    if (membership.loading) {
+        return (
+            <Layout withNavbar={true} withFooter={true}>
+                <div className="min-h-screen flex items-center justify-center bg-gray-50 font-primary">
+                    <div className="text-center">
+                        <div className="w-12 h-12 border-4 border-[#1B7691] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                        <Typography className='text-gray-500 font-medium'>Memverifikasi akses...</Typography>
+                    </div>
+                </div>
+            </Layout>
+        );
+    }
+
+    // No active membership — show locked screen
+    if (!membership.active) {
+        return (
+            <Layout withNavbar={true} withFooter={true}>
+                <SEO title='Konten Premium - Raihasa' />
+                <main className="min-h-screen bg-[#F8FAFC] pt-28 pb-16 px-4 font-primary">
+                    <div className="max-w-2xl mx-auto">
+                        <div className="bg-white border border-gray-200 rounded-3xl p-8 shadow-sm text-center">
+                            <div className="relative rounded-2xl overflow-hidden mb-8">
+                                <div className="h-48 bg-gradient-to-r from-[#1B7691]/70 to-[#0F4C61]/70" />
+                                <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] flex flex-col items-center justify-center px-6">
+                                    <div className="w-16 h-16 rounded-full bg-white/15 border border-white/25 flex items-center justify-center mb-4">
+                                        <FiLock className="w-8 h-8 text-white" />
+                                    </div>
+                                    <Typography className="text-white text-2xl font-bold mb-2">Detail Beasiswa Terkunci</Typography>
+                                    <Typography className="text-white/85 text-sm max-w-md">
+                                        Halaman detail beasiswa hanya dapat diakses oleh member aktif Raihasa.
+                                    </Typography>
+                                </div>
+                            </div>
+
+                            <Typography className="text-gray-600 mb-2 text-sm">
+                                Aktifkan membership untuk melihat detail lengkap beasiswa, persyaratan, benefit, dan link pendaftaran resmi.
+                            </Typography>
+
+                            <div className="flex flex-wrap items-center justify-center gap-3 mt-6">
+                                <ButtonLink
+                                    href='/products'
+                                    className='px-6 py-3 rounded-xl bg-[#FB991A] text-white font-semibold hover:bg-orange-600 transition-colors'
+                                >
+                                    Aktifkan Membership
+                                </ButtonLink>
+                                <ButtonLink
+                                    href='/list-scholarship'
+                                    className='px-6 py-3 rounded-xl border border-gray-200 text-gray-700 font-semibold hover:bg-gray-50 transition-colors'
+                                >
+                                    Kembali ke Daftar Beasiswa
+                                </ButtonLink>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </Layout>
+        );
+    }
+
     if (isLoading) {
         return (
             <Layout withNavbar={true} withFooter={true}>
