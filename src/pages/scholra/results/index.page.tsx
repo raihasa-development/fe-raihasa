@@ -283,7 +283,7 @@ const ScholraResultsPage = () => {
                             <Typography className="text-gray-400 font-black uppercase tracking-widest text-xs">Memuat Rekomendasi...</Typography>
                         </div>
                     ) : filtered.length > 0 ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-start">
                             {filtered.map((item, idx) => (
                                 <ScholarshipCard key={item.id} item={item} idx={idx} />
                             ))}
