@@ -157,12 +157,6 @@ export default function DreamshubPage() {
     <Layout withNavbar={true} withFooter={true}>
       <SEO title="Dreamshub - Komunitas Beasiswa" />
       <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
-        
-        .font-poppins {
-            font-family: 'Poppins', sans-serif;
-        }
-
         @keyframes scroll {
           0% { transform: translateX(0); }
           100% { transform: translateX(-50%); }
@@ -175,23 +169,23 @@ export default function DreamshubPage() {
             animation-play-state: paused;
         }
       `}</style>
-      <main className="min-h-screen bg-gray-50/50 pb-20 overflow-x-hidden font-poppins">
+      <main className="min-h-screen bg-gray-50/50 pb-20 overflow-x-hidden">
 
         {/* === Hero Section === */}
         <section className="bg-gradient-to-r from-[#1B7691] to-[#0d5a6e] pt-32 pb-32 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2"></div>
           <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#FB991A]/20 rounded-full blur-3xl -translate-x-1/2 translate-y-1/2"></div>
 
-          <div className="container mx-auto px-4 relative z-10 text-center">
-            <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-6 tracking-tight">
+          <div className="max-w-6xl mx-auto px-4 md:px-6 relative z-10 text-center">
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-6 tracking-tight">
               DreamsHub Forum
             </h1>
-            <p className="text-xl text-blue-50 max-w-2xl mx-auto font-light leading-relaxed mb-8">
+            <p className="text-lg text-blue-50 max-w-2xl mx-auto font-light leading-relaxed mb-8">
               Ruang kolaborasi untuk berbagi pengalaman, tips beasiswa, serta layanan proofreading dokumen untuk memaksimalkan peluangmu meraih mimpi.
             </p>
             <button
               onClick={() => router.push('/dreamshub/create')}
-              className="bg-white text-[#1B7691] px-8 py-3 rounded-full font-bold shadow-lg hover:shadow-xl hover:scale-105 transition-all inline-flex items-center gap-2"
+              className="bg-white text-[#1B7691] px-8 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 inline-flex items-center gap-2"
             >
               <FiEdit3 /> Mulai Diskusi
             </button>
@@ -207,7 +201,7 @@ export default function DreamshubPage() {
                 {[...manifestations, ...manifestations, ...manifestations].map((m, i) => {
                   const isOwner = isAuthenticated && user?.id === m.account_id;
                   return (
-                    <div key={`${m.id}-${i}`} className="w-[300px] bg-white p-6 rounded-2xl shadow-lg border border-gray-100 flex flex-col justify-between h-[180px] shrink-0 hover:-translate-y-1 transition-transform cursor-default group relative">
+                    <div key={`${m.id}-${i}`} className="w-[300px] bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between h-[180px] shrink-0 hover:-translate-y-1 transition-all duration-300 cursor-default group relative">
                       {/* Delete button - only for owner, show on hover */}
                       {isOwner && i < manifestations.length && (
                         <button
@@ -245,13 +239,13 @@ export default function DreamshubPage() {
           </div>
         )}
 
-        <div className="container mx-auto px-4 relative z-20">
+        <div className="max-w-6xl mx-auto px-4 md:px-6 relative z-20">
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
 
             {/* === Left Sidebar: Profile & Categories === */}
             <div className="lg:col-span-1 space-y-6">
               {/* User Profile Widget */}
-              <div className="bg-white rounded-3xl shadow-lg border border-gray-100 p-6 sticky top-24 z-30">
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sticky top-24 z-30">
                 {isAuthenticated && user ? (
                   <div className="mb-6 pb-6 border-b border-gray-100">
                     <div className="flex items-center gap-3 mb-2">
@@ -310,7 +304,7 @@ export default function DreamshubPage() {
             <div className="lg:col-span-2 space-y-6">
               {/* Search Bar */}
               <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-2 flex items-center sticky top-4 z-20">
-                <FiSearch className="ml-4 text-gray-400 w-5 h-5" />
+                <FiSearch className="ml-4 text-gray-400 w-5 h-5 shrink-0" />
                 <input
                   type="text"
                   placeholder="Cari diskusi, topik, atau beasiswa..."
@@ -327,7 +321,7 @@ export default function DreamshubPage() {
                   <p className="text-gray-500">Memuat diskusi ...</p>
                 </div>
               ) : forumPosts.length === 0 ? (
-                <div className="bg-white rounded-3xl p-12 text-center shadow-sm border border-gray-100">
+                <div className="bg-white rounded-2xl p-12 text-center shadow-sm border border-gray-100">
                   <div className="bg-gray-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 text-gray-300">
                     <FiMessageCircle className="w-10 h-10" />
                   </div>
@@ -341,7 +335,7 @@ export default function DreamshubPage() {
                     <div
                       key={post.id}
                       onClick={() => router.push(`/dreamshub/${post.id}`)}
-                      className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl hover:border-[#1B7691]/30 transition-all cursor-pointer group relative overflow-hidden"
+                      className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:border-[#1B7691]/30 transition-all duration-300 cursor-pointer group relative overflow-hidden"
                     >
                       <div className="absolute top-0 left-0 w-1 h-full bg-[#1B7691] opacity-0 group-hover:opacity-100 transition-opacity"></div>
 
@@ -416,7 +410,7 @@ export default function DreamshubPage() {
             {/* === Right Sidebar: Promotion Only === */}
             <div className="lg:col-span-1 space-y-6">
               {/* Banner Widget */}
-              <div className="bg-[#FB991A] rounded-3xl p-6 text-white text-center shadow-lg shadow-orange-500/20 sticky top-24">
+              <div className="bg-[#FB991A] rounded-2xl p-6 text-white text-center shadow-sm sticky top-24">
                 <FiTrendingUp className="w-8 h-8 mx-auto mb-3 text-white/90" />
                 <h3 className="font-bold text-lg mb-2">Tingkatkan Peluangmu!</h3>
                 <p className="text-sm text-orange-100 mb-4 px-2">Gunakan fitur rekomendasi AI untuk menemukan beasiswa yang paling cocok.</p>

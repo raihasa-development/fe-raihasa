@@ -243,8 +243,6 @@ function LearningDetailPage() {
     <Layout withNavbar={true} withFooter={true}>
       <SEO title={`${course.title} - BISA Learning`} />
       <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
-        body { font-family: 'Poppins', sans-serif; }
         .custom-scrollbar::-webkit-scrollbar {
             width: 6px;
         }
@@ -282,9 +280,9 @@ function LearningDetailPage() {
         <main className='min-h-screen bg-[#F8FAFC] pb-20 pt-20'>
           {/* Breadcrumb & Title Header */}
           <div className='bg-white border-b border-gray-200'>
-            <div className='container mx-auto px-4 py-6'>
+            <div className='max-w-6xl mx-auto px-4 md:px-6 py-6'>
               <div className='flex items-center gap-2 text-sm text-gray-500 mb-4'>
-                <ButtonLink href='/bisa-learning' className='hover:text-[#1B7691] flex items-center gap-1 transition-colors'>
+                <ButtonLink href='/bisa-learning' className='hover:text-[#1B7691] flex items-center gap-1 transition-all duration-300'>
                   <FiChevronLeft /> Learning Center
                 </ButtonLink>
                 <span className='text-gray-300'>/</span>
@@ -300,17 +298,17 @@ function LearningDetailPage() {
                   </span>
                 </div>
               )}
-              <p className='text-gray-500 mt-2 max-w-3xl'>{course.subtitle}</p>
+              <p className='text-base text-gray-600 mt-2 max-w-3xl leading-relaxed'>{course.subtitle}</p>
             </div>
           </div>
 
-          <div className='container mx-auto px-4 py-8'>
+          <div className='max-w-6xl mx-auto px-4 md:px-6 py-8'>
             <div className='grid grid-cols-1 lg:grid-cols-3 gap-8'>
 
               {/* LEFT: Video Player & Content */}
               <div className='lg:col-span-3'>
                 {/* PROTECTED Video Player */}
-                <div className='bg-black rounded-2xl overflow-hidden shadow-2xl aspect-video relative'>
+                <div className='bg-black rounded-2xl overflow-hidden shadow-lg aspect-video relative'>
                   <iframe
                     ref={iframeRef}
                     src={secureUrl}
@@ -322,7 +320,7 @@ function LearningDetailPage() {
                 </div>
 
                 {/* Action Bar */}
-                <div className='flex items-center justify-between mt-6 bg-white p-4 rounded-xl shadow-sm border border-gray-100'>
+                <div className='flex items-center justify-between mt-6 bg-white p-4 rounded-2xl shadow-sm border border-gray-100'>
                   <div className='flex items-center gap-4'>
                     <div className='w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-[#1B7691] font-bold border border-gray-200'>
                       {course.instructor.charAt(0)}

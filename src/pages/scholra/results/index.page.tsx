@@ -81,7 +81,7 @@ const ScholarshipCard = ({ item, idx }: { item: Scholarship, idx: number }) => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.05, type: 'spring', stiffness: 100 }}
-            className="bg-white rounded-[1.5rem] border border-gray-200 shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(27,118,145,0.08)] transition-all duration-300 overflow-hidden flex flex-col relative group"
+            className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden flex flex-col relative group"
         >
             {/* Top Pattern Area */}
             <div className="h-24 bg-gradient-to-r from-slate-50 to-blue-50 border-b border-gray-100/50 relative overflow-hidden">
@@ -143,7 +143,7 @@ const ScholarshipCard = ({ item, idx }: { item: Scholarship, idx: number }) => {
                     <div className="mt-2">
                         <button 
                             onClick={() => setShowDims(!showDims)}
-                            className="w-full flex items-center justify-center gap-2 py-2 text-xs font-bold text-gray-500 hover:text-[#1B7691] transition-colors border-t border-gray-100"
+                            className="w-full flex items-center justify-center gap-2 py-2 text-xs font-bold text-gray-500 hover:text-[#1B7691] transition-all duration-300 border-t border-gray-100"
                         >
                             {showDims ? <><FiChevronUp /> Hide Analysis Breakdown</> : <><FiChevronDown /> View Analysis Breakdown</>}
                         </button>
@@ -188,7 +188,7 @@ const ScholarshipCard = ({ item, idx }: { item: Scholarship, idx: number }) => {
             <div className="px-6 py-4 bg-gray-50/80 border-t border-gray-100 flex gap-3">
                 <button 
                     onClick={() => router.push(`/list-scholarship/${item.id}`)}
-                    className="flex-1 py-3 bg-[#1B7691] text-white rounded-xl font-black text-xs uppercase tracking-widest hover:bg-[#15627a] hover:shadow-lg shadow-[#1B7691]/20 transition-all flex items-center justify-center gap-2"
+                    className="flex-1 py-3 bg-[#1B7691] text-white rounded-xl font-bold text-sm hover:bg-[#15627a] hover:shadow-lg shadow-[#1B7691]/20 transition-all duration-300 flex items-center justify-center gap-2"
                 >
                     Lihat Detail
                 </button>
@@ -240,23 +240,23 @@ const ScholraResultsPage = () => {
                 <div className="bg-white border-b border-gray-200/60 shadow-sm relative overflow-hidden">
                     <div className="absolute -top-40 -right-40 w-96 h-96 bg-[#1B7691]/5 rounded-full blur-3xl pointer-events-none" />
                     
-                    <div className="container mx-auto max-w-7xl px-4 py-16">
+                    <div className="max-w-6xl mx-auto px-4 md:px-6 py-16 md:py-20">
                         <div className="flex flex-col md:flex-row items-end justify-between gap-8">
                             <div className="relative z-10 w-full max-w-3xl">
                                 <motion.button 
                                     initial={{ opacity: 0, x: -10 }}
                                     animate={{ opacity: 1, x: 0 }}
                                     onClick={() => { window.location.href = '/scholra'; }}
-                                    className="inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-gray-50 text-gray-700 rounded-full font-bold uppercase text-[10px] tracking-widest transition-all mb-8 border border-gray-200 cursor-pointer relative z-50 shadow-sm"
+                                    className="inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-gray-50 text-gray-700 rounded-xl font-bold text-xs tracking-wide transition-all duration-300 mb-8 border border-gray-200 cursor-pointer relative z-50 shadow-sm"
                                 >
                                     <FiArrowLeft size={12} /> Kembali Uji Profil
                                 </motion.button>
                                 
-                                <Typography className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight leading-tight mb-4">
+                                <Typography className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight leading-tight mb-4">
                                     Hasil Analisis <span className="text-[#1B7691]">Kecocokanmu</span>
                                 </Typography>
-                                <p className="text-gray-500 text-lg font-medium leading-relaxed max-w-2xl">
-                                    Kami telah menganalisis profil akademikmu dan menemukan <span className="text-[#FB991A] font-black">{results.length}</span> beasiswa yang paling relevan untukmu.
+                                <p className="text-base text-gray-600 leading-relaxed max-w-2xl">
+                                    Kami telah menganalisis profil akademikmu dan menemukan <span className="text-[#FB991A] font-bold">{results.length}</span> beasiswa yang paling relevan untukmu.
                                 </p>
                             </div>
 
@@ -276,7 +276,7 @@ const ScholraResultsPage = () => {
                     </div>
                 </div>
 
-                <div className="container mx-auto max-w-7xl px-4 py-14">
+                <div className="max-w-6xl mx-auto px-4 md:px-6 py-16 md:py-20">
                     {isLoading ? (
                         <div className="flex flex-col items-center justify-center py-32">
                             <div className="w-16 h-16 border-4 border-gray-200 border-t-[#1B7691] rounded-full animate-spin mb-6" />
@@ -289,7 +289,7 @@ const ScholraResultsPage = () => {
                             ))}
                         </div>
                     ) : (
-                        <div className="text-center py-32 bg-white rounded-3xl border border-gray-100 shadow-sm max-w-2xl mx-auto">
+                        <div className="text-center py-32 bg-white rounded-2xl border border-gray-100 shadow-sm max-w-2xl mx-auto">
                             <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6 text-gray-400">
                                 <FiSearch size={32} />
                             </div>

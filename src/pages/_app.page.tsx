@@ -12,6 +12,7 @@ import type { AppProps } from 'next/app';
 import Router from 'next/router';
 import { DefaultSeo } from 'next-seo';
 import nProgress from 'nprogress';
+import { useEffect } from 'react';
 
 import GoogleAnalytics from '@/components/GoogleAnalytics';
 import Toast from '@/components/Toast';
@@ -35,6 +36,18 @@ const queryClient = new QueryClient({
 });
 
 export default function App({ Component, pageProps }: AppProps) {
+  useEffect(() => {
+    const handleWheel = (e: WheelEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.tagName === 'INPUT' && (target as HTMLInputElement).type === 'number') {
+        e.preventDefault();
+        target.blur();
+      }
+    };
+    document.addEventListener('wheel', handleWheel, { passive: false });
+    return () => document.removeEventListener('wheel', handleWheel);
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <GoogleAnalytics />

@@ -70,15 +70,15 @@ const checkAuthentication = (): boolean => {
 };
 
 // Countdown Timer Component
-const CountdownTimer = () => {
+const CountdownTimer = ({ expiresAt }: { expiresAt?: string | null }) => {
   const [timeLeft, setTimeLeft] = useState({ h: 0, m: 0, s: 0 });
 
   useEffect(() => {
-    const endOfDay = new Date();
-    endOfDay.setHours(23, 59, 59, 999);
+    if (!expiresAt) return;
+    const target = new Date(expiresAt);
 
     const calculateTimeLeft = () => {
-      const difference = endOfDay.getTime() - new Date().getTime();
+      const difference = target.getTime() - new Date().getTime();
       if (difference > 0) {
         return {
           h: Math.floor((difference / (1000 * 60 * 60)) % 24),
@@ -95,7 +95,7 @@ const CountdownTimer = () => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, []);
+  }, [expiresAt]);
 
   return (
     <span className="tabular-nums font-mono font-bold">
@@ -152,21 +152,26 @@ export default function ProductsPage() {
   }, [isMounted]);
 
   // Fetch products from backend
-  const { data: plans } = useQuery<PricingPlan[]>({
+  const { data: pricingResponse } = useQuery<{ plans: PricingPlan[]; new_user_offer?: { is_active: boolean; expires_at: string | null; discount_percent: number } | null }>({
     queryKey: ['pricing-plans'],
     queryFn: async () => {
       try {
         const response = await api.get('/pricing/plans');
-        return response.data?.data?.plans || [];
+        const raw = response.data;
+        // Handle both { data: { plans: [...] } } and { plans: [...] } structures
+        const result = raw?.data || raw;
+        return result?.plans ? result : { plans: result || [] };
       } catch (error) {
-        return [];
+        return { plans: [] };
       }
     },
     retry: false,
     staleTime: 5 * 60 * 1000,
   });
 
-  const products = plans || [];
+  const products = pricingResponse?.plans || [];
+  const newUserOffer = pricingResponse?.new_user_offer;
+  const isOfferActive = !!newUserOffer?.is_active && !!newUserOffer?.expires_at;
 
   const handleSelectProduct = (productId: string, isPremium?: boolean) => {
     if (isPremium) {
@@ -197,7 +202,7 @@ Terima kasih!`);
         description="Pilih paket mentoring beasiswa terbaik. Dapatkan bimbingan intensif persiapan kuliah ke luar negeri, review essay, dan simulasi interview."
         keywords={['paket mentoring beasiswa', 'biaya mentoring beasiswa', 'bimbingan kuliah luar negeri', 'kursus beasiswa']}
       />
-      <main className="min-h-screen bg-[#FAFAFA] relative overflow-hidden font-poppins">
+      <main className="min-h-screen bg-[#FAFAFA] relative overflow-hidden">
 
         {/* Background Decorative Elements */}
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-orange-100 rounded-full blur-[100px] opacity-50 -translate-y-1/2 translate-x-1/2 pointer-events-none" />
@@ -206,16 +211,18 @@ Terima kasih!`);
         {/* Hero Section */}
         <section className="pt-32 pb-12 px-4 relative z-10">
           <div className="max-w-4xl mx-auto text-center" data-aos="fade-up">
-            <div className="flex justify-center mb-6" data-aos="fade-down" data-aos-delay="50">
-              <div className="inline-flex items-center gap-2 bg-red-50 border border-red-100 px-4 py-2 rounded-full shadow-sm animate-pulse">
-                <span className="relative flex h-2.5 w-2.5 mr-1">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
-                </span>
-                <span className="text-sm font-medium text-red-700">Promo berakhir dalam:</span>
-                <span className="text-red-600 font-bold"><CountdownTimer /></span>
+            {isOfferActive && (
+              <div className="flex justify-center mb-6" data-aos="fade-down" data-aos-delay="50">
+                <div className="inline-flex items-center gap-2 bg-red-50 border border-red-100 px-4 py-2 rounded-full shadow-sm">
+                  <span className="relative flex h-2.5 w-2.5 mr-1">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+                  </span>
+                  <span className="text-sm font-medium text-red-700">Flash Sale berakhir dalam:</span>
+                  <span className="text-red-600 font-bold"><CountdownTimer expiresAt={newUserOffer?.expires_at} /></span>
+                </div>
               </div>
-            </div>
+            )}
             <span className="inline-block py-1 px-3 rounded-full bg-orange-100 text-[#FB991A] text-sm font-semibold tracking-wide mb-4 border border-orange-200">
               MEMBERSHIP PLANS
             </span>
@@ -232,9 +239,9 @@ Terima kasih!`);
         </section>
 
         {/* Pricing Cards Section */}
-        <section className="py-12 px-4 relative z-10">
+        <section className="py-16 md:py-20 px-4 relative z-10">
           <div className="max-w-6xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
               {products.map((product, index) => {
                 const isPopular = product.is_popular;
                 const isEnterprise = product.is_enterprise;
@@ -247,11 +254,11 @@ Terima kasih!`);
                     key={product.id}
                     data-aos="fade-up"
                     data-aos-delay={index * 100}
-                    className={`flex flex-col p-6 rounded-2xl transition-all duration-300 relative group h-full ${isPopular
+                    className={`flex flex-col p-8 rounded-2xl transition-all duration-300 relative group h-full ${isPopular
                       ? 'border-2 border-[#FB991A] bg-[#FFFBF5] shadow-xl scale-[1.02] z-20'
                       : isEnterprise
-                        ? 'border border-gray-100 bg-white hover:border-[#1B7691]/30 hover:shadow-xl hover:shadow-blue-500/5'
-                        : 'border border-gray-100 bg-white hover:border-[#FB991A]/30 hover:shadow-xl hover:shadow-orange-500/5'
+                        ? 'border border-gray-100 bg-white shadow-sm hover:border-[#1B7691]/30 hover:shadow-xl hover:shadow-blue-500/5'
+                        : 'border border-gray-100 bg-white shadow-sm hover:border-[#FB991A]/30 hover:shadow-xl hover:shadow-orange-500/5'
                       }`}
                   >
                     {product.tag && (
@@ -260,52 +267,52 @@ Terima kasih!`);
                       </div>
                     )}
 
-                    <div className={`mb-4 ${product.tag ? 'mt-2' : ''}`}>
+                    <div className={`mb-6 ${product.tag ? 'mt-2' : ''}`}>
                       <Typography
                         weight="bold"
                         className={`text-xl font-bold ${isPopular ? 'text-[#DB4B24]' : 'text-gray-900'
-                          } ${isBasic ? 'group-hover:text-[#FB991A] transition-colors' : ''}`}
+                          } ${isBasic ? 'group-hover:text-[#FB991A] transition-all duration-300' : ''}`}
                       >
                         {product.name}
                       </Typography>
-                      <p className={`text-xs mt-1 ${isPopular ? 'text-[#d97706]/80' : 'text-gray-500'}`}>
+                      <p className={`text-sm mt-2 leading-relaxed ${isPopular ? 'text-[#d97706]/80' : 'text-gray-500'}`}>
                         {subtitle}
                       </p>
                     </div>
 
-                    <div className="mb-6">
+                    <div className="mb-8 pb-6 border-b border-gray-100">
                       <div className="flex items-baseline gap-1">
                         {isEnterprise ? (
                           <span className="text-2xl font-bold text-gray-900">Custom</span>
                         ) : (
                           <>
                             {product.original_price && product.original_price > product.price && (
-                              <span className="text-sm text-gray-400 line-through mr-1">
+                              <span className="text-base text-gray-400 line-through mr-2">
                                 {Math.floor(product.original_price / 1000)}k
                               </span>
                             )}
                             <span className={`font-bold text-gray-900 ${isPopular ? 'text-4xl' : 'text-3xl'}`}>
                               {Math.floor(product.price / 1000)}k
                             </span>
-                            <span className="text-gray-400 text-sm font-medium"> / {product.duration_months} bulan</span>
+                            <span className="text-gray-400 text-sm font-medium ml-1">/ {product.duration_months} bulan</span>
                           </>
                         )}
                       </div>
                       {!isEnterprise && product.original_price && product.original_price > product.price && (
-                        <div className="mt-2 text-left">
-                          <span className={`inline-block text-[10px] font-bold px-2 py-0.5 rounded-full ${isPopular ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-700'}`}>
+                        <div className="mt-3">
+                          <span className={`inline-block text-[11px] font-bold px-2.5 py-1 rounded-full ${isPopular ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-700'}`}>
                             Hemat {Math.round(((product.original_price - product.price) / product.original_price) * 100)}% {isPopular && "• Offer Ends Soon!"}
                           </span>
                         </div>
                       )}
-                      {isEnterprise && <p className="text-xs text-gray-400 mt-1">Harga menyesuaikan kebutuhan</p>}
+                      {isEnterprise && <p className="text-sm text-gray-400 mt-2">Harga menyesuaikan kebutuhan</p>}
                     </div>
 
-                    <ul className="space-y-3 mb-8 flex-1">
+                    <ul className="space-y-3.5 mb-8 flex-1">
                       {product.features?.map((feature, i) => (
-                        <li key={i} className={`flex gap-3 text-sm ${isPopular ? 'text-gray-800' : 'text-gray-600'}`}>
+                        <li key={i} className={`flex gap-3 text-sm leading-relaxed ${isPopular ? 'text-gray-800' : 'text-gray-600'}`}>
                           <div className={`mt-0.5 shrink-0 ${isPopular
-                            ? 'w-4 h-4 rounded-full bg-[#FB991A] flex items-center justify-center'
+                            ? 'w-5 h-5 rounded-full bg-[#FB991A] flex items-center justify-center'
                             : ''
                             }`}>
                             {isPopular ? (
@@ -321,7 +328,7 @@ Terima kasih!`);
 
                     <button
                       onClick={() => handleSelectProduct(product.id, isEnterprise)}
-                      className={`w-full py-3 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${isPopular
+                      className={`w-full py-3.5 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${isPopular
                         ? 'text-white bg-gradient-to-r from-[#FB991A] to-[#DB4B24] hover:shadow-lg hover:shadow-orange-500/30'
                         : isEnterprise
                           ? 'text-[#1B7691] border border-[#1B7691]/20 bg-[#1B7691]/5 hover:bg-[#1B7691] hover:text-white'
@@ -345,18 +352,18 @@ Terima kasih!`);
         </section>
 
         {/* Comparison Table Section */}
-        <section className='py-16 md:py-24 bg-white relative z-10'>
+        <section className='py-16 md:py-20 bg-white relative z-10'>
           <div className="layout">
             <div className="text-center mb-12" data-aos='fade-up'>
-              <Typography variant="h2" weight="bold" className="text-3xl md:text-4xl text-gray-900 mb-3">
+              <Typography variant="h2" weight="bold" className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">
                 Bandingkan Fitur
               </Typography>
-              <Typography className="text-gray-500">
+              <Typography className="text-base text-gray-600 leading-relaxed">
                 Detail lengkap fitur yang akan kamu dapatkan
               </Typography>
             </div>
 
-            <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden max-w-5xl mx-auto" data-aos='fade-up'>
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden max-w-5xl mx-auto" data-aos='fade-up'>
               {/* Custom Responsive Table Wrapper */}
               <div className="overflow-x-auto">
                 <table className="w-full text-sm text-left">

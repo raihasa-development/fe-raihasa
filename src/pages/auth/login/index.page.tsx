@@ -162,13 +162,13 @@ function LoginPage() {
                 <NextImage src='/images/logo.png' alt='logo' width={140} height={100} />
               </div>
               <h2 className="text-3xl font-bold text-gray-900">Masuk Akun</h2>
-              <p className="mt-2 text-gray-500">Silakan masukkan detail akun Anda</p>
+              <p className="mt-3 text-base text-gray-600">Silakan masukkan detail akun Anda</p>
             </div>
 
             <div className="bg-white">
               <FormProvider {...methods}>
-                <form method='post' className='space-y-5' onSubmit={handleSubmit(onSubmit)}>
-                  <div className="space-y-4">
+                <form method='post' className='space-y-6' onSubmit={handleSubmit(onSubmit)}>
+                  <div className="space-y-5">
                     <Input
                       id='email'
                       label='Email'

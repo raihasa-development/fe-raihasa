@@ -304,7 +304,7 @@ export default function EnhancedChatbox({ onRecommendation }: ChatboxProps) {
     const progress = ((currentStepIndex) / (STEPS.length - 1)) * 100;
 
     return (
-        <div className="flex flex-col h-full max-h-[750px] bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+        <div className="flex flex-col h-full max-h-[750px] bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
             {/* Header */}
             <div className="bg-gradient-to-r from-[#1B7691] to-[#0d5a6e] p-5">
                 <div className="flex items-center gap-4">
@@ -461,7 +461,6 @@ export default function EnhancedChatbox({ onRecommendation }: ChatboxProps) {
                                             e.preventDefault();
                                         }
                                     }}
-                                    onWheel={(e) => (e.target as HTMLInputElement).blur()}
                                     className="flex-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#1B7691] focus:border-transparent transition-all"
                                 />
                                 <button
@@ -575,7 +574,6 @@ export default function EnhancedChatbox({ onRecommendation }: ChatboxProps) {
                                             e.preventDefault();
                                         }
                                     }}
-                                    onWheel={(e) => (e.target as HTMLInputElement).blur()}
                                     className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#1B7691] focus:border-transparent transition-all"
                                 />
                                 <input
@@ -591,7 +589,6 @@ export default function EnhancedChatbox({ onRecommendation }: ChatboxProps) {
                                             e.preventDefault();
                                         }
                                     }}
-                                    onWheel={(e) => (e.target as HTMLInputElement).blur()}
                                     className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#1B7691] focus:border-transparent transition-all"
                                 />
                             </div>
@@ -616,8 +613,8 @@ export default function EnhancedChatbox({ onRecommendation }: ChatboxProps) {
                             <Typography className="text-sm text-gray-600 font-medium">Kondisi khusus (jika ada):</Typography>
                             <div className="space-y-2">
                                 {/* SKTM Checkbox */}
-                                <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-100 transition-colors">
-                                    <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${formData.is_sktm ? 'bg-[#1B7691] border-[#1B7691]' : 'border-gray-300'}`}>
+                                <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-100 transition-all duration-300">
+                                    <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all duration-300 ${formData.is_sktm ? 'bg-[#1B7691] border-[#1B7691]' : 'border-gray-300'}`}>
                                         {formData.is_sktm && <FiCheck className="w-3 h-3 text-white" />}
                                     </div>
                                     <input
@@ -633,8 +630,8 @@ export default function EnhancedChatbox({ onRecommendation }: ChatboxProps) {
                                 </label>
 
                                 {/* Has Scholarship Checkbox */}
-                                <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-100 transition-colors">
-                                    <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${formData.has_scholarships ? 'bg-[#1B7691] border-[#1B7691]' : 'border-gray-300'}`}>
+                                <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-100 transition-all duration-300">
+                                    <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all duration-300 ${formData.has_scholarships ? 'bg-[#1B7691] border-[#1B7691]' : 'border-gray-300'}`}>
                                         {formData.has_scholarships && <FiCheck className="w-3 h-3 text-white" />}
                                     </div>
                                     <input
@@ -650,8 +647,8 @@ export default function EnhancedChatbox({ onRecommendation }: ChatboxProps) {
                                 </label>
 
                                 {/* Disability Checkbox */}
-                                <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-100 transition-colors">
-                                    <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${formData.has_disability ? 'bg-[#1B7691] border-[#1B7691]' : 'border-gray-300'}`}>
+                                <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-100 transition-all duration-300">
+                                    <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all duration-300 ${formData.has_disability ? 'bg-[#1B7691] border-[#1B7691]' : 'border-gray-300'}`}>
                                         {formData.has_disability && <FiCheck className="w-3 h-3 text-white" />}
                                     </div>
                                     <input
@@ -695,7 +692,7 @@ export default function EnhancedChatbox({ onRecommendation }: ChatboxProps) {
                             <div className="flex gap-2">
                                 <button
                                     onClick={() => setFormData(prev => ({ ...prev, user_prompt: 'Carikan beasiswa yang sesuai dengan profil saya' }))}
-                                    className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200 transition-colors"
+                                    className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-xl text-sm hover:bg-gray-200 transition-all duration-300"
                                 >
                                     Skip (Gunakan default)
                                 </button>

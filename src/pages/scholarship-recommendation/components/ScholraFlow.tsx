@@ -151,7 +151,7 @@ export default function ScholraFlow() {
     };
 
     return (
-        <div className="w-full max-w-5xl mx-auto px-4 mt-8 pb-10" style={{ fontFamily: '"Poppins", sans-serif' }}>
+        <div className="w-full max-w-5xl mx-auto px-4 mt-8 pb-10">
             {/* Gamified Workspace Area */}
             <div className="flex flex-col md:flex-row items-center md:items-start justify-center gap-10 md:gap-16">
 
@@ -184,7 +184,7 @@ export default function ScholraFlow() {
                                 initial={{ opacity: 0, x: 20 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 exit={{ opacity: 0, x: -20 }}
-                                className="bg-white/80 backdrop-blur-sm rounded-[2rem] shadow-lg border border-gray-100/50 p-10 text-center flex flex-col items-center justify-center min-h-[300px]"
+                                className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-100/50 p-10 text-center flex flex-col items-center justify-center min-h-[300px]"
                             >
                                 <div className="w-12 h-12 border-[4px] border-gray-100 border-t-[#FB991A] rounded-full animate-spin mb-4" />
                                 <Typography className="text-[#1B7691] font-black uppercase tracking-widest text-sm">Menyelaraskan Database...</Typography>
@@ -198,21 +198,21 @@ export default function ScholraFlow() {
                                 className="flex flex-col gap-6"
                             >
                                 {/* Speech Bubble */}
-                                <div className="relative bg-white rounded-3xl p-8 md:p-10 shadow-[0_10px_40px_rgb(0,0,0,0.06)] border border-gray-100">
+                                <div className="relative bg-white rounded-2xl p-8 md:p-10 shadow-sm border border-gray-100">
                                     {/* Triangle pointer to Mascot */}
                                     <div className="hidden md:block absolute top-[50%] left-[-18px] w-0 h-0 border-y-[16px] border-y-transparent border-r-[18px] border-r-white -translate-y-1/2 drop-shadow-[-2px_0px_2px_rgba(0,0,0,0.02)]" />
 
-                                    <Typography className="text-2xl md:text-3xl font-black text-[#1B7691] leading-tight text-center md:text-left">
+                                    <Typography className="text-2xl md:text-3xl font-bold text-[#1B7691] leading-tight text-center md:text-left">
                                         "{currentQuestion.text}"
                                     </Typography>
                                 </div>
 
                                 {/* Gamified Options */}
-                                <div className="grid grid-cols-1 gap-3 md:pl-6 w-full">
+                                <div className="grid grid-cols-1 gap-4 md:pl-6 w-full">
                                     {currentQuestion.type === 'input_number' ? (
-                                        <div className="flex flex-col gap-3">
+                                        <div className="flex flex-col gap-4">
                                             {currentQuestion.hint && (
-                                                <p className="text-xs text-gray-400 font-medium px-1">{currentQuestion.hint}</p>
+                                                <p className="text-sm text-gray-500 font-medium px-1">{currentQuestion.hint}</p>
                                             )}
                                             <div className="flex flex-col sm:flex-row gap-3">
                                                 <input
@@ -224,7 +224,7 @@ export default function ScholraFlow() {
                                                             setInputValue(e.target.value);
                                                         }
                                                     }}
-                                                    className="flex-1 px-8 py-5 bg-white/60 backdrop-blur-md border border-gray-200/60 rounded-2xl text-2xl font-black text-center text-gray-800 outline-none focus:ring-4 focus:ring-[#1B7691]/20 focus:bg-white shadow-sm transition-all"
+                                                    className="flex-1 px-6 py-4 bg-white border border-gray-200 rounded-xl text-xl font-bold text-center text-gray-800 outline-none focus:ring-2 focus:ring-[#1B7691]/20 focus:border-[#1B7691] shadow-sm transition-all duration-300"
                                                     placeholder={currentQuestion.placeholder || (currentQuestion.id === 'umur' ? 'Contoh: 21' : 'Contoh: 3.45')}
                                                     autoFocus
                                                 />
@@ -233,18 +233,47 @@ export default function ScholraFlow() {
                                                         if (!inputValue) return;
                                                         const parsed = Number.parseFloat(inputValue);
                                                         if (Number.isNaN(parsed)) return;
+
+                                                        // Validate ranges
+                                                        if (currentQuestion.id === 'umur') {
+                                                            if (parsed < 14 || parsed > 60) {
+                                                                alert('Usia harus antara 14-60 tahun');
+                                                                return;
+                                                            }
+                                                            if (!Number.isInteger(parsed)) {
+                                                                alert('Usia harus berupa bilangan bulat');
+                                                                return;
+                                                            }
+                                                        }
+                                                        if (currentQuestion.id === 'ipk') {
+                                                            if (parsed < 0 || parsed > 4) {
+                                                                alert('IPK harus antara 0.0 - 4.0');
+                                                                return;
+                                                            }
+                                                        }
+                                                        if (currentQuestion.id === 'skor_bahasa') {
+                                                            if (parsed <= 0) {
+                                                                alert('Skor bahasa harus lebih dari 0');
+                                                                return;
+                                                            }
+                                                            if (parsed > 120) {
+                                                                alert('Skor bahasa maksimal 120 (TOEFL iBT) atau 9.0 (IELTS)');
+                                                                return;
+                                                            }
+                                                        }
+
                                                         handleAnswer(currentQuestion.id, parsed);
                                                     }}
-                                                    className="px-10 py-5 bg-gradient-to-r from-[#1B7691] to-[#15627a] text-white rounded-2xl font-black hover:scale-105 active:scale-95 transition-all shadow-[0_10px_20px_rgba(27,118,145,0.3)] flex justify-center items-center"
+                                                    className="px-8 py-4 bg-[#1B7691] hover:bg-[#15627a] text-white rounded-xl font-bold hover:scale-105 active:scale-95 transition-all duration-300 shadow-sm shadow-[#1B7691]/20 flex justify-center items-center"
                                                 >
-                                                    <FiCheck size={32} />
+                                                    <FiCheck size={28} />
                                                 </button>
                                             </div>
                                             {/* Skip button for optional number fields */}
                                             {currentQuestion.skipLabel && (
                                                 <button
                                                     onClick={() => handleAnswer(currentQuestion.id, currentQuestion.skipValue || 'skip')}
-                                                    className="mt-1 px-6 py-3 text-gray-400 font-bold hover:text-gray-700 hover:bg-white/50 rounded-xl transition-all text-sm"
+                                                    className="mt-1 px-6 py-3 text-gray-400 font-medium hover:text-gray-700 hover:bg-gray-50 rounded-xl transition-all duration-300 text-sm"
                                                 >
                                                     {currentQuestion.skipLabel}
                                                 </button>
@@ -253,16 +282,16 @@ export default function ScholraFlow() {
                                             {currentQuestion.id === 'ipk' && !currentQuestion.skipLabel && (
                                                 <button
                                                     onClick={() => handleAnswer(currentQuestion.id, 'skip')}
-                                                    className="mt-1 px-6 py-3 text-gray-400 font-bold hover:text-gray-700 hover:bg-white/50 rounded-xl transition-all"
+                                                    className="mt-1 px-6 py-3 text-gray-400 font-medium hover:text-gray-700 hover:bg-gray-50 rounded-xl transition-all duration-300"
                                                 >
                                                     Lewati (Belum Ada IPK)
                                                 </button>
                                             )}
                                         </div>
                                     ) : currentQuestion.type === 'input_text' ? (
-                                        <div className="flex flex-col gap-3">
+                                        <div className="flex flex-col gap-4">
                                             {currentQuestion.hint && (
-                                                <p className="text-xs text-gray-400 font-medium px-1">{currentQuestion.hint}</p>
+                                                <p className="text-sm text-gray-500 font-medium px-1">{currentQuestion.hint}</p>
                                             )}
                                             <div className="flex flex-col sm:flex-row gap-3">
                                                 <input
@@ -274,7 +303,7 @@ export default function ScholraFlow() {
                                                             handleAnswer(currentQuestion.id, inputValue.trim());
                                                         }
                                                     }}
-                                                    className="flex-1 px-8 py-5 bg-white/60 backdrop-blur-md border border-gray-200/60 rounded-2xl text-xl font-bold text-gray-800 outline-none focus:ring-4 focus:ring-[#1B7691]/20 focus:bg-white shadow-sm transition-all"
+                                                    className="flex-1 px-6 py-4 bg-white border border-gray-200 rounded-xl text-lg font-semibold text-gray-800 outline-none focus:ring-2 focus:ring-[#1B7691]/20 focus:border-[#1B7691] shadow-sm transition-all duration-300"
                                                     placeholder={currentQuestion.placeholder || 'Ketik jawabanmu...'}
                                                     autoFocus
                                                 />
@@ -283,16 +312,16 @@ export default function ScholraFlow() {
                                                         if (!inputValue.trim()) return;
                                                         handleAnswer(currentQuestion.id, inputValue.trim());
                                                     }}
-                                                    className="px-10 py-5 bg-gradient-to-r from-[#1B7691] to-[#15627a] text-white rounded-2xl font-black hover:scale-105 active:scale-95 transition-all shadow-[0_10px_20px_rgba(27,118,145,0.3)] flex justify-center items-center"
+                                                    className="px-8 py-4 bg-[#1B7691] hover:bg-[#15627a] text-white rounded-xl font-bold hover:scale-105 active:scale-95 transition-all duration-300 shadow-lg shadow-[#1B7691]/20 flex justify-center items-center"
                                                 >
-                                                    <FiCheck size={32} />
+                                                    <FiCheck size={28} />
                                                 </button>
                                             </div>
                                             {/* Skip button for optional text fields */}
                                             {currentQuestion.skipLabel && (
                                                 <button
                                                     onClick={() => handleAnswer(currentQuestion.id, currentQuestion.skipValue || 'skip')}
-                                                    className="mt-1 px-6 py-3 text-gray-400 font-bold hover:text-gray-700 hover:bg-white/50 rounded-xl transition-all text-sm"
+                                                    className="mt-1 px-6 py-3 text-gray-400 font-medium hover:text-gray-700 hover:bg-gray-50 rounded-xl transition-all duration-300 text-sm"
                                                 >
                                                     {currentQuestion.skipLabel}
                                                 </button>
@@ -306,9 +335,9 @@ export default function ScholraFlow() {
                                                 <button
                                                     key={idx}
                                                     onClick={() => handleAnswer(currentQuestion.id, value)}
-                                                    className="group relative w-full text-center px-6 py-5 bg-white/70 backdrop-blur-md border-2 border-white rounded-2xl hover:bg-gradient-to-r hover:from-[#1B7691] hover:to-[#15627a] hover:border-transparent hover:text-white hover:scale-[1.02] active:scale-95 transition-all duration-300 shadow-sm hover:shadow-lg overflow-hidden"
+                                                    className="group relative w-full text-center px-6 py-4 bg-white border border-gray-200 rounded-xl hover:bg-[#1B7691] hover:border-[#1B7691] hover:text-white hover:scale-[1.02] active:scale-95 transition-all duration-300 shadow-sm hover:shadow-md overflow-hidden"
                                                 >
-                                                    <span className="relative z-10 font-bold text-gray-600 group-hover:text-white text-lg">
+                                                    <span className="relative z-10 font-semibold text-gray-700 group-hover:text-white text-base">
                                                         {label}
                                                     </span>
                                                 </button>
@@ -322,22 +351,22 @@ export default function ScholraFlow() {
                                 key="final"
                                 initial={{ opacity: 0, scale: 0.95 }}
                                 animate={{ opacity: 1, scale: 1 }}
-                                className="bg-gradient-to-br from-[#1B7691] to-[#0d5a6e] rounded-3xl shadow-2xl p-10 md:p-14 text-center flex flex-col items-center justify-center relative overflow-hidden"
+                                className="bg-gradient-to-br from-[#1B7691] to-[#0d5a6e] rounded-2xl shadow-sm p-10 md:p-14 text-center flex flex-col items-center justify-center relative overflow-hidden"
                             >
                                 <div className="absolute inset-0 pattern-dots text-white opacity-5"></div>
                                 <div className="relative z-10 w-20 h-20 bg-white/10 rounded-full backdrop-blur-sm flex items-center justify-center mb-6 text-[#FB991A] border border-white/20 shadow-lg">
                                     <FiTarget size={40} />
                                 </div>
-                                <Typography className="text-4xl md:text-5xl font-black text-white mb-4 tracking-tight drop-shadow-md">
+                                <Typography className="text-3xl md:text-4xl font-bold text-white mb-4 tracking-tight">
                                     Selesai!
                                 </Typography>
-                                <Typography className="text-white/90 max-w-md mx-auto leading-relaxed text-lg font-medium mb-10">
+                                <Typography className="text-white/90 max-w-md mx-auto leading-relaxed text-base mb-10">
                                     Berdasarkan jawabanmu, kami menemukan kandidat unggulan dari database beasiswa.
                                 </Typography>
 
                                 <button
                                     onClick={() => router.push('/scholra/results')}
-                                    className="w-full sm:w-auto px-10 py-5 bg-white text-[#1B7691] rounded-2xl font-black text-base uppercase tracking-widest shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-3 relative z-10"
+                                    className="w-full sm:w-auto px-8 py-4 bg-white text-[#1B7691] rounded-xl font-bold text-base shadow-sm hover:shadow-md hover:scale-105 active:scale-95 transition-all duration-300 flex items-center justify-center gap-3 relative z-10"
                                 >
                                     Lihat Hasil Akhir <FiArrowRight className="w-5 h-5" />
                                 </button>

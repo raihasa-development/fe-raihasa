@@ -225,10 +225,6 @@ const AdminPromoManagement = () => {
         new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(value);
 
     const isExpired = (date: string) => new Date(date) < new Date();
-    const blurOnWheel = (e: React.WheelEvent<HTMLInputElement>) => {
-        e.preventDefault();
-        (e.target as HTMLInputElement).blur();
-    };
 
     const formatNumberInput = (value: number | string) => {
         const numeric = String(value ?? '').replace(/\D/g, '');
@@ -533,8 +529,6 @@ const AdminPromoManagement = () => {
                                         <input
                                             type="number"
                                             value={formData.discount_percent}
-                                            onWheel={blurOnWheel}
-                                            onWheelCapture={blurOnWheel}
                                             onChange={e => {
                                                 const value = Math.min(100, Math.max(0, Number(e.target.value) || 0));
                                                 setFormData({
@@ -558,8 +552,6 @@ const AdminPromoManagement = () => {
                                             type="text"
                                             inputMode="numeric"
                                             value={formatNumberInput(formData.discount_amount)}
-                                            onWheel={blurOnWheel}
-                                            onWheelCapture={blurOnWheel}
                                             onChange={e => {
                                                 const value = Math.max(0, parseNumberInput(e.target.value));
                                                 setFormData({
@@ -581,8 +573,6 @@ const AdminPromoManagement = () => {
                                         <input
                                             type="number"
                                             value={formData.max_uses}
-                                            onWheel={blurOnWheel}
-                                            onWheelCapture={blurOnWheel}
                                             onChange={e => setFormData({ ...formData, max_uses: e.target.value })}
                                             className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#1B7691] text-gray-800"
                                             placeholder="∞"
@@ -627,8 +617,6 @@ const AdminPromoManagement = () => {
                                         <input
                                             type="number"
                                             value={formData.affiliate_commission_pct}
-                                            onWheel={blurOnWheel}
-                                            onWheelCapture={blurOnWheel}
                                             onChange={e => {
                                                 const value = Math.min(100, Math.max(0, Number(e.target.value) || 0));
                                                 setFormData({ ...formData, affiliate_commission_pct: value });

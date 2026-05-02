@@ -15,14 +15,14 @@ const ScholraTestingPage = () => {
                 description="Temukan beasiswa yang paling cocok dengan profil akademik dan kondisimu menggunakan Scholra Guide."
             />
 
-            <main className="min-h-screen bg-[#FDFEFE] py-20 px-4 relative overflow-hidden">
+            <main className="min-h-screen bg-[#FDFEFE] py-16 md:py-20 px-4 relative overflow-hidden">
                 {/* Background Decor */}
                 <div className="absolute top-0 left-0 w-full h-full pointer-events-none opacity-40">
                     <div className="absolute top-[-10%] left-[-5%] w-[40%] h-[40%] bg-blue-50 rounded-full blur-[120px]" />
                     <div className="absolute bottom-[-10%] right-[-5%] w-[40%] h-[40%] bg-orange-50 rounded-full blur-[120px]" />
                 </div>
 
-                <div className="container mx-auto relative z-10">
+                <div className="max-w-6xl mx-auto px-4 md:px-6 relative z-10">
                     <div className="max-w-4xl mx-auto mb-16 text-center">
                         <motion.div 
                             initial={{ opacity: 0, y: -20 }}
@@ -33,11 +33,11 @@ const ScholraTestingPage = () => {
                              <span className="text-[10px] font-black text-[#1B7691] uppercase tracking-[0.3em]">AI-Driven Analytics</span>
                         </motion.div>
                         
-                        <Typography className="text-4xl md:text-6xl font-black text-gray-900 mb-6 tracking-tighter">
+                        <Typography className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 tracking-tight">
                             The Smartest Way to <br/>
                             <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#1B7691] to-[#0d5a6e]">Find Scholarships</span>
                         </Typography>
-                        <p className="text-gray-500 text-lg max-w-2xl mx-auto leading-relaxed font-medium mb-12">
+                        <p className="text-base text-gray-600 leading-relaxed max-w-2xl mx-auto mb-12">
                             Mulai konsultasi dengan Scholra dan biarkan teknologi kami mencocokkan profilmu dengan kesempatan terbaik di seluruh dunia.
                         </p>
                     </div>

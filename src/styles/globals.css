@@ -40,6 +40,12 @@
     0px 0px 1px rgba(65, 78, 98, 0.05);
 }
 
+@layer base {
+  html, body {
+    font-family: 'Poppins', sans-serif;
+  }
+}
+
 @font-face {
   font-family: 'Poppins';
   src: url('../styles/font/Poppins/Poppins-ExtraLight.eot');

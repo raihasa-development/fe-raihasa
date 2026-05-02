@@ -51,11 +51,6 @@ const AdminPricingManagement = () => {
         fetchPlans();
     }, []);
 
-    const blurOnWheel = (e: React.WheelEvent<HTMLInputElement>) => {
-        e.preventDefault();
-        (e.target as HTMLInputElement).blur();
-    };
-
     const formatNumberInput = (value: number | string) => {
         const numeric = String(value ?? '').replace(/\D/g, '');
         if (!numeric) return '';
@@ -367,8 +362,6 @@ const AdminPricingManagement = () => {
                                             inputMode="numeric"
                                             required
                                             value={formatNumberInput(formData.price)}
-                                            onWheel={blurOnWheel}
-                                            onWheelCapture={blurOnWheel}
                                             onChange={e => setFormData({ ...formData, price: parseNumberInput(e.target.value) })}
                                             className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#1B7691] text-gray-800"
                                             placeholder="49000"
@@ -381,8 +374,6 @@ const AdminPricingManagement = () => {
                                             type="text"
                                             inputMode="numeric"
                                             value={formatNumberInput(formData.original_price)}
-                                            onWheel={blurOnWheel}
-                                            onWheelCapture={blurOnWheel}
                                             onChange={e => setFormData({ ...formData, original_price: parseNumberInput(e.target.value) })}
                                             className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#1B7691] text-gray-800"
                                             placeholder="79000"
@@ -398,8 +389,6 @@ const AdminPricingManagement = () => {
                                             type="number"
                                             required
                                             value={formData.duration_months}
-                                            onWheel={blurOnWheel}
-                                            onWheelCapture={blurOnWheel}
                                             onChange={e => setFormData({ ...formData, duration_months: Number(e.target.value) })}
                                             className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#1B7691] text-gray-800"
                                             placeholder="3"
@@ -410,8 +399,6 @@ const AdminPricingManagement = () => {
                                         <input
                                             type="number"
                                             value={formData.forum_tokens}
-                                            onWheel={blurOnWheel}
-                                            onWheelCapture={blurOnWheel}
                                             onChange={e => setFormData({ ...formData, forum_tokens: Number(e.target.value) })}
                                             className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#1B7691] text-gray-800"
                                             placeholder="5"
@@ -422,8 +409,6 @@ const AdminPricingManagement = () => {
                                         <input
                                             type="number"
                                             value={formData.sort_order}
-                                            onWheel={blurOnWheel}
-                                            onWheelCapture={blurOnWheel}
                                             onChange={e => setFormData({ ...formData, sort_order: Number(e.target.value) })}
                                             className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#1B7691] text-gray-800"
                                             placeholder="1"

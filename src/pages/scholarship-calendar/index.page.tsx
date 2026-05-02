@@ -490,8 +490,6 @@ export default function ScholarshipCalendarPage() {
     <Layout withNavbar={true} withFooter={true}>
       <SEO title="Kalender Beasiswa | Scholra" />
       <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
-        
         .animate-fadeIn {
           animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
@@ -502,9 +500,6 @@ export default function ScholarshipCalendarPage() {
         }
 
         /* Calendar Updates */
-        .rbc-calendar {
-            font-family: 'Poppins', sans-serif;
-        }
         .rbc-header {
             padding: 16px 8px;
             font-weight: 600;
@@ -614,7 +609,7 @@ export default function ScholarshipCalendarPage() {
               <div className="lg:col-span-4">
                 <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 block">Cari Beasiswa</label>
                 <div className="relative group">
-                  <FiSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-[#1B7691] transition-colors" />
+                  <FiSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-[#1B7691] transition-all duration-300" />
                   <input
                     type="text"
                     placeholder="Ketik nama beasiswa..."
@@ -762,9 +757,9 @@ export default function ScholarshipCalendarPage() {
 
             {/* RIGHT CONTENT: Calendar */}
             <div className="lg:col-span-3">
-              <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-200 p-8 h-[800px] relative">
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 h-[800px] relative">
                 {isLoading ? (
-                  <div className="absolute inset-0 flex items-center justify-center bg-white/80 z-10 rounded-3xl">
+                  <div className="absolute inset-0 flex items-center justify-center bg-white/80 z-10 rounded-2xl">
                     <div className="flex flex-col items-center">
                       <div className="animate-spin rounded-full h-12 w-12 border-4 border-gray-200 border-t-[#1B7691]"></div>
                       <p className="mt-4 text-gray-500 font-medium text-sm">Memuat data kalender...</p>
@@ -795,7 +790,7 @@ export default function ScholarshipCalendarPage() {
             </div>
           </div>
 
-          <section className="mt-12 bg-white rounded-3xl border border-gray-200 shadow-sm p-8">
+          <section className="mt-12 bg-white rounded-2xl border border-gray-200 shadow-sm p-8">
             <div className="flex flex-col lg:flex-row gap-10 items-start">
               <div className="lg:w-1/3">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-[#1B7691]/10 text-[#1B7691] text-xs font-bold uppercase tracking-wider mb-4">

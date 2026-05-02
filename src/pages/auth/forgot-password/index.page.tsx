@@ -42,13 +42,13 @@ export default function ForgotPasswordPage() {
         <Layout withNavbar={true} withFooter={true}>
             <SEO title="Lupa Password | Raih Asa" description="Reset password akun Raih Asa Anda." />
 
-            <main className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 font-poppins">
-                <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-lg border border-gray-100">
+            <main className="min-h-screen flex items-center justify-center bg-gray-50 py-16 md:py-20 px-4">
+                <div className="max-w-md w-full space-y-8 bg-white p-8 md:p-10 rounded-2xl shadow-sm border border-gray-100">
                     <div>
-                        <Typography variant="h2" weight="bold" className="text-center text-3xl text-gray-900">
+                        <Typography variant="h2" weight="bold" className="text-center text-3xl font-bold text-gray-900">
                             {isSuccess ? 'Cek Email Anda' : 'Lupa Password?'}
                         </Typography>
-                        <Typography className="mt-2 text-center text-sm text-gray-600">
+                        <Typography className="mt-3 text-center text-base text-gray-600 leading-relaxed">
                             {isSuccess
                                 ? 'Kami telah mengirimkan instruksi reset password ke email Anda. Silakan cek inbox atau spam folder Anda.'
                                 : 'Masukkan email Anda untuk menerima instruksi reset password.'}
@@ -58,7 +58,7 @@ export default function ForgotPasswordPage() {
                     {!isSuccess ? (
                         <FormProvider {...methods}>
                             <form method="post" className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
-                                <div className="space-y-4">
+                                <div className="space-y-5">
                                     <Input
                                         id="email"
                                         label="Email Address"
@@ -79,7 +79,7 @@ export default function ForgotPasswordPage() {
                                         type="submit"
                                         variant="primary"
                                         isLoading={isLoading}
-                                        className="w-full py-3"
+                                        className="w-full !py-3 !rounded-xl !font-semibold"
                                     >
                                         Kirim Instruksi Reset
                                     </Button>
@@ -87,7 +87,7 @@ export default function ForgotPasswordPage() {
                                     <button
                                         type="button"
                                         onClick={() => router.push('/login')}
-                                        className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+                                        className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-all duration-300"
                                     >
                                         Kembali ke Login
                                     </button>
@@ -101,14 +101,14 @@ export default function ForgotPasswordPage() {
                                     onClick={() => setIsSuccess(false)}
                                     variant="warning"
                                     isOutline
-                                    className="w-full py-3"
+                                    className="w-full !py-3 !rounded-xl"
                                 >
                                     Kirim Ulang Email
                                 </Button>
                                 <Button
                                     onClick={() => router.push('/login')}
                                     variant="primary"
-                                    className="w-full py-3"
+                                    className="w-full !py-3 !rounded-xl"
                                 >
                                     Kembali ke Login
                                 </Button>

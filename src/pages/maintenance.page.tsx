@@ -11,7 +11,7 @@ export default function MaintenancePage() {
         <title>Pemeliharaan Sistem | Raihasa</title>
       </Head>
 
-      <div className='max-w-md bg-white p-8 rounded-3xl shadow-xl shadow-[#1B7691]/10 border border-[#1B7691]/20 mt-16'>
+      <div className='max-w-md bg-white p-8 rounded-2xl shadow-sm border border-[#1B7691]/20 mt-16'>
         <div className='flex justify-center mb-6'>
           <NextImage
             src='/images/mentor/haira.png'

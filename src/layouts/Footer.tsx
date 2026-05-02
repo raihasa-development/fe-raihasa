@@ -66,22 +66,22 @@ export default function Footer() {
             <h3 className='text-white font-semibold mb-4'>Platform</h3>
             <ul className='space-y-3'>
               <li>
-                <UnstyledLink href='/coming-soon' className='text-white/70 hover:text-white text-sm transition-colors'>
+                <UnstyledLink href='/scholra' className='text-white/70 hover:text-white text-sm transition-all duration-300'>
                   Scholra AI
                 </UnstyledLink>
               </li>
               <li>
-                <UnstyledLink href='/coming-soon' className='text-white/70 hover:text-white text-sm transition-colors'>
+                <UnstyledLink href='/dreamshub' className='text-white/70 hover:text-white text-sm transition-all duration-300'>
                   Dreamshub Forum
                 </UnstyledLink>
               </li>
               <li>
-                <UnstyledLink href='/coming-soon' className='text-white/70 hover:text-white text-sm transition-colors'>
+                <UnstyledLink href='/bisa-learning' className='text-white/70 hover:text-white text-sm transition-all duration-300'>
                   BISA Learning
                 </UnstyledLink>
               </li>
               <li>
-                <UnstyledLink href='/scholarship-info' className='text-white/70 hover:text-white text-sm transition-colors'>
+                <UnstyledLink href='/scholarship-calendar' className='text-white/70 hover:text-white text-sm transition-all duration-300'>
                   Calendar Beasiswa
                 </UnstyledLink>
               </li>

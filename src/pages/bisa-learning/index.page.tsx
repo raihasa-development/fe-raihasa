@@ -120,11 +120,6 @@ function BISALearningPage() {
 		<Layout withNavbar={true} withFooter={true}>
 			<SEO title="BISA Learning Center" />
 			<style jsx global>{`
-                @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
-                
-                body {
-                    font-family: 'Poppins', sans-serif;
-                }
                 .no-scrollbar::-webkit-scrollbar {
                     display: none;
                 }
@@ -136,7 +131,7 @@ function BISALearningPage() {
 
 			<main className='min-h-screen bg-[#F8FAFC] pb-20'>
 				{/* Hero Area */}
-				<div className='relative overflow-hidden bg-gradient-to-r from-[#1B7691] to-[#0F4C61] pt-32 pb-24 rounded-b-[3rem] shadow-xl'>
+				<div className='relative overflow-hidden bg-gradient-to-r from-[#1B7691] to-[#0F4C61] pt-32 pb-24 rounded-b-[2rem] shadow-lg'>
 
 					{/* Decorative Background Elements */}
 					<div className='absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl translate-x-1/3 -translate-y-1/3'></div>
@@ -150,10 +145,10 @@ function BISALearningPage() {
 										BISA Learning Center
 									</span>
 								</div>
-								<Typography className='font-extrabold text-3xl md:text-5xl mb-4 leading-tight'>
+								<Typography className='font-bold text-3xl md:text-4xl mb-4 leading-tight'>
 									Tingkatkan Skill,<br />Raih Beasiswa Impian
 								</Typography>
-								<Typography className='text-blue-100 text-lg md:text-xl font-light mb-8 max-w-lg mx-auto md:mx-0'>
+								<Typography className='text-blue-100 text-base md:text-lg font-light mb-8 max-w-lg mx-auto md:mx-0 leading-relaxed'>
 									Akses materi eksklusif langsung dari para Awardee untuk persiapan beasiswa yang lebih matang.
 								</Typography>
 							</div>
@@ -184,7 +179,7 @@ function BISALearningPage() {
 				<div className='container mx-auto px-4 sm:px-6 lg:px-8 -mt-12 relative z-20'>
 
 					{/* Membership Status Banner */}
-					<div className={`rounded-3xl p-6 mb-8 shadow-lg flex items-center justify-between flex-wrap gap-4 transition-all duration-500 ${membership.loading ? 'bg-gray-100' : membership.active ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white' : 'bg-white border border-gray-200'}`}>
+					<div className={`rounded-2xl p-6 mb-8 shadow-sm flex items-center justify-between flex-wrap gap-4 transition-all duration-300 ${membership.loading ? 'bg-gray-100' : membership.active ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white' : 'bg-white border border-gray-100'}`}>
 						{membership.loading ? (
 							<div className="flex items-center gap-3 w-full">
 								<div className="w-6 h-6 rounded-full bg-gray-300 animate-pulse" />
@@ -237,8 +232,8 @@ function BISALearningPage() {
 										<div className='p-2 bg-[#FB991A] rounded-lg text-white'><FiClock /></div>
 										<h2 className='text-xl md:text-2xl font-bold text-black'>Lanjutkan Belajar</h2>
 									</div>
-									<div className='bg-white p-6 rounded-3xl shadow-xl border border-gray-100 flex flex-col md:flex-row gap-6 items-center'>
-										<div className='relative w-full md:w-64 h-40 rounded-2xl overflow-hidden shrink-0 group'>
+									<div className='bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-6 items-center'>
+										<div className='relative w-full md:w-64 h-40 rounded-xl overflow-hidden shrink-0 group'>
 											<img src={lastViewed.thumbnail} className='w-full h-full object-cover group-hover:scale-110 transition-transform duration-700' alt="Continue" />
 											<div className='absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity'>
 												<FiPlay className='text-white w-10 h-10' />
@@ -298,13 +293,13 @@ function BISALearningPage() {
 
 							{/* Content Grid */}
 							{isLoading ? (
-								<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-8'>
+								<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
 									{[1, 2, 3].map(i => (
-										<div key={i} className='h-80 bg-white rounded-3xl animate-pulse shadow-sm border border-gray-100'></div>
+										<div key={i} className='h-80 bg-white rounded-2xl animate-pulse shadow-sm border border-gray-100'></div>
 									))}
 								</div>
 							) : filteredCourses.length > 0 ? (
-								<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-8'>
+								<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
 									{filteredCourses.map((course) => {
 										const isLocked = !course.is_authorize;
 										const thumbnail = course.ThumbnailModule || (course.videoId ? `https://img.youtube.com/vi/${course.videoId}/maxresdefault.jpg` : '');
@@ -312,7 +307,7 @@ function BISALearningPage() {
 										return (
 											<div
 												key={course.id}
-												className='group bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-lg shadow-blue-500/5 hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-500 hover:-translate-y-2 flex flex-col h-full'
+												className='group bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 flex flex-col h-full'
 											>
 												{/* Card Image */}
 												<div
@@ -434,7 +429,7 @@ function BISALearningPage() {
 									})}
 								</div>
 							) : (
-								<div className='bg-white rounded-3xl p-12 text-center shadow-lg border border-gray-100'>
+								<div className='bg-white rounded-2xl p-12 text-center shadow-sm border border-gray-100'>
 									{/* Empty State */}
 									<div className='w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6 text-gray-300'>
 										<FiSearch className='w-10 h-10' />

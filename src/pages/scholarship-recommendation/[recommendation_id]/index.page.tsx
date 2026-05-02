@@ -392,7 +392,7 @@ export default function ScholarshipDetailPage() {
           <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#FB991A]/20 rounded-full blur-3xl -translate-x-1/3 translate-y-1/3"></div>
 
           <div className="container mx-auto px-4 relative z-10">
-            <button onClick={() => router.back()} className="group flex items-center gap-2 text-white/80 hover:text-white mb-8 transition-colors">
+            <button onClick={() => router.back()} className="group flex items-center gap-2 text-white/80 hover:text-white mb-8 transition-all duration-300">
               <div className="bg-white/10 p-2 rounded-full group-hover:bg-white/20 transition-all">
                 <FiArrowLeft className="w-5 h-5" />
               </div>
@@ -472,7 +472,7 @@ export default function ScholarshipDetailPage() {
               </div>
 
               {/* Tabs / Sections */}
-              <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                 <div className="p-8 space-y-8">
                   <section>
                     <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
@@ -521,7 +521,7 @@ export default function ScholarshipDetailPage() {
                     <h3 className="text-lg font-bold text-gray-900 mb-4">Dokumen yang Dibutuhkan</h3>
                     <div className="flex flex-wrap gap-2">
                       {scholarshipDetail.documents?.map((doc, i) => (
-                        <span key={i} className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-700 font-medium">
+                        <span key={i} className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-700 font-medium">
                           {doc}
                         </span>
                       ))}
@@ -531,7 +531,7 @@ export default function ScholarshipDetailPage() {
               </div>
 
               {/* Manifestation Board Redesigned */}
-              <div className="bg-gradient-to-br from-white to-blue-50 rounded-3xl shadow-sm border border-blue-100 p-8 relative overflow-hidden">
+              <div className="bg-gradient-to-br from-white to-blue-50 rounded-2xl shadow-sm border border-blue-100 p-8 relative overflow-hidden">
                 <div className="relative z-10">
                   <div className="flex items-center justify-between mb-6">
                     <div>
@@ -553,7 +553,7 @@ export default function ScholarshipDetailPage() {
                       <button
                         onClick={handleManifestationSubmit}
                         disabled={!manifestation.trim() || isSubmitting}
-                        className="bg-[#1B7691] hover:bg-[#15627a] text-white px-5 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 disabled:opacity-50"
+                        className="bg-primary-blue hover:bg-[#15627a] text-white px-5 py-2 rounded-xl text-sm font-medium transition-all duration-300 flex items-center gap-2 disabled:opacity-50"
                       >
                         {isSubmitting ? 'Mengirim...' : <><FiSend /> Kirim</>}
                       </button>
@@ -596,7 +596,7 @@ export default function ScholarshipDetailPage() {
             {/* Right Column: Sticky Action */}
             <div className="lg:col-span-1">
               <div className="sticky top-24 space-y-6">
-                <div className="bg-white p-6 rounded-3xl shadow-lg border border-gray-100 text-center">
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center">
                   <h3 className="font-bold text-gray-900 mb-2">Siap Mendaftar?</h3>
                   <p className="text-gray-500 text-sm mb-6">Pastikan semua dokumen sudah siap sebelum melanjutkan.</p>
 
