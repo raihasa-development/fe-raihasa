@@ -143,17 +143,17 @@ function UserHomePage() {
     <Layout withNavbar={true} withFooter={true}>
       <SEO title='Home - Raihasa' />
 
-      <main className='min-h-screen bg-[#F8FAFC] pt-28 pb-16'>
+      <main className='min-h-screen bg-[#F8FAFC] pt-28 pb-16 md:pb-20'>
         <div className='container mx-auto px-4 sm:px-6 lg:px-8'>
           <section className='relative overflow-hidden rounded-[2rem] bg-gradient-to-r from-[#1B7691] to-[#0F4C61] p-7 md:p-10 text-white mb-8'>
             <div className='absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl translate-x-1/3 -translate-y-1/3' />
             <div className='absolute bottom-0 left-0 w-56 h-56 bg-[#FB991A]/25 rounded-full blur-3xl -translate-x-1/3 translate-y-1/3' />
 
             <div className='relative z-10'>
-              <Typography className='text-3xl md:text-5xl font-extrabold tracking-tight mb-3'>
+              <Typography as='h1' className='text-3xl md:text-5xl font-extrabold tracking-tight mb-3'>
                 Selamat datang, {firstName}!
               </Typography>
-              <Typography className='text-blue-100 text-base md:text-lg max-w-3xl leading-relaxed'>
+              <Typography className='text-blue-100 text-base md:text-lg max-w-2xl leading-relaxed'>
                 Pantau perkembangan belajarmu di BISA Learning dan temukan beasiswa yang sesuai dengan profilmu.
               </Typography>
             </div>
@@ -200,7 +200,7 @@ function UserHomePage() {
               {!membership.loading && !membership.active && (
                 <ButtonLink
                   href='/products'
-                  className='px-5 py-3 rounded-xl bg-[#FB991A] text-white font-semibold hover:bg-orange-600 transition-colors'
+                  className='px-6 py-3 rounded-xl bg-[#FB991A] text-white font-semibold hover:bg-orange-600 transition-all duration-300'
                 >
                   Dapatkan Akses
                 </ButtonLink>
@@ -244,9 +244,9 @@ function UserHomePage() {
           <section className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
             <div className='space-y-6'>
               <article className='bg-white border border-gray-200 rounded-2xl p-6 shadow-sm'>
-                <Typography className='text-xl font-bold text-gray-900 mb-4'>Akses Cepat</Typography>
+                <Typography as='h2' className='text-xl font-bold text-gray-900 mb-4'>Akses Cepat</Typography>
                 <div className='space-y-3'>
-                  <ButtonLink href={learningLandingHref} className='w-full flex items-center justify-between rounded-xl border border-gray-200 px-4 py-3 hover:border-[#1B7691]/30 hover:bg-[#1B7691]/5 transition-colors'>
+                  <ButtonLink href={learningLandingHref} className='w-full flex items-center justify-between rounded-xl border border-gray-200 px-4 py-3 hover:border-[#1B7691]/30 hover:bg-[#1B7691]/5 transition-all duration-300'>
                     <span className='inline-flex items-center gap-2 text-sm font-semibold text-gray-800'>
                       {learningLocked ? <FiLock className='w-4 h-4 text-amber-600' /> : <FiBookOpen className='w-4 h-4 text-[#1B7691]' />}
                       {learningLocked ? 'BISA Learning (Terkunci)' : 'BISA Learning'}
@@ -254,14 +254,14 @@ function UserHomePage() {
                     <FiArrowRight className='w-4 h-4 text-gray-400' />
                   </ButtonLink>
 
-                  <ButtonLink href='/scholra' className='w-full flex items-center justify-between rounded-xl border border-gray-200 px-4 py-3 hover:border-[#1B7691]/30 hover:bg-[#1B7691]/5 transition-colors'>
+                  <ButtonLink href='/scholra' className='w-full flex items-center justify-between rounded-xl border border-gray-200 px-4 py-3 hover:border-[#1B7691]/30 hover:bg-[#1B7691]/5 transition-all duration-300'>
                     <span className='inline-flex items-center gap-2 text-sm font-semibold text-gray-800'>
                       <FiSearch className='w-4 h-4 text-[#1B7691]' /> Cari Beasiswa (Scholra)
                     </span>
                     <FiArrowRight className='w-4 h-4 text-gray-400' />
                   </ButtonLink>
 
-                  <ButtonLink href='/scholarship-calendar' className='w-full flex items-center justify-between rounded-xl border border-gray-200 px-4 py-3 hover:border-[#1B7691]/30 hover:bg-[#1B7691]/5 transition-colors'>
+                  <ButtonLink href='/scholarship-calendar' className='w-full flex items-center justify-between rounded-xl border border-gray-200 px-4 py-3 hover:border-[#1B7691]/30 hover:bg-[#1B7691]/5 transition-all duration-300'>
                     <span className='inline-flex items-center gap-2 text-sm font-semibold text-gray-800'>
                       <FiCalendar className='w-4 h-4 text-[#1B7691]' /> Kalender Beasiswa
                     </span>
@@ -272,13 +272,13 @@ function UserHomePage() {
 
               {lastViewed && (
                 <article className='bg-white border border-gray-200 rounded-2xl p-6 shadow-sm'>
-                  <Typography className='text-xl font-bold text-gray-900 mb-3'>Lanjutkan Belajar</Typography>
+                  <Typography as='h2' className='text-xl font-bold text-gray-900 mb-3'>Lanjutkan Belajar</Typography>
                   <Typography className='text-sm text-gray-600 mb-2'>{lastViewed.title}</Typography>
                   <Typography className='text-xs text-gray-500 mb-4'>Terakhir dibuka: {lastViewed.lastLesson}</Typography>
                   <div className='w-full bg-gray-100 rounded-full h-2 mb-4 overflow-hidden'>
                     <div className='h-full bg-gradient-to-r from-[#1B7691] to-[#2ecc71]' style={{ width: `${lastViewed.progress || 0}%` }} />
                   </div>
-                  <ButtonLink href={learningModuleHref(lastViewed.id, Boolean(lastViewedCourse?.is_authorize))} className='inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#1B7691] text-white text-sm font-semibold hover:bg-[#15627a] transition-colors'>
+                  <ButtonLink href={learningModuleHref(lastViewed.id, Boolean(lastViewedCourse?.is_authorize))} className='inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#1B7691] text-white text-sm font-semibold hover:bg-[#15627a] transition-all duration-300'>
                     {!lastViewedCourse?.is_authorize ? 'Aktifkan Membership' : 'Lanjutkan'} <FiArrowRight className='w-4 h-4' />
                   </ButtonLink>
                 </article>
@@ -289,7 +289,7 @@ function UserHomePage() {
               <article className='bg-white border border-gray-200 rounded-2xl p-6 shadow-sm'>
                 <div className='flex items-center justify-between mb-4 gap-3'>
                   <div>
-                    <Typography className='text-2xl font-bold text-gray-900'>Modul BISA Learning</Typography>
+                    <Typography as='h2' className='text-2xl font-bold text-gray-900'>Modul BISA Learning</Typography>
                     <Typography className='text-gray-600 text-sm'>Modul pilihan untuk mempersiapkan perjalanan beasiswamu.</Typography>
                   </div>
                   <ButtonLink href={learningLandingHref} className='text-sm font-semibold text-[#1B7691] hover:text-[#15627a] whitespace-nowrap'>

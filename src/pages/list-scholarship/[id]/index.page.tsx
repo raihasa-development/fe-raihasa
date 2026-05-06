@@ -423,13 +423,13 @@ export default function ScholarshipDetailPage() {
                             <div className="flex flex-wrap items-center justify-center gap-3 mt-6">
                                 <ButtonLink
                                     href='/products'
-                                    className='px-6 py-3 rounded-xl bg-[#FB991A] text-white font-semibold hover:bg-orange-600 transition-colors'
+                                    className='px-6 py-3 rounded-xl bg-primary-orange text-white font-semibold hover:bg-orange-600 transition-all duration-300'
                                 >
                                     Aktifkan Membership
                                 </ButtonLink>
                                 <ButtonLink
                                     href='/list-scholarship'
-                                    className='px-6 py-3 rounded-xl border border-gray-200 text-gray-700 font-semibold hover:bg-gray-50 transition-colors'
+                                    className='px-6 py-3 rounded-xl border border-gray-200 text-gray-700 font-semibold hover:bg-gray-50 transition-all duration-300'
                                 >
                                     Kembali ke Daftar Beasiswa
                                 </ButtonLink>
@@ -486,7 +486,7 @@ export default function ScholarshipDetailPage() {
                     <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(#fff 1px, transparent 1px)', backgroundSize: '24px 24px' }}></div>
 
                     <div className="container mx-auto px-4 relative z-10">
-                        <button onClick={() => router.push('/list-scholarship')} className="group flex items-center gap-2 text-white/80 hover:text-white mb-8 transition-colors text-sm font-medium">
+                        <button onClick={() => router.push('/list-scholarship')} className="group flex items-center gap-2 text-white/80 hover:text-white mb-8 transition-all duration-300 text-sm font-medium">
                             <div className="bg-white/10 p-2 rounded-lg group-hover:bg-white/20 transition-all">
                                 <FiArrowLeft className="w-4 h-4" />
                             </div>

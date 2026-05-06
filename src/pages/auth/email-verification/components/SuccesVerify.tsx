@@ -4,38 +4,35 @@ import Typography from '@/components/Typography';
 
 export default function SuccessVerify() {
   return (
-    <section className='min-h-screen bg-white gap-4 md:gap-2.5 flex justify-center items-center flex-col'>
-      <NextImage
-        src='/images/auth/email-verification/successmascot.png'
-        alt='success mascot'
-        width={665}
-        height={369}
-        className='md:w-[665px] md:h-[369px] w-[314px] h-[174px]'
-      />
-      <div className='flex flex-col items-center justify-center gap-4 md:gap-8'>
-        <Typography
-          as='h1'
-          variant='h3'
-          weight='bold'
-          className='text-white px-5 py-2 md:px-12 md:py-4 bg-primary-orange w-fit text-3xl'
-        >
-          VERIFIED
-        </Typography>
-        <Typography
-          as='h2'
-          variant='h6'
-          weight='medium'
-          className='text-primary-blue text-center px-5 md:w-[816px]'
-        >
-          Yay, E-Mail kamu telah{' '}
-          <span className='text-primary-orange'>terverifikasi!</span> Sekarang
-          kamu sudah dapat{' '}
-          <span className='text-primary-orange underline hover:no-underline hover:cursor-pointer'>
-            <UnstyledLink href='/auth/login'>Log In</UnstyledLink>
+    <section className='min-h-screen bg-gray-50 flex justify-center items-center flex-col py-16 md:py-20 px-4'>
+      <div className='max-w-lg w-full bg-white rounded-2xl shadow-sm border border-gray-100 p-8 md:p-12 flex flex-col items-center text-center'>
+        <NextImage
+          src='/images/auth/email-verification/successmascot.png'
+          alt='success mascot'
+          width={665}
+          height={369}
+          className='md:w-[400px] md:h-[222px] w-[280px] h-[155px] mb-8'
+        />
+        <div className='flex flex-col items-center justify-center gap-4'>
+          <span className='inline-block text-white px-6 py-2 bg-[#1B7691] rounded-xl font-bold text-xl tracking-wide'>
+            VERIFIED
           </span>
-          . Selamat bereksplorasi dan{' '}
-          <span className='text-primary-orange'>Meraih Asa!!!</span>
-        </Typography>
+          <Typography
+            as='h2'
+            variant='h6'
+            weight='medium'
+            className='text-gray-900 text-center max-w-md text-base leading-relaxed mt-2'
+          >
+            Yay, E-Mail kamu telah{' '}
+            <span className='text-[#FB991A] font-bold'>terverifikasi!</span> Sekarang
+            kamu sudah dapat{' '}
+            <span className='text-[#1B7691] font-bold underline hover:no-underline hover:cursor-pointer'>
+              <UnstyledLink href='/auth/login'>Log In</UnstyledLink>
+            </span>
+            . Selamat bereksplorasi dan{' '}
+            <span className='text-[#FB991A] font-bold'>Meraih Asa!</span>
+          </Typography>
+        </div>
       </div>
     </section>
   );

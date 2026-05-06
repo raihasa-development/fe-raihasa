@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import Layout from '@/layouts/Layout';
@@ -6,13 +6,12 @@ import SEO from '@/components/SEO';
 import Typography from '@/components/Typography';
 import api from '@/lib/api';
 import { getToken } from '@/lib/cookies';
-import { FiCheck, FiClock, FiX, FiLoader, FiCreditCard, FiSmartphone } from 'react-icons/fi';
+import { FiCheck, FiClock, FiX, FiLoader, FiCreditCard, FiShield, FiArrowLeft } from 'react-icons/fi';
 
 type ProductData = {
   id: string;
   nama: string;
   harga: number;
-  harga_diskon?: number;
   deskripsi: string;
   masa_aktif: number;
   jenis?: string;
@@ -26,7 +25,6 @@ type PromoPreview = {
   base_amount?: number | null;
   final_amount?: number | null;
   final_price?: number | null;
-  new_user_offer?: NewUserOffer;
 };
 
 type NewUserOffer = {
@@ -39,18 +37,14 @@ type NewUserOffer = {
   price_after_discount: number;
 };
 
-
-
 type PaymentStatus = 'idle' | 'creating' | 'pending' | 'success' | 'failed';
 
 export default function CheckoutPage() {
   const router = useRouter();
   const { productId } = router.query;
   const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>('idle');
-  const [paymentData, setPaymentData] = useState<any>(null);
   const [snapLoaded, setSnapLoaded] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-
   const [promoCode, setPromoCode] = useState('');
   const [appliedPromo, setAppliedPromo] = useState<PromoPreview | null>(null);
   const [promoError, setPromoError] = useState('');
@@ -59,482 +53,295 @@ export default function CheckoutPage() {
 
   const toSafeNumber = (value: unknown, fallback = 0): number => {
     if (typeof value === 'number' && Number.isFinite(value)) return value;
-    if (typeof value === 'string') {
-      const parsed = Number(value);
-      if (Number.isFinite(parsed)) return parsed;
-    }
+    if (typeof value === 'string') { const p = Number(value); if (Number.isFinite(p)) return p; }
     return fallback;
   };
 
   const handleValidatePromo = async () => {
     if (!promoCode || !product) return;
-
-    const autoPromoCode = product.new_user_offer?.code?.toUpperCase();
-    if (autoPromoCode && promoCode.toUpperCase() === autoPromoCode) {
-      setPromoError('Kode ini otomatis diterapkan untuk akun baru. Gunakan kode promo tambahan lain (mis. referral).');
+    const autoCode = product.new_user_offer?.code?.toUpperCase();
+    if (autoCode && promoCode.toUpperCase() === autoCode) {
+      setPromoError('Kode ini otomatis diterapkan untuk akun baru. Gunakan kode referral lain.');
       setAppliedPromo(null);
       return;
     }
-
     setPromoLoading(true);
     setPromoError('');
     try {
       const token = getToken();
-      const response = await api.post('/pricing/validate-promo', 
-        { code: promoCode, plan_id: product.id },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      const promoData = response.data?.data || {};
-      const discountAmount = toSafeNumber(promoData.discount_amount, 0);
-      const finalAmount = toSafeNumber(
-        promoData.final_amount ?? promoData.final_price,
-        product.harga,
-      );
-
+      const res = await api.post('/pricing/validate-promo', { code: promoCode, plan_id: product.id }, { headers: { Authorization: `Bearer ${token}` } });
+      const d = res.data?.data || {};
+      const disc = toSafeNumber(d.discount_amount, 0);
       setAppliedPromo({
-        ...promoData,
-        discount_amount: discountAmount,
-        auto_discount_amount: toSafeNumber(promoData.auto_discount_amount, 0),
-        promo_discount_amount: toSafeNumber(promoData.promo_discount_amount, discountAmount),
-        base_amount: toSafeNumber(promoData.base_amount, product.harga),
-        final_amount: finalAmount,
+        ...d,
+        discount_amount: disc,
+        auto_discount_amount: toSafeNumber(d.auto_discount_amount, 0),
+        promo_discount_amount: toSafeNumber(d.promo_discount_amount, disc),
+        base_amount: toSafeNumber(d.base_amount, product.harga),
+        final_amount: toSafeNumber(d.final_amount ?? d.final_price, product.harga),
       });
     } catch (e: any) {
-      setPromoError(e.response?.data?.message || 'Kode promo tidak valid atau kadaluarsa');
+      setPromoError(e.response?.data?.message || 'Kode promo tidak valid');
       setAppliedPromo(null);
-    } finally {
-      setPromoLoading(false);
-    }
+    } finally { setPromoLoading(false); }
   };
 
-  // Load Midtrans Snap script
   useEffect(() => {
-    // Determine Snap URL based on environment
     const isProduction = process.env.NEXT_PUBLIC_MIDTRANS_IS_PRODUCTION === 'true';
-    const snapScript = isProduction
-      ? 'https://app.midtrans.com/snap/snap.js'
-      : 'https://app.sandbox.midtrans.com/snap/snap.js';
-
+    const snapScript = isProduction ? 'https://app.midtrans.com/snap/snap.js' : 'https://app.sandbox.midtrans.com/snap/snap.js';
     const clientKey = process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY || '';
-
-    if (!clientKey) {
-      setErrorMessage('Midtrans client key tidak dikonfigurasi');
-      return;
-    }
-
+    if (!clientKey) { setErrorMessage('Midtrans client key tidak dikonfigurasi'); return; }
     const script = document.createElement('script');
     script.src = snapScript;
     script.setAttribute('data-client-key', clientKey);
     script.async = true;
-
-    script.onload = () => {
-      setSnapLoaded(true);
-    };
-
-    script.onerror = () => {
-      setErrorMessage('Gagal memuat script pembayaran');
-    };
-
+    script.onload = () => setSnapLoaded(true);
+    script.onerror = () => setErrorMessage('Gagal memuat script pembayaran');
     document.body.appendChild(script);
-
-    return () => {
-      if (document.body.contains(script)) {
-        document.body.removeChild(script);
-      }
-    };
+    return () => { if (document.body.contains(script)) document.body.removeChild(script); };
   }, []);
+
   const { data: product, isLoading: productLoading } = useQuery({
     queryKey: ['product-checkout', productId],
     queryFn: async () => {
       if (!productId) return null;
-
-      // Fetch from v2 Pricing API
       try {
-        const response = await api.get<{ data: any }>(`/pricing/plans/${productId}`);
-        const plan = response.data.data;
+        const res = await api.get<{ data: any }>(`/pricing/plans/${productId}`);
+        const plan = res.data.data;
         if (!plan) return null;
-
-        // Normalize data structure for UI
-        return {
-          id: plan.id,
-          nama: plan.name,
-          harga: toSafeNumber(plan.price, 0),
-          harga_diskon: undefined, // no legacy discount logic here
-          deskripsi: plan.description || '',
-          masa_aktif: toSafeNumber(plan.duration_months, 0),
-          jenis: plan.is_enterprise ? 'private' : (plan.is_popular ? 'ideal' : 'basic'),
-          new_user_offer: plan.new_user_offer,
-        } as ProductData;
-      } catch (e) {
-        console.error("Failed to fetch plan for checkout", e);
-        return null;
-      }
+        return { id: plan.id, nama: plan.name, harga: toSafeNumber(plan.price, 0), deskripsi: plan.description || '', masa_aktif: toSafeNumber(plan.duration_months, 0), jenis: plan.is_enterprise ? 'private' : (plan.is_popular ? 'ideal' : 'basic'), new_user_offer: plan.new_user_offer } as ProductData;
+      } catch { return null; }
     },
     enabled: !!productId,
   });
 
-  // Create payment mutation
   const createPaymentMutation = useMutation({
     mutationFn: async () => {
       const token = getToken();
       if (!token) throw new Error('Not authenticated');
-
-      const response = await api.post('/pricing/payments/create', {
-        plan_id: product?.id,
-        promo_code: appliedPromo ? promoCode : undefined,
-      }, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      return response.data.data;
+      const res = await api.post('/pricing/payments/create', { plan_id: product?.id, promo_code: appliedPromo ? promoCode : undefined }, { headers: { Authorization: `Bearer ${token}` } });
+      return res.data.data;
     },
     onSuccess: (data) => {
-      setPaymentData(data);
       setPaymentStatus('pending');
-
-      // Automatically launch midtrans snap on successful token creation
       if (window.snap) {
         // @ts-ignore
         window.snap.pay(data.token, {
           onSuccess: (result: any) => router.push(`/payment/success?orderId=${result.order_id || data.order_id}&amount=${displayPrice}`),
           onPending: () => setErrorMessage('Menunggu pembayaran...'),
-          onError: (result: any) => {
-            const midtransMessage = result?.status_message || result?.message;
-            setErrorMessage(midtransMessage || 'Pembayaran gagal/dibatalkan.');
-            setPaymentStatus('failed');
-          },
-          onClose: () => { setPaymentStatus('idle'); },
+          onError: (result: any) => { setErrorMessage(result?.status_message || 'Pembayaran gagal.'); setPaymentStatus('failed'); },
+          onClose: () => setPaymentStatus('idle'),
         });
       }
     },
-    onError: (error: any) => {
-      setPaymentStatus('failed');
-      setErrorMessage(error.response?.data?.message || 'Gagal memproses pembayaran');
-    },
+    onError: (error: any) => { setPaymentStatus('failed'); setErrorMessage(error.response?.data?.message || 'Gagal memproses pembayaran'); },
   });
 
-  useEffect(() => {
-    const timer = setInterval(() => setOfferNow(new Date()), 1000);
-    return () => clearInterval(timer);
-  }, []);
+  useEffect(() => { const t = setInterval(() => setOfferNow(new Date()), 1000); return () => clearInterval(t); }, []);
 
   const liveOffer = product?.new_user_offer;
-  const isOfferActive =
-    !!liveOffer?.is_active &&
-    !!liveOffer?.expires_at &&
-    new Date(liveOffer.expires_at) > offerNow;
+  const isOfferActive = !!liveOffer?.is_active && !!liveOffer?.expires_at && new Date(liveOffer.expires_at) > offerNow;
+  const baseAmount = toSafeNumber(appliedPromo?.base_amount, toSafeNumber(product?.harga, 0));
+  const autoDiscount = toSafeNumber(appliedPromo?.auto_discount_amount, isOfferActive ? toSafeNumber(liveOffer?.discount_amount, 0) : 0);
+  const promoDiscount = toSafeNumber(appliedPromo?.promo_discount_amount, appliedPromo ? toSafeNumber(appliedPromo?.discount_amount, 0) : 0);
+  const displayPrice = toSafeNumber(appliedPromo?.final_amount ?? appliedPromo?.final_price, Math.max(0, baseAmount - autoDiscount));
+  const hasDiscount = autoDiscount > 0 || promoDiscount > 0;
+  const offerSec = isOfferActive && liveOffer?.expires_at ? Math.max(0, Math.floor((new Date(liveOffer.expires_at).getTime() - offerNow.getTime()) / 1000)) : 0;
+  const oh = Math.floor(offerSec / 3600), om = Math.floor((offerSec % 3600) / 60), os = offerSec % 60;
 
-  const baseAmount = toSafeNumber(
-    appliedPromo?.base_amount,
-    toSafeNumber(product?.harga, 0),
-  );
+  const fmt = (n: number) => `Rp ${n.toLocaleString('id-ID')}`;
+  const isProcessing = paymentStatus === 'creating' || paymentStatus === 'pending';
 
-  const autoDiscountAmount = toSafeNumber(
-    appliedPromo?.auto_discount_amount,
-    isOfferActive ? toSafeNumber(liveOffer?.discount_amount, 0) : 0,
-  );
-
-  const promoDiscountAmount = toSafeNumber(
-    appliedPromo?.promo_discount_amount,
-    appliedPromo ? toSafeNumber(appliedPromo?.discount_amount, 0) : 0,
-  );
-
-  const displayPrice = toSafeNumber(
-    appliedPromo?.final_amount ?? appliedPromo?.final_price,
-    Math.max(0, baseAmount - autoDiscountAmount),
-  );
-
-  const hasDiscount = autoDiscountAmount > 0 || promoDiscountAmount > 0;
-
-  const offerRemainingSeconds = isOfferActive && liveOffer?.expires_at
-    ? Math.max(0, Math.floor((new Date(liveOffer.expires_at).getTime() - offerNow.getTime()) / 1000))
-    : 0;
-  const offerHour = Math.floor(offerRemainingSeconds / 3600);
-  const offerMinute = Math.floor((offerRemainingSeconds % 3600) / 60);
-  const offerSecond = offerRemainingSeconds % 60;
-
-  // Render loading state
   if (productLoading || !product) {
     return (
-      <Layout withNavbar={true} withFooter={true}>
+      <Layout withNavbar withFooter>
         <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <div className="text-center">
-            <FiLoader className="w-12 h-12 text-[#FB991A] animate-spin mx-auto mb-4" />
-            <Typography className="text-gray-600">Memuat data produk...</Typography>
-          </div>
+          <FiLoader className="w-8 h-8 text-gray-300 animate-spin" />
         </div>
       </Layout>
     );
   }
 
-  return (
-    <Layout withNavbar={true} withFooter={true}>
-      <SEO title={`Checkout - ${product.nama} | Raihasa`} />
-      <main className="min-h-screen bg-[#FDFCFB] relative overflow-hidden flex items-center justify-center py-16 px-4">
-        {/* Background Blobs for ambiance */}
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-orange-100 rounded-full blur-[100px] opacity-40 -translate-y-1/2 translate-x-1/3" />
-        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-red-50 rounded-full blur-[80px] opacity-40 translate-y-1/3 -translate-x-1/4" />
-
-        <div className="relative w-full max-w-xl z-10" data-aos="fade-up">
-          {/* Header / Breadcrumb-ish */}
-          <div className="text-center mb-6">
-            <Typography variant="h1" weight="bold" className="text-2xl md:text-[2rem] font-poppins text-gray-900 font-semibold tracking-tight mb-2">
-              Review Pesanan
-            </Typography>
-            <Typography className="text-gray-500 text-[15px] leading-relaxed">
-              Pastikan detail paket langganan Anda sudah sesuai
-            </Typography>
+  if (paymentStatus === 'success') {
+    return (
+      <Layout withNavbar withFooter>
+        <SEO title="Pembayaran Berhasil | Raihasa" />
+        <main className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-10 max-w-sm w-full text-center">
+            <div className="w-14 h-14 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-4">
+              <FiCheck className="w-7 h-7 text-green-600" />
+            </div>
+            <h1 className="text-xl font-bold text-gray-900 mb-1">Pembayaran Berhasil</h1>
+            <p className="text-sm text-gray-500 mb-6">Membership Anda telah aktif.</p>
+            <button onClick={() => router.push('/home')} className="w-full py-3 bg-gray-900 text-white rounded-xl text-sm font-semibold hover:bg-black transition-all duration-300">
+              Ke Dashboard
+            </button>
           </div>
+        </main>
+      </Layout>
+    );
+  }
 
-          {/* MAIN CARD */}
-          <div className="bg-white/85 backdrop-blur-xl rounded-3xl shadow-[0_16px_45px_-20px_rgba(17,24,39,0.22)] border border-white/70 overflow-hidden">
+  if (paymentStatus === 'failed') {
+    return (
+      <Layout withNavbar withFooter>
+        <SEO title="Pembayaran Gagal | Raihasa" />
+        <main className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-10 max-w-sm w-full text-center">
+            <div className="w-14 h-14 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+              <FiX className="w-7 h-7 text-red-600" />
+            </div>
+            <h1 className="text-xl font-bold text-gray-900 mb-1">Gagal Memproses</h1>
+            <p className="text-sm text-gray-500 mb-2">Terjadi kesalahan pada transaksi.</p>
+            {errorMessage && <p className="text-xs text-red-500 bg-red-50 rounded-lg px-3 py-2 mb-6">{errorMessage}</p>}
+            <button onClick={() => { setErrorMessage(''); setPaymentStatus('idle'); createPaymentMutation.reset(); }} className="w-full py-3 bg-gray-900 text-white rounded-xl text-sm font-semibold hover:bg-black transition-all duration-300">
+              Coba Lagi
+            </button>
+          </div>
+        </main>
+      </Layout>
+    );
+  }
 
-            {/* Ready to Pay State */}
-            {paymentStatus !== 'success' && paymentStatus !== 'failed' && (
-              <div>
-                {/* Product Summary Header */}
-                <div className="bg-gradient-to-r from-gray-50 to-white px-8 py-7 border-b border-gray-100">
-                  <div className="flex items-start justify-between mb-1">
-                    <div>
-                      {/* <span className="inline-block py-1 px-3 rounded-full bg-orange-100/60 text-[#DB4B24] text-[11px] font-semibold tracking-normal uppercase mb-3">
-                        // {product.jenis === 'basic' ? 'Basic Tier' : 'Premium Tier'}
-                      </span> */}
-                      <Typography variant="h2" weight="bold" className="text-xl md:text-2xl font-poppins text-gray-900 leading-tight">
-                        {product.nama}
-                      </Typography>
-                      <Typography className="text-gray-500 text-[13px] mt-1">
-                        Akses Membership {product.masa_aktif} Bulan
-                      </Typography>
-                    </div>
-                    {/* Compact Price */}
-                    <div className="text-right">
-                      {hasDiscount && (
-                        <Typography className="text-sm text-gray-400 line-through decoration-red-300">
-                          Rp {baseAmount.toLocaleString('id-ID')}
-                        </Typography>
-                      )}
-                    </div>
+  return (
+    <Layout withNavbar withFooter>
+      <SEO title={`Checkout - ${product.nama} | Raihasa`} />
+      <main className="min-h-screen bg-gray-50 pt-28 pb-16 px-4">
+        <div className="max-w-4xl mx-auto">
+
+          {/* Back link */}
+          <button onClick={() => router.push('/products')} className="flex items-center gap-2 text-sm text-gray-400 hover:text-gray-600 mb-6 transition-all duration-300">
+            <FiArrowLeft className="w-4 h-4" /> Kembali ke pilihan paket
+          </button>
+
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+
+            {/* LEFT: Order details (3 cols) */}
+            <div className="lg:col-span-3 space-y-4">
+
+              {/* Product card */}
+              <div className="bg-white rounded-2xl border border-gray-100 p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h1 className="text-lg font-bold text-gray-900">{product.nama}</h1>
+                    <p className="text-sm text-gray-500 mt-0.5">Akses {product.masa_aktif} bulan</p>
                   </div>
-
-                  {isOfferActive && (
-                    <div className="mt-4 rounded-2xl border border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 p-4">
-                      <div className="flex items-start justify-between gap-4">
-                        <div>
-                          <p className="text-[11px] font-bold uppercase tracking-wide text-amber-700">Flash Sale Akun Baru</p>
-                          <p className="text-sm text-amber-900 font-semibold mt-1">
-                            Penawaran khusus {liveOffer?.discount_percent || 35}% sudah aktif untuk akun Anda.
-                          </p>
-                          <p className="text-xs text-amber-700/90 mt-1">
-                            Kode otomatis diterapkan. Anda tetap bisa menambahkan kode referral sebagai diskon tambahan.
-                          </p>
-                        </div>
-                        <div className="rounded-xl bg-white/80 px-3 py-2 border border-amber-200 min-w-[128px] text-right">
-                          <p className="text-[10px] uppercase tracking-wide text-gray-500">Berakhir dalam</p>
-                          <p className="font-mono font-bold text-amber-700 text-sm">
-                            {String(offerHour).padStart(2, '0')}:{String(offerMinute).padStart(2, '0')}:{String(offerSecond).padStart(2, '0')}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Huge Price Display */}
-                  <div className="mt-5 flex items-end gap-2">
-                    <span className="text-[11px] text-gray-500 font-semibold uppercase tracking-[0.08em]">Total Pembayaran</span>
-                    <span className="text-3xl md:text-[2.2rem] leading-none font-bold text-gray-900">
-                      <span className="text-lg md:text-xl mr-1 text-gray-700 font-semibold">Rp</span>
-                      {displayPrice.toLocaleString('id-ID')}
-                    </span>
+                  <div className="text-right">
+                    {hasDiscount && <p className="text-sm text-gray-400 line-through">{fmt(baseAmount)}</p>}
+                    <p className="text-2xl font-bold text-gray-900">{fmt(displayPrice)}</p>
                   </div>
                 </div>
-
-                {/* Features & Details */}
-                <div className="px-8 py-6 bg-white">
-                  <div className="space-y-4">
-                    {/* Description Snippet */}
-                    <div className="p-4 bg-orange-50/30 rounded-2xl border border-orange-100/50">
-                      <div className="flex gap-3">
-                        <div className="mt-1 min-w-[1.25rem]">
-                          <FiCheck className="w-5 h-5 text-[#FB991A]" />
-                        </div>
-                        <Typography className="text-sm text-gray-600 leading-relaxed">
-                          {product.deskripsi || "Akses penuh ke semua materi pembelajaran dan mentoring eksklusif."}
-                        </Typography>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between text-sm text-gray-500">
-                      <div className="flex items-center gap-2">
-                        <FiClock className="w-4 h-4" />
-                        <span>Masa Aktif</span>
-                      </div>
-                      <span className="font-semibold text-gray-700">{product.masa_aktif} Bulan</span>
-                    </div>
-
-                    <div className="flex items-center justify-between text-sm text-gray-500">
-                      <div className="flex items-center gap-2">
-                        <FiSmartphone className="w-4 h-4" />
-                        <span>Metode Bayar</span>
-                      </div>
-                      <span className="font-semibold text-gray-700">QRIS / Transfer / CC</span>
-                    </div>
-                  </div>
-
-                  {/* Promo Code Section */}
-                  <div className="mt-6 mb-6">
-                    <Typography className="text-sm font-semibold text-gray-700 mb-1">Pilih Metode Pembayaran (Dicek Otomatis)</Typography>
-                    <Typography className="text-xs text-gray-500 mb-3">Tersedia QRIS, Virtual Account, e-wallet, kartu kredit, dan metode lainnya di Midtrans.</Typography>
-
-                    <Typography className="text-sm font-semibold text-gray-700 mb-2">Kode Promo Tambahan (Opsional)</Typography>
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        value={promoCode}
-                        onChange={(e) => {
-                          setPromoCode(e.target.value.toUpperCase());
-                          setPromoError('');
-                          if (appliedPromo) setAppliedPromo(null);
-                        }}
-                        placeholder="Masukkan Kode"
-                        className="flex-1 px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#FB991A]/40 bg-gray-50 uppercase font-medium text-sm"
-                        disabled={promoLoading || paymentStatus === 'creating' || paymentStatus === 'pending'}
-                      />
-                      <button
-                        onClick={handleValidatePromo}
-                        disabled={!promoCode || promoLoading || !!appliedPromo || paymentStatus === 'creating' || paymentStatus === 'pending'}
-                        className="px-6 py-3 bg-gray-900 text-white rounded-xl text-sm font-semibold hover:bg-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[100px]"
-                      >
-                        {promoLoading ? <FiLoader className="animate-spin w-5 h-5" /> : appliedPromo ? <FiCheck className="w-5 h-5 text-green-400" /> : 'Terapkan'}
-                      </button>
-                    </div>
-                    {promoError && <p className="text-red-500 text-xs mt-2 flex items-center gap-1"><FiX /> {promoError}</p>}
-                    {appliedPromo && <p className="text-green-600 text-xs mt-2 flex items-center gap-1 font-medium"><FiCheck /> Kode promo berhasil diterapkan. Diskon tambahan: Rp {promoDiscountAmount.toLocaleString('id-ID')}</p>}
-                  </div>
-
-                  <div className="mb-6 rounded-2xl border border-gray-100 bg-gray-50/80 p-4">
-                    <Typography className="text-sm font-semibold text-gray-800 mb-3">Detail Transaksi</Typography>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between text-gray-600">
-                        <span>Akses {product.masa_aktif} Bulan</span>
-                        <span className="font-medium text-gray-800">Rp {baseAmount.toLocaleString('id-ID')}</span>
-                      </div>
-
-                      {autoDiscountAmount > 0 && (
-                        <div className="flex justify-between text-green-700">
-                          <span>Discount Flash Sale {liveOffer?.discount_percent || 35}% (Spesial Akun Baru)</span>
-                          <span className="font-medium">-Rp {autoDiscountAmount.toLocaleString('id-ID')}</span>
-                        </div>
-                      )}
-
-                      {promoDiscountAmount > 0 && (
-                        <div className="flex justify-between text-green-700">
-                          <span>Diskon Kode Promo Tambahan</span>
-                          <span className="font-medium">-Rp {promoDiscountAmount.toLocaleString('id-ID')}</span>
-                        </div>
-                      )}
-
-                      <div className="border-t border-dashed border-gray-300 pt-2 mt-2 flex justify-between text-gray-900 font-bold">
-                        <span>Total</span>
-                        <span>Rp {displayPrice.toLocaleString('id-ID')}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Divider */}
-                  <div className="mb-6 border-t border-dashed border-gray-200 relative">
-                    <div className="absolute -left-[44px] -top-3 w-6 h-6 bg-[#FDFCFB] rounded-full" />
-                    <div className="absolute -right-[44px] -top-3 w-6 h-6 bg-[#FDFCFB] rounded-full" />
-                  </div>
-
-                  {/* Payment Action */}
-                  <div className="pb-6 space-y-4">
-                    <button
-                      onClick={() => {
-                        if (!snapLoaded || !window.snap) {
-                          setErrorMessage('Gagal memuat gateway, silakan refresh.');
-                          return;
-                        }
-                        if (paymentStatus === 'creating' || paymentStatus === 'pending') return;
-                        
-                        setPaymentStatus('creating');
-                        createPaymentMutation.mutate();
-                      }}
-                      disabled={!snapLoaded || paymentStatus === 'creating' || paymentStatus === 'pending'}
-                      className="w-full relative group overflow-hidden bg-gradient-to-r from-[#FB991A] to-[#DB4B24] rounded-xl py-4 transition-all duration-300 transform hover:-translate-y-0.5 hover:shadow-lg hover:shadow-orange-300/30 disabled:opacity-70 disabled:hover:translate-y-0 disabled:hover:shadow-none"
-                    >
-                      <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
-                      <div className="relative flex items-center justify-center gap-2 text-white font-bold text-lg">
-                        {snapLoaded && paymentStatus !== 'creating' && paymentStatus !== 'pending' ? (
-                          <>
-                            <FiCreditCard className="w-5 h-5" />
-                            <span>Bayar Sekarang</span>
-                          </>
-                        ) : (
-                          <>
-                            <FiLoader className="w-5 h-5 animate-spin" />
-                            <span>{paymentStatus === 'creating' ? 'Membuat Tagihan...' : 'Memuat...'}</span>
-                          </>
-                        )}
-                      </div>
-                    </button>
-
-                    <button
-                      onClick={() => router.push('/products')}
-                      className="w-full py-3 text-sm font-medium text-gray-500 hover:text-gray-700 transition-colors"
-                    >
-                      Batal & Kembali
-                    </button>
-                  </div>
-
-                  {/* Error Toast Inline */}
-                  {errorMessage && (
-                    <div className="mt-4 p-3 bg-red-50 text-red-600 text-sm rounded-lg text-center animate-pulse">
-                      {errorMessage}
-                    </div>
-                  )}
-
-                  {/* Secure Badge */}
-                  <div className="mt-6 flex justify-center items-center gap-2 opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
-                    <img src="/images/midtanslogo.svg" alt="Midtrans" className="h-4" />
-                    <Typography className="text-[10px] text-gray-400">Secured Payment Gateway</Typography>
-                  </div>
-
-                </div>
-              </div>
-            )}
-
-            {/* Success State */}
-            {paymentStatus === 'success' && (
-              <div className="p-10 text-center flex flex-col items-center justify-center">
-                <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6">
-                  <FiCheck className="w-10 h-10 text-green-600" />
-                </div>
-                <Typography variant="h2" className="text-xl md:text-2xl font-semibold text-gray-800 mb-2">Terima Kasih!</Typography>
-                <Typography className="text-gray-500 text-sm mb-8">Pembayaran berhasil. Membership Anda aktif.</Typography>
-                <button onClick={() => router.push('/dashboard')} className="px-8 py-3 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 transition-all">
-                  Ke Dashboard
-                </button>
-              </div>
-            )}
-
-            {/* Failed State */}
-            {paymentStatus === 'failed' && (
-              <div className="p-10 text-center flex flex-col items-center justify-center">
-                <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mb-6">
-                  <FiX className="w-10 h-10 text-red-600" />
-                </div>
-                <Typography variant="h2" className="text-xl md:text-2xl font-semibold text-gray-800 mb-2">Gagal Memproses</Typography>
-                <Typography className="text-gray-500 text-sm mb-4">Terjadi kesalahan pada transaksi.</Typography>
-                {errorMessage && (
-                  <div className="mb-8 px-4 py-3 rounded-xl bg-red-50 border border-red-100 text-red-600 text-sm max-w-md">
-                    {errorMessage}
-                  </div>
+                {product.deskripsi && (
+                  <p className="text-sm text-gray-500 leading-relaxed border-t border-gray-100 pt-4">{product.deskripsi}</p>
                 )}
-                <button onClick={() => { setErrorMessage(''); setPaymentStatus('idle'); createPaymentMutation.reset(); }} className="px-8 py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-black transition-all">
-                  Coba Lagi
-                </button>
               </div>
-            )}
+
+              {/* Flash sale banner */}
+              {isOfferActive && (
+                <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-center justify-between gap-4">
+                  <div>
+                    <p className="text-xs font-bold text-amber-700 uppercase tracking-wide">Flash Sale Akun Baru</p>
+                    <p className="text-sm text-amber-900 mt-0.5">Diskon {liveOffer?.discount_percent || 35}% otomatis diterapkan</p>
+                  </div>
+                  <div className="bg-white rounded-lg px-3 py-1.5 border border-amber-200 text-center shrink-0">
+                    <p className="text-[10px] text-gray-400 uppercase">Sisa waktu</p>
+                    <p className="font-mono font-bold text-amber-700 text-sm">{String(oh).padStart(2,'0')}:{String(om).padStart(2,'0')}:{String(os).padStart(2,'0')}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Promo code */}
+              <div className="bg-white rounded-2xl border border-gray-100 p-6">
+                <p className="text-sm font-semibold text-gray-700 mb-3">Kode Promo (Opsional)</p>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={promoCode}
+                    onChange={(e) => { setPromoCode(e.target.value.toUpperCase()); setPromoError(''); if (appliedPromo) setAppliedPromo(null); }}
+                    placeholder="Masukkan kode"
+                    className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium uppercase focus:outline-none focus:ring-2 focus:ring-primary-blue/20 transition-all duration-300"
+                    disabled={promoLoading || isProcessing}
+                  />
+                  <button
+                    onClick={handleValidatePromo}
+                    disabled={!promoCode || promoLoading || !!appliedPromo || isProcessing}
+                    className="px-5 py-2.5 bg-gray-900 text-white rounded-xl text-sm font-semibold hover:bg-black transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed min-w-[90px] flex items-center justify-center"
+                  >
+                    {promoLoading ? <FiLoader className="animate-spin w-4 h-4" /> : appliedPromo ? <FiCheck className="w-4 h-4 text-green-400" /> : 'Pakai'}
+                  </button>
+                </div>
+                {promoError && <p className="text-red-500 text-xs mt-2 flex items-center gap-1"><FiX className="w-3 h-3" /> {promoError}</p>}
+                {appliedPromo && <p className="text-green-600 text-xs mt-2 flex items-center gap-1"><FiCheck className="w-3 h-3" /> Diskon {fmt(promoDiscount)} diterapkan</p>}
+              </div>
+
+              {/* Transaction detail */}
+              <div className="bg-white rounded-2xl border border-gray-100 p-6">
+                <p className="text-sm font-semibold text-gray-700 mb-3">Rincian Pembayaran</p>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between text-gray-500">
+                    <span>{product.nama} ({product.masa_aktif} bln)</span>
+                    <span className="text-gray-700 font-medium">{fmt(baseAmount)}</span>
+                  </div>
+                  {autoDiscount > 0 && (
+                    <div className="flex justify-between text-green-600">
+                      <span>Flash Sale {liveOffer?.discount_percent || 35}%</span>
+                      <span>-{fmt(autoDiscount)}</span>
+                    </div>
+                  )}
+                  {promoDiscount > 0 && (
+                    <div className="flex justify-between text-green-600">
+                      <span>Kode Promo</span>
+                      <span>-{fmt(promoDiscount)}</span>
+                    </div>
+                  )}
+                  <div className="border-t border-dashed border-gray-200 pt-2 mt-1 flex justify-between font-bold text-gray-900">
+                    <span>Total</span>
+                    <span>{fmt(displayPrice)}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* RIGHT: Payment action (2 cols) */}
+            <div className="lg:col-span-2">
+              <div className="bg-white rounded-2xl border border-gray-100 p-6 lg:sticky lg:top-28 space-y-5">
+                <div>
+                  <p className="text-xs text-gray-400 uppercase tracking-wide font-semibold mb-1">Total Bayar</p>
+                  <p className="text-3xl font-bold text-gray-900">{fmt(displayPrice)}</p>
+                </div>
+
+                <button
+                  onClick={() => {
+                    if (!snapLoaded || !window.snap) { setErrorMessage('Gagal memuat gateway, silakan refresh.'); return; }
+                    if (isProcessing) return;
+                    setPaymentStatus('creating');
+                    createPaymentMutation.mutate();
+                  }}
+                  disabled={!snapLoaded || isProcessing}
+                  className="w-full py-3.5 bg-gradient-to-r from-[#FB991A] to-[#DB4B24] text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-orange-200/50 transition-all duration-300 disabled:opacity-60"
+                >
+                  {!isProcessing ? <><FiCreditCard className="w-4 h-4" /> Bayar Sekarang</> : <><FiLoader className="w-4 h-4 animate-spin" /> {paymentStatus === 'creating' ? 'Membuat Tagihan...' : 'Memuat...'}</>}
+                </button>
+
+                {errorMessage && <p className="text-xs text-red-500 bg-red-50 rounded-lg px-3 py-2 text-center">{errorMessage}</p>}
+
+                <div className="space-y-3 pt-2 border-t border-gray-100">
+                  <div className="flex items-center gap-2.5 text-xs text-gray-400">
+                    <FiShield className="w-3.5 h-3.5 shrink-0" />
+                    <span>Pembayaran terenkripsi SSL</span>
+                  </div>
+                  <div className="flex items-center gap-2.5 text-xs text-gray-400">
+                    <FiClock className="w-3.5 h-3.5 shrink-0" />
+                    <span>Akses langsung aktif setelah bayar</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-center gap-2 pt-2 opacity-40">
+                  <img src="/images/midtanslogo.svg" alt="Midtrans" className="h-3" />
+                  <span className="text-[9px] text-gray-400">Secured Payment</span>
+                </div>
+              </div>
+            </div>
 
           </div>
         </div>

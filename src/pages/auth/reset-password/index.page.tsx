@@ -57,13 +57,13 @@ export default function ResetPasswordPage() {
         <Layout withNavbar={true} withFooter={true}>
             <SEO title="Reset Password | Raih Asa" description="Buat password baru untuk akun Anda." />
 
-            <main className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 font-poppins">
-                <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-lg border border-gray-100">
+            <main className="min-h-screen flex items-center justify-center bg-gray-50 py-16 md:py-20 px-4">
+                <div className="max-w-md w-full space-y-8 bg-white p-8 md:p-10 rounded-2xl shadow-sm border border-gray-100">
                     <div>
-                        <Typography variant="h2" weight="bold" className="text-center text-3xl text-gray-900">
+                        <Typography variant="h2" weight="bold" className="text-center text-3xl font-bold text-gray-900">
                             {isSuccess ? 'Password Berhasil Direset' : 'Buat Password Baru'}
                         </Typography>
-                        <Typography className="mt-2 text-center text-sm text-gray-600">
+                        <Typography className="mt-3 text-center text-base text-gray-600 leading-relaxed">
                             {isSuccess
                                 ? 'Silakan login kembali dengan password baru Anda. Mengalihkan...'
                                 : 'Masukkan password baru yang aman untuk akun Anda.'}
@@ -73,7 +73,7 @@ export default function ResetPasswordPage() {
                     {!isSuccess ? (
                         <FormProvider {...methods}>
                             <form method="post" className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
-                                <div className="space-y-4">
+                                <div className="space-y-5">
                                     <Input
                                         id="password"
                                         label="Password Baru"
@@ -107,7 +107,7 @@ export default function ResetPasswordPage() {
                                         type="submit"
                                         variant="primary"
                                         isLoading={isLoading}
-                                        className="w-full py-3"
+                                        className="w-full !py-3 !rounded-xl !font-semibold"
                                     >
                                         Reset Password
                                     </Button>
@@ -119,7 +119,7 @@ export default function ResetPasswordPage() {
                             <Button
                                 onClick={() => router.push('/login')}
                                 variant="primary"
-                                className="w-full py-3"
+                                className="w-full !py-3 !rounded-xl !font-semibold"
                             >
                                 Login Sekarang
                             </Button>

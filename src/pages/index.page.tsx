@@ -144,6 +144,7 @@ export default function Home() {
               {/* Main Headline */}
               <div ref={titleMainRef} data-aos='fade-up' data-aos-delay='300'>
                 <Typography
+                  as='h1'
                   className='font-extrabold text-3xl md:text-4xl lg:text-5xl xl:text-6xl text-[#FB991A] leading-tight text-center xl:text-left'
                 >
                   Raih Beasiswa Impianmu dengan Lebih Mudah
@@ -169,7 +170,7 @@ export default function Home() {
                   size='lg'
                   className='group'
                 >
-                  <div className='flex items-center justify-center gap-2 px-6 py-3 md:px-8 md:py-4 text-sm md:text-base font-bold text-white bg-gradient-to-r from-[#1B7691] to-[#0e5c71] rounded-full shadow-lg hover:shadow-xl hover:shadow-[#1B7691]/30 transition-all duration-300 hover:scale-105'>
+                  <div className='flex items-center justify-center gap-2 px-6 py-3 md:px-8 md:py-4 text-sm md:text-base font-bold text-white bg-gradient-to-r from-[#1B7691] to-[#0e5c71] rounded-xl shadow-lg hover:shadow-xl hover:shadow-[#1B7691]/30 transition-all duration-300 hover:scale-105'>
                     Daftar BISA Membership
                     <FaArrowRightLong className='transition-transform duration-300 group-hover:translate-x-1' />
                   </div>
@@ -334,14 +335,14 @@ export default function Home() {
           </div> */}
         </section>
 
-        <section className='relative px-4 md:px-10 py-20 md:py-28'>
+        <section className='relative px-4 md:px-10 py-16 md:py-20'>
           <div className='container mx-auto max-w-6xl'>
             {/* Section Header */}
             <div className='text-center mb-14 md:mb-20' data-aos='fade-up'>
               <Typography className='text-sm md:text-base font-medium text-[#1B7691] uppercase tracking-widest mb-3'>
                 Ekosistem Beasiswa Terlengkap
               </Typography>
-              <Typography className='text-3xl md:text-4xl lg:text-[42px] font-bold text-gray-900 leading-tight'>
+              <Typography as='h2' className='text-3xl md:text-4xl lg:text-[42px] font-bold text-gray-900 leading-tight'>
                 Semua yang Kamu Butuhkan untuk
                 <span className='block text-[#FB991A]'>Raih Beasiswa Impian</span>
               </Typography>
@@ -364,7 +365,7 @@ export default function Home() {
                 <Typography className='text-xl font-bold text-gray-900 mt-3 mb-2'>
                   Scholra
                 </Typography>
-                <Typography className='text-gray-600 text-sm leading-relaxed mb-4'>
+                <Typography className='text-gray-600 text-sm leading-relaxed mb-4 max-w-prose'>
                   Asisten cerdas yang menganalisis profilmu dan merekomendasikan beasiswa paling sesuai. Hemat waktu riset dengan rekomendasi personal.
                 </Typography>
                 <span className='inline-flex items-center gap-1 text-[#1B7691] text-sm font-medium hover:gap-2 transition-all cursor-pointer'>
@@ -389,7 +390,7 @@ export default function Home() {
                 <Typography className='text-xl font-bold text-gray-900 mt-3 mb-2'>
                   BISA Learning
                 </Typography>
-                <Typography className='text-gray-600 text-sm leading-relaxed mb-4'>
+                <Typography className='text-gray-600 text-sm leading-relaxed mb-4 max-w-prose'>
                   Akses ratusan video tutorial dan e-book persiapan beasiswa. Dari CV, motivation letter, hingga interview.
                 </Typography>
                 <span className='inline-flex items-center gap-1 text-[#1B7691] text-sm font-medium hover:gap-2 transition-all cursor-pointer'>
@@ -411,7 +412,7 @@ export default function Home() {
                 <Typography className='text-xl font-bold text-gray-900 mt-3 mb-2'>
                   Dreamshub
                 </Typography>
-                <Typography className='text-gray-600 text-sm leading-relaxed mb-4'>
+                <Typography className='text-gray-600 text-sm leading-relaxed mb-4 max-w-prose'>
                   Komunitas eksklusif untuk konsultasi langsung dengan mentor dan awardee. Dapat feedback real dan tips praktis.
                 </Typography>
                 <span className='inline-flex items-center gap-1 text-[#FB991A] text-sm font-medium hover:gap-2 transition-all cursor-pointer'>
@@ -436,7 +437,7 @@ export default function Home() {
                   variant='unstyled'
                   className='flex-shrink-0'
                 >
-                  <div className='px-6 py-3 text-sm md:text-base font-bold text-[#1B7691] bg-white rounded-full hover:bg-gray-100 transition-colors'>
+                  <div className='px-6 py-3 text-sm md:text-base font-bold text-[#1B7691] bg-white rounded-xl hover:bg-gray-100 transition-all duration-300'>
                     Daftar Sekarang
                   </div>
                 </ButtonLink>
@@ -446,7 +447,7 @@ export default function Home() {
         </section>
 
         {/* BISA LEARNING PREVIEW SECTION */}
-        <section className='relative px-4 bg-gray-50/50 md:px-10 py-20 md:py-28 overflow-hidden'>
+        <section className='relative px-4 bg-gray-50/50 md:px-10 py-16 md:py-20 overflow-hidden'>
           <div className='absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent'></div>
           <div className='container mx-auto max-w-6xl'>
             <div className='flex flex-col md:flex-row justify-between items-end mb-12 md:mb-16' data-aos='fade-up'>
@@ -454,16 +455,16 @@ export default function Home() {
                 <Typography className='text-sm md:text-base font-medium text-[#1B7691] uppercase tracking-widest mb-3'>
                   BISA Learning Center
                 </Typography>
-                <Typography className='text-3xl md:text-4xl font-bold text-gray-900 leading-tight'>
+                <Typography as='h2' className='text-3xl md:text-4xl font-bold text-gray-900 leading-tight'>
                   Materi Eksklusif dari
                   <span className='text-[#FB991A]'> Awardee & Mentor</span>
                 </Typography>
-                <Typography className='text-gray-600 mt-4 text-sm md:text-base'>
+                <Typography className='text-gray-600 mt-4 text-sm md:text-base max-w-prose'>
                   Dapatkan akses ke ratusan materi video dan panduan komprehensif untuk mempersiapkan diri lolos beasiswa melalui BISA Learning Center.
                 </Typography>
               </div>
               <ButtonLink href='/products' variant='unstyled' className='hidden md:block group'>
-                <div className='flex items-center gap-2 text-[#1B7691] font-bold group-hover:bg-[#1B7691]/10 px-4 py-2 rounded-full transition-colors'>
+                <div className='flex items-center gap-2 text-[#1B7691] font-bold group-hover:bg-[#1B7691]/10 px-4 py-2 rounded-xl transition-all duration-300'>
                   Gabung Sekarang <FiChevronRight className='transition-transform group-hover:translate-x-1' />
                 </div>
               </ButtonLink>
@@ -488,7 +489,7 @@ export default function Home() {
                       onClick={() => window.location.href = '/products'}
                     >
                       <div className='relative h-56 overflow-hidden'>
-                        <div className='absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors z-10 flex items-center justify-center'>
+                        <div className='absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-all duration-300 z-10 flex items-center justify-center'>
                           <div className='bg-white/90 backdrop-blur w-12 h-12 rounded-full flex items-center justify-center transform scale-90 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-300'>
                             <FiPlay className='w-5 h-5 ml-1 text-[#1B7691] fill-[#1B7691]' />
                           </div>
@@ -522,7 +523,7 @@ export default function Home() {
                           </div>
                           <span className='text-[10px] text-gray-400 font-medium'>({course.rating || '4.5'}) • Preview</span>
                         </div>
-                        <h3 className='text-lg font-bold text-gray-900 mb-2 line-clamp-2 leading-tight group-hover:text-[#1B7691] transition-colors'>
+                        <h3 className='text-lg font-bold text-gray-900 mb-2 line-clamp-2 leading-tight group-hover:text-[#1B7691] transition-all duration-300'>
                           {course.name}
                         </h3>
                         <p className='text-sm text-gray-500 line-clamp-2 mb-4'>
@@ -555,10 +556,10 @@ export default function Home() {
             className='relative z-30 grid gap-3 title place-items-center'
             data-aos-delay='600'
           >
-            <Typography className='text-xl md:text-[32px] text-[#1B7691]'>
+            <Typography as='h2' className='text-xl md:text-[32px] text-[#1B7691]'>
               Maju bersama
             </Typography>
-            <Typography className='font-extrabold text-4xl md:text-[80px] text-[#FB991A] mt-3'>
+            <Typography as='h2' className='font-extrabold text-4xl md:text-[80px] text-[#FB991A] mt-3'>
               RAIH ASA
             </Typography>
           </div>
@@ -683,6 +684,7 @@ export default function Home() {
             </div>
             <div className='lg:col-span-8 2xl:col-span-9 relative w-full mt-12 pb-[420px] lg:pb-0 lg:h-full '>
               <Typography
+                as='h2'
                 className='text-[28px] font-medium text-[#1B7691] px-4 lg:px-0'
                 data-aos='fade-right'
                 data-aos-delay='400'
@@ -810,7 +812,7 @@ export default function Home() {
             </div>
           </div>
         </section> */}
-        <section className='bg-white py-16 md:py-24 overflow-hidden border-t border-gray-100'>
+        <section className='bg-white py-16 md:py-20 overflow-hidden border-t border-gray-100'>
 
           {/* SECTION 1: AS SEEN ON (Static, Premium, Trusted) */}
           <div className='container mx-auto px-4 mb-20 text-center' data-aos='fade-up'>

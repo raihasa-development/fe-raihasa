@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  FiBookOpen, FiUsers, FiAward, FiCpu, FiArrowRight, FiDollarSign, FiUserCheck, FiActivity, FiCreditCard
+  FiBookOpen, FiUsers, FiAward, FiCpu, FiArrowRight, FiDollarSign, FiUserCheck, FiActivity, FiCreditCard, FiSettings
 } from 'react-icons/fi';
 
 import withAuth from '@/components/hoc/withAuth';
@@ -66,6 +66,13 @@ const modules = [
     icon: FiActivity,
     href: 'https://analytics.google.com',
     color: 'bg-orange-50 text-orange-600',
+  },
+  {
+    title: 'Konfigurasi Sistem',
+    description: 'Atur parameter flash sale onboarding, timebomb, dan master data lainnya.',
+    icon: FiSettings,
+    href: '/admin/config',
+    color: 'bg-violet-50 text-violet-600',
   },
 ];
 

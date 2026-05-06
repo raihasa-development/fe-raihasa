@@ -9,19 +9,19 @@ import api from '@/lib/api';
 
 type Transaction = {
     id: string;
-    order_id: string;
-    status: 'PENDING' | 'APPROVED' | 'REJECTED';
-    total_bayar: number;
+    midtrans_order_id: string;
+    original_amount: number;
+    discount_amount: number;
+    final_amount: number;
+    status: string;
+    midtrans_status: string | null;
+    paid_at: string | null;
     created_at: string;
-    UserProgram: {
-        User: {
-            name: string;
-            email: string;
-        };
-        ProductProgram: {
-            name: string;
-        }
+    Subscription: {
+        Plan: { name: string; slug: string };
+        User: { id: string; name: string; email: string };
     };
+    PromoCode: { code: string; type: string } | null;
 };
 
 export default withAuth(AdminPaymentsPage, 'admin');
@@ -36,7 +36,7 @@ function AdminPaymentsPage() {
     const fetchTransactions = async () => {
         setLoading(true);
         try {
-            const { data } = await api.get('/payments/transactions', {
+            const { data } = await api.get('/pricing/transactions', {
                 params: {
                     page,
                     limit: 10,
@@ -46,7 +46,7 @@ function AdminPaymentsPage() {
             });
             setTransactions(data?.data || []);
         } catch (error) {
-            toast.error('Failed to fetch transactions');
+            toast.error('Gagal memuat transaksi');
         } finally {
             setLoading(false);
         }
@@ -59,33 +59,24 @@ function AdminPaymentsPage() {
         return () => clearTimeout(timeout);
     }, [search, page, filterStatus]);
 
-    const updateStatus = async (id: string, status: string) => {
-        if (!confirm(`Are you sure you want to change status to ${status}?`)) return;
-
-        try {
-            await api.patch(`/payments/transactions/${id}/status`, { status });
-            toast.success(`Transaction ${status}`);
-            fetchTransactions();
-        } catch (error) {
-            toast.error('Failed to update status');
-        }
-    };
-
     const statusColor = (status: string) => {
         switch (status) {
-            case 'APPROVED': return 'bg-green-100 text-green-700';
-            case 'PENDING': return 'bg-yellow-100 text-yellow-700';
-            case 'REJECTED': return 'bg-red-100 text-red-700';
+            case 'PAID': return 'bg-green-100 text-green-700';
+            case 'PENDING_PAYMENT': return 'bg-yellow-100 text-yellow-700';
+            case 'FAILED': return 'bg-red-100 text-red-700';
+            case 'EXPIRED_PAYMENT': return 'bg-gray-100 text-gray-500';
+            case 'REFUNDED': return 'bg-blue-100 text-blue-700';
             default: return 'bg-gray-100 text-gray-700';
         }
     };
 
     const statusIcon = (status: string) => {
         switch (status) {
-            case 'APPROVED': return <FiCheckCircle />;
-            case 'PENDING': return <FiClock />;
-            case 'REJECTED': return <FiXCircle />;
-            default: return <FiAlertCircle />;
+            case 'PAID': return <FiCheckCircle />;
+            case 'PENDING_PAYMENT': return <FiClock />;
+            case 'FAILED': return <FiXCircle />;
+            case 'EXPIRED_PAYMENT': return <FiAlertCircle />;
+            default: return <FiDollarSign />;
         }
     };
 
@@ -103,10 +94,11 @@ function AdminPaymentsPage() {
                         value={filterStatus}
                         onChange={(e) => setFilterStatus(e.target.value)}
                     >
-                        <option value="">All Status</option>
-                        <option value="PENDING">Pending</option>
-                        <option value="APPROVED">Approved</option>
-                        <option value="REJECTED">Rejected</option>
+                        <option value="">Semua Status</option>
+                        <option value="PAID">Paid</option>
+                        <option value="PENDING_PAYMENT">Pending</option>
+                        <option value="FAILED">Failed</option>
+                        <option value="EXPIRED_PAYMENT">Expired</option>
                     </select>
                     <div className='relative'>
                         <FiSearch className='absolute left-3 top-1/2 -translate-y-1/2 text-gray-400' />
@@ -132,7 +124,7 @@ function AdminPaymentsPage() {
                                 <th className='p-4 text-xs font-bold text-gray-500 uppercase tracking-wider'>Amount</th>
                                 <th className='p-4 text-xs font-bold text-gray-500 uppercase tracking-wider'>Status</th>
                                 <th className='p-4 text-xs font-bold text-gray-500 uppercase tracking-wider'>Date</th>
-                                <th className='p-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-right'>Action</th>
+                                <th className='p-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-right'>Promo</th>
                             </tr>
                         </thead>
                         <tbody className='divide-y divide-gray-50'>
@@ -143,45 +135,31 @@ function AdminPaymentsPage() {
                             ) : (
                                 transactions.map((t) => (
                                     <tr key={t.id} className='hover:bg-gray-50/50 transition-colors'>
-                                        <td className='p-4 font-mono text-xs text-gray-600'>{t.order_id || '-'}</td>
+                                        <td className='p-4 font-mono text-xs text-gray-600'>{t.midtrans_order_id || '-'}</td>
                                         <td className='p-4'>
-                                            <div className='font-bold text-gray-900 text-sm'>{t.UserProgram?.User?.name || 'Unknown'}</div>
-                                            <div className='text-xs text-gray-500'>{t.UserProgram?.User?.email}</div>
+                                            <div className='font-bold text-gray-900 text-sm'>{t.Subscription?.User?.name || '-'}</div>
+                                            <div className='text-xs text-gray-500'>{t.Subscription?.User?.email}</div>
                                         </td>
-                                        <td className='p-4 text-sm text-gray-700'>{t.UserProgram?.ProductProgram?.name || '-'}</td>
-                                        <td className='p-4 font-medium text-gray-900'>Rp {t.total_bayar?.toLocaleString()}</td>
+                                        <td className='p-4 text-sm text-gray-700'>{t.Subscription?.Plan?.name || '-'}</td>
+                                        <td className='p-4'>
+                                            <div className='font-medium text-gray-900'>Rp {t.final_amount?.toLocaleString('id-ID')}</div>
+                                            {t.discount_amount > 0 && (
+                                                <div className='text-[10px] text-green-600'>-Rp {t.discount_amount.toLocaleString('id-ID')} diskon</div>
+                                            )}
+                                        </td>
                                         <td className='p-4'>
                                             <span className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold w-fit ${statusColor(t.status)}`}>
-                                                {statusIcon(t.status)} {t.status}
+                                                {statusIcon(t.status)} {t.status.replace('_', ' ')}
                                             </span>
                                         </td>
                                         <td className='p-4 text-xs text-gray-500'>
-                                            {new Date(t.created_at).toLocaleDateString()}
+                                            {t.paid_at ? new Date(t.paid_at).toLocaleDateString('id-ID') : new Date(t.created_at).toLocaleDateString('id-ID')}
                                         </td>
                                         <td className='p-4 text-right'>
-                                            {t.status === 'PENDING' && (
-                                                <div className="flex justify-end gap-2">
-                                                    <button
-                                                        onClick={() => updateStatus(t.id, 'APPROVED')}
-                                                        className='text-xs text-white bg-green-500 hover:bg-green-600 px-3 py-1.5 rounded-lg transition-colors'
-                                                    >
-                                                        Approve
-                                                    </button>
-                                                    <button
-                                                        onClick={() => updateStatus(t.id, 'REJECTED')}
-                                                        className='text-xs text-red-500 border border-red-200 hover:bg-red-50 px-3 py-1.5 rounded-lg transition-colors'
-                                                    >
-                                                        Reject
-                                                    </button>
-                                                </div>
-                                            )}
-                                            {t.status !== 'PENDING' && (
-                                                <button
-                                                    onClick={() => updateStatus(t.id, t.status === 'APPROVED' ? 'REJECTED' : 'APPROVED')}
-                                                    className='text-[10px] text-gray-400 hover:text-gray-600 underline'
-                                                >
-                                                    Force Change
-                                                </button>
+                                            {t.PromoCode && (
+                                                <span className='text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded font-medium'>
+                                                    {t.PromoCode.code}
+                                                </span>
                                             )}
                                         </td>
                                     </tr>

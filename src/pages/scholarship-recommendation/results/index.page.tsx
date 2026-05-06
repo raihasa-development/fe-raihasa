@@ -247,7 +247,7 @@ export default function ScholarshipResultsPage() {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
               <button
                 onClick={() => router.push('/scholarship-recommendation')}
-                className="flex items-center gap-2 text-gray-500 hover:text-[#1B7691] transition-colors font-medium self-start"
+                className="flex items-center gap-2 text-gray-500 hover:text-[#1B7691] transition-all duration-300 font-medium self-start"
               >
                 <div className="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center shadow-sm">
                   <FiArrowLeft />
@@ -295,17 +295,17 @@ export default function ScholarshipResultsPage() {
               className="container mx-auto px-4 flex flex-col items-center min-h-[600px]"
             >
               {activeCards.length === 0 ? (
-                <div className="bg-white rounded-3xl p-10 shadow-xl text-center max-w-md w-full border border-gray-100">
+                <div className="bg-white rounded-2xl p-10 shadow-sm text-center max-w-md w-full border border-gray-100">
                   <div className="w-24 h-24 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6">
                     <FiCheckCircle className="w-10 h-10 text-green-500" />
                   </div>
                   <h2 className="text-2xl font-bold text-gray-900 mb-2">Semua Selesai!</h2>
                   <p className="text-gray-500 mb-8">Kamu sudah melihat semua rekomendasi beasiswa untuk saat ini.</p>
                   <div className="flex gap-3 justify-center">
-                    <button onClick={handleResetDeck} className="px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-bold transition-colors flex items-center gap-2">
+                    <button onClick={handleResetDeck} className="px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-bold transition-all duration-300 flex items-center gap-2">
                       <FiRotateCcw /> Ulangi
                     </button>
-                    <button onClick={() => setViewMode('list')} className="px-6 py-3 bg-[#1B7691] hover:bg-[#15627a] text-white rounded-xl font-bold transition-colors shadow-lg shadow-blue-900/20 flex items-center gap-2">
+                    <button onClick={() => setViewMode('list')} className="px-6 py-3 bg-primary-blue hover:bg-[#15627a] text-white rounded-xl font-bold transition-all duration-300 shadow-sm flex items-center gap-2">
                       <FiGrid /> Lihat List
                     </button>
                   </div>
@@ -334,7 +334,7 @@ export default function ScholarshipResultsPage() {
               className="container mx-auto px-4 max-w-4xl"
             >
               <div className="relative mb-8 group">
-                <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#1B7691] transition-colors" />
+                <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#1B7691] transition-all duration-300" />
                 <input
                   type="text"
                   placeholder="Cari beasiswa berdasarkan nama atau penyedia..."
@@ -345,7 +345,7 @@ export default function ScholarshipResultsPage() {
               </div>
 
               {filteredRecommendations.length === 0 ? (
-                <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-gray-300">
+                <div className="text-center py-20 bg-white rounded-2xl border border-dashed border-gray-300">
                   <p className="text-gray-400 font-medium">Tidak ada beasiswa ditemukan</p>
                 </div>
               ) : (
@@ -393,7 +393,7 @@ export default function ScholarshipResultsPage() {
                               )}
                             </div>
 
-                            <h3 className="text-xl font-bold text-gray-900 mb-1 font-primary group-hover:text-[#1B7691] transition-colors">
+                            <h3 className="text-xl font-bold text-gray-900 mb-1 font-primary group-hover:text-[#1B7691] transition-all duration-300">
                               {scholarship.title}
                             </h3>
 
@@ -445,7 +445,7 @@ export default function ScholarshipResultsPage() {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
-                className="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl"
+                className="bg-white rounded-2xl p-8 max-w-sm w-full shadow-sm"
               >
                 <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-6 text-[#1B7691]">
                   <FiLock size={28} />
@@ -453,10 +453,10 @@ export default function ScholarshipResultsPage() {
                 <h3 className="text-xl font-bold text-center text-gray-900 mb-2">Simpan ke Wishlist?</h3>
                 <p className="text-center text-gray-500 mb-8 text-sm leading-relaxed">Login terlebih dahulu untuk menyimpan beasiswa ini dan mendapatkan notifikasi deadline.</p>
 
-                <button onClick={() => router.push('/auth/login')} className="w-full py-3.5 bg-[#1B7691] text-white font-bold rounded-xl mb-3 shadow-lg shadow-blue-900/20 hover:scale-[1.02] transition-transform">
+                <button onClick={() => router.push('/auth/login')} className="w-full py-3.5 bg-primary-blue text-white font-bold rounded-xl mb-3 shadow-sm hover:scale-[1.02] transition-all duration-300">
                   Login Sekarang
                 </button>
-                <button onClick={() => setShowLoginModal(false)} className="w-full py-3.5 text-gray-500 font-bold hover:text-gray-800 transition-colors">
+                <button onClick={() => setShowLoginModal(false)} className="w-full py-3.5 text-gray-500 font-bold hover:text-gray-800 transition-all duration-300">
                   Nanti Saja
                 </button>
               </motion.div>
@@ -586,7 +586,7 @@ function CardItem({ data, active, onSwipe, onDetail }: {
 
           <button
             onClick={(e) => { e.stopPropagation(); onDetail(); }}
-            className="h-12 rounded-2xl bg-gray-100 text-gray-600 font-bold text-sm hover:bg-gray-200 transition-colors flex items-center justify-center gap-2"
+            className="h-12 rounded-2xl bg-gray-100 text-gray-600 font-bold text-sm hover:bg-gray-200 transition-all duration-300 flex items-center justify-center gap-2"
           >
             <FiInfo size={18} /> Detail
           </button>

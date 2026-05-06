@@ -444,7 +444,7 @@ export default function Chatbox({ onRecommendation }: ChatboxProps) {
   );
 
   return (
-    <div className="flex flex-col h-full max-h-[700px] bg-white rounded-lg shadow-sm border border-gray-100">
+    <div className="flex flex-col h-full max-h-[700px] bg-white rounded-2xl shadow-sm border border-gray-100">
       {/* Header */}
       <div className="flex items-center gap-3 p-5 border-b border-gray-100">
         <div className="w-9 h-9 bg-[#1B7691] rounded-full flex items-center justify-center">
@@ -529,7 +529,7 @@ export default function Chatbox({ onRecommendation }: ChatboxProps) {
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setDropdownOpen(!dropdownOpen)}
-              className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-700 hover:border-[#1B7691] transition-colors"
+              className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-700 hover:border-[#1B7691] transition-all duration-300"
             >
               <span className="text-gray-400">Pilih provinsi...</span>
               <FiChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
@@ -552,7 +552,7 @@ export default function Chatbox({ onRecommendation }: ChatboxProps) {
                     <button
                       key={province}
                       onClick={() => handleDropdownSelect(province)}
-                      className="w-full px-4 py-2.5 text-left text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                      className="w-full px-4 py-2.5 text-left text-sm text-gray-700 hover:bg-gray-50 transition-all duration-300"
                     >
                       {province}
                     </button>
@@ -611,7 +611,7 @@ export default function Chatbox({ onRecommendation }: ChatboxProps) {
               <button
                 type="submit"
                 disabled={!inputValue.trim() || isLoading}
-                className="mr-2 p-2 bg-[#1B7691] text-white rounded-lg hover:bg-[#145a6e] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                className="mr-2 p-2 bg-primary-blue text-white rounded-xl hover:bg-[#145a6e] transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 <FiSend className="w-4 h-4" />
               </button>

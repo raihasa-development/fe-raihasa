@@ -131,14 +131,14 @@ export default function RegisterPage() {
                 <NextImage src='/images/logo.png' alt='logo' width={140} height={100} />
               </div>
               <h2 className="text-3xl font-bold text-gray-900">Buat Akun Baru</h2>
-              <p className="mt-2 text-gray-500">Mulai langkah pertamamu meraih beasiswa impian.</p>
+              <p className="mt-3 text-base text-gray-600">Mulai langkah pertamamu meraih beasiswa impian.</p>
             </div>
 
             <div className="bg-white">
               <FormProvider {...methods}>
                 <form
                   method="post"
-                  className='space-y-4 md:space-y-5'
+                  className='space-y-5'
                   onSubmit={handleSubmit(onSubmit)}
                 >
                   <Input

@@ -60,40 +60,33 @@ function CreatePostPage() {
     return (
         <Layout withNavbar={true} withFooter={true}>
             <SEO title="Buat Diskusi Baru - DreamsHub" />
-            <style jsx global>{`
-                @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
-                
-                .font-poppins {
-                    font-family: 'Poppins', sans-serif;
-                }
-            `}</style>
-            <main className="min-h-screen bg-gray-50 pb-20 font-poppins">
+            <main className="min-h-screen bg-gray-50 pb-20">
                 <div className="bg-gradient-to-r from-[#1B7691] to-[#0d5a6e] h-48 relative">
                     <div className="absolute inset-0 bg-white/5 backdrop-blur-[2px]"></div>
                 </div>
 
-                <div className="container mx-auto px-4 -mt-24 relative z-10 max-w-3xl">
-                    <button onClick={() => router.back()} className="text-white/90 hover:text-white flex items-center gap-2 mb-6 font-medium">
+                <div className="max-w-6xl mx-auto px-4 md:px-6 -mt-24 relative z-10 max-w-3xl">
+                    <button onClick={() => router.back()} className="text-white/90 hover:text-white flex items-center gap-2 mb-6 font-medium transition-all duration-300">
                         <FiArrowLeft /> Batal
                     </button>
 
-                    <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
+                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                         <div className="p-8 border-b border-gray-100 bg-gray-50/50">
                             <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 bg-[#1B7691]/10 rounded-2xl flex items-center justify-center text-[#1B7691]">
+                                <div className="w-12 h-12 bg-[#1B7691]/10 rounded-xl flex items-center justify-center text-[#1B7691]">
                                     <FiEdit3 className="w-6 h-6" />
                                 </div>
                                 <div>
                                     <h1 className="text-2xl font-bold text-gray-900">Buat Diskusi Baru</h1>
-                                    <p className="text-gray-500">Mulai percakapan dengan komunitas</p>
+                                    <p className="text-base text-gray-600">Mulai percakapan dengan komunitas</p>
                                 </div>
                             </div>
                         </div>
 
-                        <form onSubmit={handleSubmit} className="p-8 space-y-6">
+                        <form onSubmit={handleSubmit} className="p-8 space-y-8">
 
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+                                <label className="block text-sm font-bold text-gray-700 mb-3 flex items-center gap-2">
                                     <FiTag className="text-[#1B7691]" /> Kategori Topik
                                 </label>
                                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
@@ -102,8 +95,8 @@ function CreatePostPage() {
                                             key={cat.id}
                                             type="button"
                                             onClick={() => setCategoryId(cat.id)}
-                                            className={`px-4 py-3 rounded-xl border text-sm font-medium transition-all text-left ${categoryId === cat.id
-                                                ? 'bg-[#1B7691] text-white border-[#1B7691] shadow-md shadow-blue-500/20'
+                                            className={`px-4 py-3 rounded-xl border text-sm font-medium transition-all duration-300 text-left ${categoryId === cat.id
+                                                ? 'bg-[#1B7691] text-white border-[#1B7691] shadow-sm'
                                                 : 'bg-white text-gray-600 border-gray-200 hover:border-[#1B7691]/50 hover:bg-blue-50'
                                                 }`}
                                         >
@@ -114,14 +107,14 @@ function CreatePostPage() {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+                                <label className="block text-sm font-bold text-gray-700 mb-3 flex items-center gap-2">
                                     <FiInfo className="text-[#1B7691]" /> Visibilitas Konsultasi
                                 </label>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <button
                                         type="button"
                                         onClick={() => setIsPrivate(false)}
-                                        className={`flex items-start gap-4 p-4 rounded-2xl border transition-all text-left ${!isPrivate
+                                        className={`flex items-start gap-4 p-4 rounded-xl border transition-all duration-300 text-left ${!isPrivate
                                             ? 'bg-blue-50 border-[#1B7691] ring-1 ring-[#1B7691]'
                                             : 'bg-white border-gray-100 hover:border-gray-200'
                                             }`}
@@ -138,7 +131,7 @@ function CreatePostPage() {
                                     <button
                                         type="button"
                                         onClick={() => setIsPrivate(true)}
-                                        className={`flex items-start gap-4 p-4 rounded-2xl border transition-all text-left ${isPrivate
+                                        className={`flex items-start gap-4 p-4 rounded-xl border transition-all duration-300 text-left ${isPrivate
                                             ? 'bg-orange-50 border-[#FB991A] ring-1 ring-[#FB991A]'
                                             : 'bg-white border-gray-100 hover:border-gray-200'
                                             }`}
@@ -155,7 +148,7 @@ function CreatePostPage() {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+                                <label className="block text-sm font-bold text-gray-700 mb-3 flex items-center gap-2">
                                     <FiLink className="text-[#1B7691]" /> Link Lampiran (Optional)
                                 </label>
                                 <input
@@ -171,7 +164,7 @@ function CreatePostPage() {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-2">Judul Diskusi</label>
+                                <label className="block text-sm font-bold text-gray-700 mb-3">Judul Diskusi</label>
                                 <input
                                     type="text"
                                     value={title}
@@ -182,7 +175,7 @@ function CreatePostPage() {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+                                <label className="block text-sm font-bold text-gray-700 mb-3 flex items-center gap-2">
                                     <FiFileText className="text-[#1B7691]" /> Isi Diskusi
                                 </label>
                                 <textarea
@@ -195,13 +188,13 @@ function CreatePostPage() {
                             </div>
 
                             <div className="pt-6 border-t border-gray-100 flex justify-end gap-4">
-                                <button type="button" onClick={() => router.back()} className="px-6 py-3 rounded-xl text-gray-600 font-medium hover:bg-gray-50 transition-colors">
+                                <button type="button" onClick={() => router.back()} className="px-6 py-3 rounded-xl text-gray-600 font-medium hover:bg-gray-50 transition-all duration-300">
                                     Batal
                                 </button>
                                 <button
                                     type="submit"
                                     disabled={isSubmitting}
-                                    className="px-8 py-3 bg-[#1B7691] hover:bg-[#15627a] text-white rounded-xl font-bold shadow-lg shadow-blue-500/30 transition-all transform hover:-translate-y-1 disabled:opacity-50 disabled:translate-y-0"
+                                    className="px-8 py-3 bg-[#1B7691] hover:bg-[#15627a] text-white rounded-xl font-bold shadow-lg shadow-[#1B7691]/20 transition-all duration-300 hover:-translate-y-0.5 disabled:opacity-50 disabled:translate-y-0"
                                 >
                                     {isSubmitting ? 'Memposting...' : 'Posting Diskusi'}
                                 </button>

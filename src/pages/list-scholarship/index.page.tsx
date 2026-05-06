@@ -207,7 +207,7 @@ export default function ListScholarshipPage() {
                     <div className="container mx-auto px-4 relative z-10">
                         <button
                             onClick={() => router.back()}
-                            className="group flex items-center gap-2 text-white/90 hover:text-white mb-6 transition-colors text-sm font-medium"
+                            className="group flex items-center gap-2 text-white/90 hover:text-white mb-6 transition-all duration-300 text-sm font-medium"
                         >
                             <div className="bg-white/10 p-1.5 rounded-lg group-hover:bg-white/20 transition-all">
                                 <FiArrowLeft className="w-4 h-4" />
@@ -243,11 +243,11 @@ export default function ListScholarshipPage() {
                 <div className="container mx-auto px-4 -mt-16 relative z-20">
 
                     {/* FILTER BAR */}
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-8">
+                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-8">
                         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
                             {/* Search */}
                             <div className="lg:col-span-4 relative group">
-                                <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-[#1B7691] transition-colors" />
+                                <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-[#1B7691] transition-all duration-300" />
                                 <input
                                     type="text"
                                     value={searchQuery}
@@ -311,10 +311,11 @@ export default function ListScholarshipPage() {
 
                     {/* LIST */}
                     {filteredResults.length === 0 ? (
-                        <div className="bg-white rounded-2xl border border-gray-200 p-16 text-center">
+                        <div className="bg-white rounded-2xl border border-gray-100 p-16 text-center shadow-sm">
                             <FiSearch className="w-8 h-8 text-gray-400 mx-auto mb-4" />
-                            <h3 className="font-bold text-gray-900">Tidak ada beasiswa ditemukan</h3>
-                            <button onClick={() => { setSearchQuery(''); setSelectedJenjang([]); setSelectedJenis([]); setFilterStatus('all') }} className="mt-4 text-[#1B7691] font-bold text-sm hover:underline">
+                            <h3 className="font-bold text-gray-900 text-xl">Tidak ada beasiswa ditemukan</h3>
+                            <p className="text-base text-gray-600 mt-2">Coba ubah filter atau kata kunci pencarian.</p>
+                            <button onClick={() => { setSearchQuery(''); setSelectedJenjang([]); setSelectedJenis([]); setFilterStatus('all') }} className="mt-6 text-[#1B7691] font-bold text-sm hover:underline transition-all duration-300">
                                 Reset Filter
                             </button>
                         </div>
@@ -332,7 +333,7 @@ export default function ListScholarshipPage() {
                                             initial={{ opacity: 0, y: 10 }}
                                             whileInView={{ opacity: 1, y: 0 }}
                                             viewport={{ once: true }}
-                                            className={`bg-white rounded-2xl p-6 border transition-all hover:shadow-md group relative overflow-hidden ${active ? 'border-gray-200 hover:border-[#1B7691]/30' : 'border-gray-200 bg-gray-50'
+                                            className={`bg-white rounded-2xl p-6 border transition-all duration-300 hover:shadow-md group relative overflow-hidden ${active ? 'border-gray-100 hover:border-[#1B7691]/30' : 'border-gray-100 bg-gray-50'
                                                 }`}
                                         >
                                             <div className="flex flex-col md:flex-row gap-6 relative z-10">
@@ -370,7 +371,7 @@ export default function ListScholarshipPage() {
                                                         ))}
                                                     </div>
 
-                                                    <h3 className="text-xl font-bold text-gray-900 mb-1 group-hover:text-[#1B7691] transition-colors font-primary">
+                                                    <h3 className="text-xl font-bold text-gray-900 mb-1 group-hover:text-[#1B7691] transition-all duration-300 font-primary">
                                                         {s.nama}
                                                     </h3>
 
@@ -456,7 +457,7 @@ export default function ListScholarshipPage() {
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.95 }}
-                            className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 text-center"
+                            className="bg-white rounded-2xl shadow-sm max-w-sm w-full p-6 text-center"
                         >
                             <div className="w-14 h-14 bg-blue-50 text-[#1B7691] rounded-full flex items-center justify-center mx-auto mb-4">
                                 <FiLock className="w-6 h-6" />
@@ -464,10 +465,10 @@ export default function ListScholarshipPage() {
                             <h3 className="text-lg font-bold text-gray-900 mb-2">Login Diperlukan</h3>
                             <p className="text-sm text-gray-500 mb-6">Silakan login untuk mengakses detail beasiswa ini.</p>
                             <div className="flex flex-col gap-3">
-                                <button onClick={() => router.push('/auth/login')} className="w-full py-3 bg-[#1B7691] text-white font-bold rounded-xl hover:bg-[#15627a] transition-colors">
+                                <button onClick={() => router.push('/auth/login')} className="w-full py-3 bg-primary-blue text-white font-bold rounded-xl hover:bg-[#15627a] transition-all duration-300">
                                     Login Sekarang
                                 </button>
-                                <button onClick={() => setShowLoginModal(false)} className="w-full py-3 text-gray-500 font-medium hover:bg-gray-50 rounded-xl transition-colors">
+                                <button onClick={() => setShowLoginModal(false)} className="w-full py-3 text-gray-500 font-medium hover:bg-gray-50 rounded-xl transition-all duration-300">
                                     Batal
                                 </button>
                             </div>

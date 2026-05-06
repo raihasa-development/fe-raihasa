@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FiCheckCircle, FiXCircle, FiSearch, FiGift, FiClock } from 'react-icons/fi';
+import { FiCheckCircle, FiXCircle, FiSearch, FiGift, FiClock, FiSlash } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 
 import withAuth from '@/components/hoc/withAuth';
@@ -22,6 +22,11 @@ type User = {
       end: string;
     }[]
   }[];
+  Subscriptions?: {
+    status: string;
+    ends_at: string | null;
+    Plan: { name: string };
+  }[];
 };
 
 export default withAuth(AdminUsersPage, 'admin');
@@ -36,10 +41,6 @@ function AdminUsersPage() {
   const [isMembershipModalOpen, setIsMembershipModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [tokenAmount, setTokenAmount] = useState<number>(0);
-
-  const blurOnWheel = (e: React.WheelEvent<HTMLInputElement>) => {
-    (e.target as HTMLInputElement).blur();
-  };
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -81,6 +82,20 @@ function AdminUsersPage() {
   };
 
   const getUserStatus = (user: User) => {
+    // Check v2 Subscription first
+    const activeSub = user.Subscriptions?.find(s => 
+      s.status === 'ACTIVE' && s.ends_at && new Date(s.ends_at) > new Date()
+    );
+    if (activeSub) {
+      return (
+        <span className="flex flex-col">
+          <span className="text-green-600 font-bold text-xs">{activeSub.Plan.name}</span>
+          <span className="text-gray-400 text-[10px]">Exp: {activeSub.ends_at ? new Date(activeSub.ends_at).toLocaleDateString('id-ID') : '-'}</span>
+        </span>
+      );
+    }
+
+    // Fallback to legacy UserProgram/LMS
     const activeProgram = user.UserProgram?.find(up => {
       const lms = up.LMS?.[0];
       if (!lms?.end) return false;
@@ -92,7 +107,7 @@ function AdminUsersPage() {
       return (
         <span className="flex flex-col">
           <span className="text-green-600 font-bold text-xs">{activeProgram.ProductProgram.name}</span>
-          <span className="text-gray-400 text-[10px]">Exp: {lms?.end ? new Date(lms.end).toLocaleDateString() : '-'}</span>
+          <span className="text-gray-400 text-[10px]">Exp: {lms?.end ? new Date(lms.end).toLocaleDateString('id-ID') : '-'}</span>
         </span>
       );
     }
@@ -112,6 +127,18 @@ function AdminUsersPage() {
     } catch (error) {
       console.error(error);
       toast.error('Failed to add tokens');
+    }
+  };
+
+  const handleRevertToFree = async (user: User) => {
+    if (!confirm(`Revert ${user.name} ke Free Member? Semua subscription aktif akan dibatalkan.`)) return;
+    try {
+      await api.post('/pricing/admin/subscriptions/cancel', { user_id: user.id });
+      toast.success(`${user.name} berhasil di-revert ke Free Member`);
+      fetchUsers();
+    } catch (error: any) {
+      console.error(error);
+      toast.error(error?.response?.data?.message || 'Gagal revert subscription');
     }
   };
 
@@ -195,6 +222,13 @@ function AdminUsersPage() {
                     </td>
                     <td className='p-4 text-right flex justify-end gap-2'>
                       <button
+                        onClick={() => handleRevertToFree(user)}
+                        className='text-xs text-red-600 hover:text-red-700 font-medium border border-red-600/20 px-3 py-1.5 rounded-lg hover:bg-red-600/5 transition-colors flex items-center gap-1'
+                        title="Revert ke Free"
+                      >
+                        <FiSlash /> Revert
+                      </button>
+                      <button
                         onClick={() => openMembershipModal(user)}
                         className='text-xs text-blue-600 hover:text-blue-700 font-medium border border-blue-600/20 px-3 py-1.5 rounded-lg hover:bg-blue-600/5 transition-colors flex items-center gap-1'
                         title="Set Membership"
@@ -250,7 +284,6 @@ function AdminUsersPage() {
             <input
               type="number"
               value={tokenAmount}
-              onWheel={blurOnWheel}
               onChange={(e) => setTokenAmount(Number(e.target.value))}
               className="w-full border p-2 rounded mb-4 focus:ring-2 focus:ring-[#E58941]"
               placeholder="Amount"
@@ -276,37 +309,104 @@ function AdminUsersPage() {
 
 function MembershipModal({ isOpen, onClose, user, onSuccess }: { isOpen: boolean, onClose: () => void, user: User | null, onSuccess: () => void }) {
   const [days, setDays] = useState(30);
+  const [plans, setPlans] = useState<{ id: string; name: string; slug: string }[]>([]);
+  const [selectedPlanId, setSelectedPlanId] = useState('');
   const [loading, setLoading] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
 
-  const blurOnWheel = (e: React.WheelEvent<HTMLInputElement>) => {
-    (e.target as HTMLInputElement).blur();
-  };
+  useEffect(() => {
+    if (isOpen) {
+      api.get('/pricing/admin/plans').then(({ data }) => {
+        const activePlans = (data?.data || []).filter((p: any) => p.is_active);
+        setPlans(activePlans);
+        if (activePlans.length > 0 && !selectedPlanId) {
+          setSelectedPlanId(activePlans[0].id);
+        }
+      }).catch(() => {
+        toast.error('Gagal memuat daftar plan');
+      });
+    }
+  }, [isOpen]);
 
   if (!isOpen || !user) return null;
 
-  const handleActivate = async () => {
+  const activeSub = user.Subscriptions?.find(s =>
+    s.status === 'ACTIVE' && s.ends_at && new Date(s.ends_at) > new Date()
+  );
+
+  const handleAssign = async () => {
+    if (!selectedPlanId) {
+      toast.error('Pilih plan terlebih dahulu');
+      return;
+    }
     setLoading(true);
     try {
-      await api.post('/lms/activate-manual', {
+      await api.post('/pricing/admin/subscriptions/assign', {
         user_id: user.id,
-        days: days
+        plan_id: selectedPlanId,
+        duration_days: days
       });
-      toast.success(`Membership for ${user.name} activated for ${days} days!`);
+      toast.success(`Subscription untuk ${user.name} berhasil di-assign (${days} hari)`);
       onSuccess();
       onClose();
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      toast.error('Failed to activate membership');
+      toast.error(error?.response?.data?.message || 'Gagal assign subscription');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleCancel = async () => {
+    if (!confirm(`Revert ${user.name} ke Free Member?`)) return;
+    setCancelling(true);
+    try {
+      await api.post('/pricing/admin/subscriptions/cancel', { user_id: user.id });
+      toast.success(`${user.name} berhasil di-revert ke Free Member`);
+      onSuccess();
+      onClose();
+    } catch (error: any) {
+      console.error(error);
+      toast.error(error?.response?.data?.message || 'Gagal cancel subscription');
+    } finally {
+      setCancelling(false);
     }
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
       <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-sm">
-        <Typography variant="h4" className="font-bold mb-2">Set Membership</Typography>
-        <p className="text-sm text-gray-500 mb-4">Grant or extend membership access for <b>{user.name}</b>.</p>
+        <Typography variant="h4" className="font-bold mb-2">Subscription Management</Typography>
+        <p className="text-sm text-gray-500 mb-4">Kelola subscription untuk <b>{user.name}</b>.</p>
+
+        {/* Current Status */}
+        {activeSub && (
+          <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+            <p className="text-xs font-bold text-green-700">Subscription Aktif</p>
+            <p className="text-xs text-green-600">{activeSub.Plan.name} — Exp: {activeSub.ends_at ? new Date(activeSub.ends_at).toLocaleDateString('id-ID') : '-'}</p>
+            <button
+              onClick={handleCancel}
+              disabled={cancelling}
+              className="mt-2 text-xs text-red-600 font-medium border border-red-300 px-3 py-1 rounded-lg hover:bg-red-50 transition-colors disabled:opacity-50"
+            >
+              {cancelling ? 'Processing...' : 'Revert ke Free'}
+            </button>
+          </div>
+        )}
+
+        {/* Assign Membership Form */}
+        <div className="mb-4">
+          <label className="block text-xs font-bold text-gray-700 mb-1">Plan</label>
+          <select
+            value={selectedPlanId}
+            onChange={(e) => setSelectedPlanId(e.target.value)}
+            className="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none text-sm"
+          >
+            {plans.map(plan => (
+              <option key={plan.id} value={plan.id}>{plan.name}</option>
+            ))}
+          </select>
+        </div>
 
         <div className="mb-4">
           <label className="block text-xs font-bold text-gray-700 mb-1">Duration (Days)</label>
@@ -324,7 +424,6 @@ function MembershipModal({ isOpen, onClose, user, onSuccess }: { isOpen: boolean
           <input
             type="number"
             value={days}
-            onWheel={blurOnWheel}
             onChange={(e) => setDays(Number(e.target.value))}
             className="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none"
             placeholder="Custom days..."
@@ -334,11 +433,11 @@ function MembershipModal({ isOpen, onClose, user, onSuccess }: { isOpen: boolean
         <div className="flex justify-end gap-2">
           <button onClick={onClose} disabled={loading} className="px-4 py-2 text-gray-500 hover:bg-gray-100 rounded text-sm font-medium">Cancel</button>
           <button
-            onClick={handleActivate}
-            disabled={loading}
+            onClick={handleAssign}
+            disabled={loading || !selectedPlanId}
             className="px-4 py-2 bg-blue-600 text-white rounded text-sm font-medium hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
           >
-            {loading ? 'Processing...' : 'Activate Access'}
+            {loading ? 'Processing...' : 'Assign Membership'}
           </button>
         </div>
       </div>

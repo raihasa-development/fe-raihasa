@@ -27,7 +27,7 @@ export default function Sidebar() {
     if (pathName.includes('scholra') || pathName.includes('dreamshub') || pathName.includes('bisa-learning')) {
       setIsServicesOpen(true);
       setActiveSection('services');
-    } else if (pathName.includes('users') || pathName.includes('payments') || pathName.includes('manajemen-beasiswa') || pathName.includes('courses') || pathName.includes('pricing') || pathName.includes('promos')) {
+    } else if (pathName.includes('users') || pathName.includes('payments') || pathName.includes('manajemen-beasiswa') || pathName.includes('courses') || pathName.includes('pricing') || pathName.includes('promos') || pathName.includes('config')) {
       setIsManagementOpen(true);
       setActiveSection('management');
     }
@@ -87,6 +87,12 @@ export default function Sidebar() {
           href: '/admin/scholra-tracks',
           icon: IoBulbOutline,
           paths: ['/admin/scholra-tracks']
+        },
+        {
+          title: 'Konfigurasi Sistem',
+          href: '/admin/config',
+          icon: IoSettingsOutline,
+          paths: ['/admin/config']
         }
       ]
     }

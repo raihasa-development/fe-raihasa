@@ -67,7 +67,7 @@ export default function BinaryQuestion({
               {/* First Option */}
               <label
                 className={`
-                  flex gap-5 items-center w-full px-4 py-3 rounded-lg border transition-colors cursor-pointer
+                  flex gap-5 items-center w-full px-4 py-3 rounded-xl border transition-all duration-300 cursor-pointer
                   ${
                     selectedValue === firstValue
                       ? 'bg-[#1B7691] text-white border-[#1B7691]'
@@ -95,7 +95,7 @@ export default function BinaryQuestion({
                         ? 'border-white border-[4px] ring-1 ring-[#4EA4BE]'
                         : 'border-[#E4E4E7] border'
                     }
-                    transition-colors
+                    transition-all duration-300
                   `}
                 >
                   {/* Inner dot */}
@@ -107,7 +107,7 @@ export default function BinaryQuestion({
                           ? 'bg-[#1B7691]'
                           : 'bg-transparent'
                       }
-                      transition-colors
+                      transition-all duration-300
                     `}
                   />
                 </span>
@@ -118,7 +118,7 @@ export default function BinaryQuestion({
               {/* Second Option */}
               <label
                 className={`
-                  flex gap-5 items-center w-full px-4 py-3 rounded-lg border transition-colors cursor-pointer
+                  flex gap-5 items-center w-full px-4 py-3 rounded-xl border transition-all duration-300 cursor-pointer
                   ${
                     selectedValue === secondValue
                       ? 'bg-[#1B7691] text-white border-[#1B7691]'
@@ -145,7 +145,7 @@ export default function BinaryQuestion({
                         ? 'border-white border-[4px] ring-1 ring-[#4EA4BE]'
                         : 'border-[#E4E4E7] border-2'
                     }
-                    transition-colors
+                    transition-all duration-300
                   `}
                 >
                   <span
@@ -156,7 +156,7 @@ export default function BinaryQuestion({
                           ? 'bg-[#1B7691]'
                           : 'bg-transparent'
                       }
-                      transition-colors
+                      transition-all duration-300
                     `}
                   />
                 </span>

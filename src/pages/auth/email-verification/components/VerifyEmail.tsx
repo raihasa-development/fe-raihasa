@@ -3,53 +3,51 @@ import Typography from '@/components/Typography';
 
 export default function VerifyEmail() {
   return (
-    <section className='min-h-screen flex-col gap-6 md:gap-16 bg-white flex items-center justify-center py-20'>
-      <div className='relative flex items-center justify-center -translate-x-5'>
-        <div className='flex items-center relative justify-center z-20'>
+    <section className='min-h-screen bg-gray-50 flex items-center justify-center py-16 md:py-20 px-4'>
+      <div className='max-w-lg w-full bg-white rounded-2xl shadow-sm border border-gray-100 p-8 md:p-12 flex flex-col items-center text-center'>
+        <div className='relative flex items-center justify-center mb-8'>
           <NextImage
             src='/images/auth/email-verification/mascot.png'
             alt='mascot'
             width={335}
             height={335}
-            className='md:w-[335px] md:h-[335px] w-[225px] h-[225px]'
+            className='md:w-[200px] md:h-[200px] w-[160px] h-[160px]'
           />
+        </div>
+
+        <Typography
+          as='h1'
+          className='text-2xl md:text-3xl font-bold text-gray-900 mb-3'
+        >
+          Cek Email Kamu Sekarang!
+        </Typography>
+
+        <Typography
+          as='h2'
+          className='text-base text-gray-600 leading-relaxed mb-6'
+        >
+          Link verifikasi sudah dikirimkan ke emailmu.
+          <br /> Yuk cek dan lakukan verifikasi akun!
+        </Typography>
+
+        <div className='max-w-md'>
           <Typography
-            as='h1'
-            variant='h5'
-            weight='bold'
-            className='text-primary-orange text-left relative text-sm -translate-x-10 md:-translate-x-14'
+            as='p'
+            className='text-sm text-gray-500 leading-relaxed'
           >
-            Cek Email Kamu
-            <br /> Sekarang!
+            Jika Anda tidak melihat email tersebut, periksa tempat lain, seperti
+            folder sampah, spam, sosial, atau lainnya.
+          </Typography>
+          <Typography
+            as='p'
+            className='text-sm text-gray-500 mt-4'
+          >
+            Belum menerima email?{' '}
+            <span className='text-[#FB991A] font-semibold hover:cursor-pointer hover:underline transition-all duration-300'>
+              Kirim ulang email verifikasi
+            </span>
           </Typography>
         </div>
-        <div className='absolute w-[253px] h-[110px] md:w-[528px] md:h-[203px] bg-[#FFF3E2] rounded-2xl z-10 ml-14' />
-        <div className='absolute h-[110px] md:w-[528px] md:h-[203px] w-[253px] bg-[#FFE2B7] rounded-2xl z-0 ml-14 -rotate-6' />
-      </div>
-      <Typography
-        as='h2'
-        variant='h6'
-        weight='medium'
-        className='text-primary-blue text-center text-xs'
-      >
-        Link verifikasi sudah dikirimkan ke emailmu.
-        <br /> Yuk cek dan lakukan verifikasi akun!
-      </Typography>
-      <div className='px-5 md:w-[608px]'>
-        <Typography
-          as='h3'
-          variant='t'
-          weight='medium'
-          className='text-primary-blue text-center text-xs'
-        >
-          Jika Anda tidak melihat email tersebut, periksa tempat lain, seperti
-          folder sampah, spam, sosial, atau lainnya.
-          <br />
-          <br /> Belum menerima email?{' '}
-          <span className='text-primary-orange hover:cursor-pointer'>
-            Kirim ulang email verifikasi
-          </span>
-        </Typography>
       </div>
     </section>
   );

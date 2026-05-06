@@ -181,10 +181,10 @@ export default function PaymentPage() {
       <Layout withNavbar={true} withFooter={true}>
         <SEO title="Payment | Raihasa" />
         <main className="min-h-screen bg-gray-50">
-          <section className='pt-32 pb-12'>
+          <section className='pt-32 pb-16'>
             <div className="layout">
-              <div className="bg-white rounded-lg shadow-sm p-8 max-w-2xl mx-auto">
-                <div className="flex flex-col items-center justify-center space-y-3">
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 max-w-2xl mx-auto">
+                <div className="flex flex-col items-center justify-center space-y-4">
                   <div className="animate-spin rounded-full h-10 w-10 border-3 border-gray-200 border-t-[#FB991A]"></div>
                   <Typography className="text-gray-600 text-sm">Memuat detail pembayaran...</Typography>
                 </div>
@@ -201,9 +201,9 @@ export default function PaymentPage() {
       <Layout withNavbar={true} withFooter={true}>
         <SEO title="Product Not Found | Raihasa" />
         <main className="min-h-screen bg-gray-50">
-          <section className='pt-32 pb-12'>
+          <section className='pt-32 pb-16'>
             <div className="layout">
-              <div className="bg-white rounded-lg shadow-sm p-8 text-center max-w-xl mx-auto" data-aos="fade-up">
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center max-w-xl mx-auto" data-aos="fade-up">
                 <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
                   <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -217,7 +217,7 @@ export default function PaymentPage() {
                 </Typography>
                 <button
                   onClick={() => router.push('/products')}
-                  className="bg-[#FB991A] text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-[#e88a15] transition-colors inline-flex items-center gap-2"
+                  className="bg-[#FB991A] text-white px-6 py-3 rounded-xl text-sm font-semibold hover:bg-[#e88a15] transition-all duration-300 inline-flex items-center gap-2"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -242,10 +242,10 @@ export default function PaymentPage() {
       <SEO title={`Payment - ${selectedProduct.nama} | Raihasa`} />
       <main className="min-h-screen bg-gray-50">
         {/* Hero Section */}
-        <section className='pt-32 pb-6'>
+        <section className='pt-32 pb-8'>
           <div className='layout'>
             <div
-              className='w-full bg-gradient-to-r from-[#FB991A] to-[#C0172A] py-12 shadow-sm rounded-lg'
+              className='w-full bg-gradient-to-r from-[#FB991A] to-[#C0172A] py-12 shadow-sm rounded-2xl'
               data-aos='fade-up'
             >
               <div className="text-center max-w-2xl mx-auto px-4">
@@ -266,14 +266,14 @@ export default function PaymentPage() {
             <nav className="flex items-center space-x-2 text-sm text-gray-500" data-aos="fade-right">
               <button
                 onClick={() => router.push('/')}
-                className="hover:text-[#FB991A] transition-colors"
+                className="hover:text-primary-orange transition-all duration-300"
               >
                 Home
               </button>
               <span>/</span>
               <button
                 onClick={() => router.push('/products')}
-                className="hover:text-[#FB991A] transition-colors"
+                className="hover:text-primary-orange transition-all duration-300"
               >
                 Products
               </button>
@@ -286,10 +286,10 @@ export default function PaymentPage() {
         {/* Main Content */}
         <section className='pb-12'>
           <div className='layout'>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Payment Form */}
               <div className="lg:col-span-2" data-aos="fade-up">
-                <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
                   <Typography variant="h3" weight="semibold" className="text-lg mb-6 pb-4 border-b border-gray-200">
                     Detail Pembayaran
                   </Typography>
@@ -306,8 +306,8 @@ export default function PaymentPage() {
 
               {/* Order Summary Sidebar */}
               <div className="lg:col-span-1" data-aos="fade-up" data-aos-delay="100">
-                <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm sticky top-24">
-                  <div className="p-6">
+                <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm sticky top-24">
+                  <div className="p-8">
                     <Typography variant="h4" weight="semibold" className="text-lg mb-4 pb-4 border-b border-gray-200">
                       Ringkasan Pesanan
                     </Typography>
@@ -329,11 +329,11 @@ export default function PaymentPage() {
                     </div>
 
                     {/* Total */}
-                    <div className="space-y-2 mb-6 pb-6 border-b border-gray-200">
+                    <div className="space-y-3 mb-6 pb-6 border-b border-gray-200">
                       {hasDiscount && (
                         <div className="flex justify-between items-center">
                           <Typography className="text-gray-500 text-sm">Harga Normal</Typography>
-                          <Typography className="text-gray-500 text-sm line-through">
+                          <Typography className="text-gray-400 text-base line-through">
                             Rp {selectedProduct.harga.toLocaleString('id-ID')}
                           </Typography>
                         </div>
@@ -343,11 +343,11 @@ export default function PaymentPage() {
                           Total Bayar
                         </Typography>
                         <div className="text-right">
-                          <Typography variant="h3" weight="semibold" className="text-xl text-[#FB991A]">
+                          <Typography variant="h3" weight="bold" className="text-2xl text-[#FB991A]">
                             Rp {displayPrice.toLocaleString('id-ID')}
                           </Typography>
                           {hasDiscount && (
-                            <Typography className="text-xs text-green-600 font-medium">
+                            <Typography className="text-xs text-green-600 font-medium mt-1">
                               Hemat Rp {(selectedProduct.harga - displayPrice).toLocaleString('id-ID')}
                             </Typography>
                           )}
@@ -395,9 +395,9 @@ export default function PaymentPage() {
         </section>
 
         {/* Payment Methods Info */}
-        <section className='pb-12'>
+        <section className='pb-16 md:pb-20'>
           <div className='layout'>
-            <div className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm" data-aos="fade-up">
+            <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm" data-aos="fade-up">
               <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-gradient-to-r from-[#FB991A] to-[#C0172A] rounded-lg flex items-center justify-center flex-shrink-0">
@@ -409,11 +409,11 @@ export default function PaymentPage() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 flex-wrap justify-center lg:justify-end">
-                  <span className="px-3 py-1.5 bg-gray-50 rounded-md text-xs font-medium text-gray-700 border border-gray-200">Credit Card</span>
-                  <span className="px-3 py-1.5 bg-gray-50 rounded-md text-xs font-medium text-gray-700 border border-gray-200">Bank Transfer</span>
-                  <span className="px-3 py-1.5 bg-gray-50 rounded-md text-xs font-medium text-gray-700 border border-gray-200">E-Wallet</span>
-                  <span className="px-3 py-1.5 bg-gray-50 rounded-md text-xs font-medium text-gray-700 border border-gray-200">Convenience Store</span>
+                <div className="flex items-center gap-2.5 flex-wrap justify-center lg:justify-end">
+                  <span className="px-3 py-1.5 bg-gray-50 rounded-lg text-xs font-medium text-gray-700 border border-gray-100">Credit Card</span>
+                  <span className="px-3 py-1.5 bg-gray-50 rounded-lg text-xs font-medium text-gray-700 border border-gray-100">Bank Transfer</span>
+                  <span className="px-3 py-1.5 bg-gray-50 rounded-lg text-xs font-medium text-gray-700 border border-gray-100">E-Wallet</span>
+                  <span className="px-3 py-1.5 bg-gray-50 rounded-lg text-xs font-medium text-gray-700 border border-gray-100">Convenience Store</span>
                 </div>
               </div>
             </div>
