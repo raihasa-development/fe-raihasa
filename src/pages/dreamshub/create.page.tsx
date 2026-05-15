@@ -141,7 +141,7 @@ function CreatePostPage() {
                                         </div>
                                         <div>
                                             <p className={`font-bold text-sm ${isPrivate ? 'text-[#FB991A]' : 'text-gray-700'}`}>Konsultasi Pribadi</p>
-                                            <p className="text-xs text-gray-500 mt-1 leading-relaxed">Hanya Anda dan tim mentor yang dapat melihat konsultasi ini. Cocok untuk pertanyaan personal.</p>
+                                            <p className="text-xs text-gray-500 mt-1 leading-relaxed">Hanya Anda dan Mentor yang dapat melihat konsultasi ini.</p>
                                         </div>
                                     </button>
                                 </div>
