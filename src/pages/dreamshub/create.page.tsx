@@ -123,8 +123,8 @@ function CreatePostPage() {
                                             <FiUnlock className="w-5 h-5" />
                                         </div>
                                         <div>
-                                            <p className={`font-bold text-sm ${!isPrivate ? 'text-[#1B7691]' : 'text-gray-700'}`}>Publik</p>
-                                            <p className="text-xs text-gray-500 mt-1 leading-relaxed">Konsultasi Anda dapat dilihat oleh seluruh komunitas DreamsHub.</p>
+                                            <p className={`font-bold text-sm ${!isPrivate ? 'text-[#1B7691]' : 'text-gray-700'}`}>Diskusi Terbuka</p>
+                                            <p className="text-xs text-gray-500 mt-1 leading-relaxed">Konsultasi kamu dapat dilihat oleh seluruh komunitas DreamsHub dan bermanfaat untuk yang lain.</p>
                                         </div>
                                     </button>
 
@@ -140,8 +140,8 @@ function CreatePostPage() {
                                             <FiLock className="w-5 h-5" />
                                         </div>
                                         <div>
-                                            <p className={`font-bold text-sm ${isPrivate ? 'text-[#FB991A]' : 'text-gray-700'}`}>Privat (Khusus Admin)</p>
-                                            <p className="text-xs text-gray-500 mt-1 leading-relaxed">Hanya Anda dan Admin yang dapat melihat konsultasi ini.</p>
+                                            <p className={`font-bold text-sm ${isPrivate ? 'text-[#FB991A]' : 'text-gray-700'}`}>Konsultasi Pribadi</p>
+                                            <p className="text-xs text-gray-500 mt-1 leading-relaxed">Hanya Anda dan tim mentor yang dapat melihat konsultasi ini. Cocok untuk pertanyaan personal.</p>
                                         </div>
                                     </button>
                                 </div>

@@ -224,17 +224,6 @@ export default function ListScholarshipPage() {
                                     Temukan ribuan peluang pendidikan dari seluruh dunia. Gunakan filter untuk mencari yang sesuai denganmu.
                                 </p>
                             </div>
-
-                            <div className="flex gap-3">
-                                <div className="bg-white rounded-xl px-4 py-3 text-center min-w-[90px] shadow-sm">
-                                    <p className="text-xl font-bold text-[#1B7691] mb-0 leading-none">{openCount}</p>
-                                    <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mt-1">Dibuka</p>
-                                </div>
-                                <div className="bg-white/10 rounded-xl px-4 py-3 text-center min-w-[90px] border border-white/20">
-                                    <p className="text-xl font-bold text-white mb-0 leading-none">{closedCount}</p>
-                                    <p className="text-[10px] text-white/70 font-bold uppercase tracking-wider mt-1">Ditutup</p>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
