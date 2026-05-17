@@ -712,18 +712,6 @@ export default function ScholarshipCalendarPage() {
                     <FiChevronRight />
                   </button>
                 </div>
-
-                {/* Stats for selected month */}
-                <div className="grid grid-cols-2 gap-3 mt-4">
-                  <div className="bg-blue-50 p-3 rounded-xl border border-blue-100">
-                    <p className="text-xs text-blue-600 font-medium mb-1">Akan Datang</p>
-                    <p className="text-2xl font-bold text-blue-800">{monthlyStats.upcoming}</p>
-                  </div>
-                  <div className="bg-amber-50 p-3 rounded-xl border border-amber-100">
-                    <p className="text-xs text-amber-600 font-medium mb-1">Segera Tutup</p>
-                    <p className="text-2xl font-bold text-amber-800">{monthlyStats.closingSoon}</p>
-                  </div>
-                </div>
               </div>
 
               {/* Legend */}

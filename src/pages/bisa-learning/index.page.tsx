@@ -12,16 +12,9 @@ import api from '@/lib/api';
 import { getToken } from '@/lib/cookies';
 
 const courseCategories = [
-	{ id: 'all', title: 'Semua Program', color: 'bg-gray-800' },
-	{ id: 'pertamina', title: 'Pertamina Sobat Bumi', color: 'bg-blue-600' },
-	{ id: 'tanoto', title: 'TANOTO Foundation', color: 'bg-green-600' },
-	{ id: 'bright', title: 'Bright Scholarship', color: 'bg-purple-600' },
-	{ id: 'bca', title: 'Bakti BCA', color: 'bg-orange-600' },
-	{ id: 'kse', title: 'Karya Salemba Empat', color: 'bg-red-600' },
-	{ id: 'unggulan', title: 'Beasiswa Unggulan', color: 'bg-indigo-600' },
-	{ id: 'bangkit', title: 'Indonesia Bangkit', color: 'bg-teal-600' },
-	{ id: 'paragon', title: 'Paragon', color: 'bg-pink-600' },
-	{ id: 'glow-lovely', title: 'Glow and Lovely', color: 'bg-yellow-500' },
+	{ id: 'all', title: 'Semua Modul', color: 'bg-gray-800' },
+	{ id: 'DALAM_NEGERI', title: 'Dalam Negeri', color: 'bg-blue-600' },
+	{ id: 'LUAR_NEGERI', title: 'Luar Negeri', color: 'bg-green-600' },
 ];
 
 export default withAuth(BISALearningPage, 'user');
@@ -110,7 +103,7 @@ function BISALearningPage() {
 	}, []);
 
 	const filteredCourses = courses.filter((course) => {
-		const matchCategory = selectedCategory === 'all' || course.categoryId === selectedCategory;
+		const matchCategory = selectedCategory === 'all' || (course as any).schema_type === selectedCategory;
 		const matchSearch = course.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
 			(course.instructor && course.instructor.toLowerCase().includes(searchQuery.toLowerCase()));
 		return matchCategory && matchSearch;

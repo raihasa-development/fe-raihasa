@@ -208,28 +208,22 @@ function UserHomePage() {
             </div>
           </section>
 
-          <section className='grid grid-cols-2 md:grid-cols-3 gap-4 mb-8'>
+          <section className='grid grid-cols-2 gap-4 mb-8'>
             {[
               {
                 icon: FiBookOpen,
-                label: 'Total Modul Belajar',
+                label: 'Total Modul',
                 value: String(courses.length),
                 tone: 'bg-blue-50 text-[#1B7691]',
               },
               {
-                icon: FiSearch,
-                label: 'Total Beasiswa',
-                value: '92+',
-                tone: 'bg-emerald-50 text-emerald-700',
-              },
-              {
                 icon: membership.active ? FiUnlock : FiLock,
-                label: 'Status Membership',
+                label: 'Membership',
                 value: membership.loading ? '...' : membership.active ? 'Aktif' : 'Belum Aktif',
                 tone: membership.active ? 'bg-green-50 text-green-700' : 'bg-amber-50 text-amber-700',
               },
             ].map((item) => (
-              <article key={item.label} className='bg-white border border-gray-200 rounded-2xl p-4 shadow-sm'>
+              <article key={item.label} className='bg-white border border-gray-200 rounded-2xl p-5 shadow-sm'>
                 <div className={`w-10 h-10 rounded-xl ${item.tone} flex items-center justify-center mb-3`}>
                   <item.icon className='w-5 h-5' />
                 </div>

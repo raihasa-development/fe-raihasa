@@ -355,7 +355,7 @@ export default function DreamshubPage() {
                         <div className="flex gap-2">
                           {post.is_private && (
                             <span className="text-[10px] px-2 py-0.5 bg-orange-100 text-[#FB991A] rounded-full font-bold flex items-center gap-1">
-                                <FiLock /> Privat
+                                <FiLock /> Konsultasi Pribadi
                             </span>
                           )}
                           {post.is_pinned && <MdOutlinePushPin className="text-[#FB991A]" />}

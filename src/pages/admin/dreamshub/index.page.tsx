@@ -186,9 +186,9 @@ function AdminDreamshubPage() {
                     <div className="pr-6">
                       <div className="flex items-center gap-2 mb-1">
                         {post.is_private ? (
-                          <span className="text-[10px] bg-orange-100 text-[#FB991A] rounded px-1.5 py-0.5 font-bold flex items-center gap-1"><FiLock size={10} /> Privat</span>
+                          <span className="text-[10px] bg-orange-100 text-[#FB991A] rounded px-1.5 py-0.5 font-bold flex items-center gap-1"><FiLock size={10} /> Konsultasi Pribadi</span>
                         ) : (
-                          <span className="text-[10px] bg-blue-100 text-[#1B7691] rounded px-1.5 py-0.5 font-bold flex items-center gap-1"><FiUnlock size={10} /> Publik</span>
+                          <span className="text-[10px] bg-blue-100 text-[#1B7691] rounded px-1.5 py-0.5 font-bold flex items-center gap-1"><FiUnlock size={10} /> Diskusi Terbuka</span>
                         )}
                         <p className="font-bold text-sm text-gray-900 line-clamp-1">{post.title}</p>
                       </div>
@@ -232,9 +232,9 @@ function AdminDreamshubPage() {
                     {selectedPost.category?.name || 'General'}
                   </span>
                   {selectedPost.is_private ? (
-                    <span className="text-[10px] bg-orange-100 text-[#FB991A] px-2 py-0.5 rounded-full font-bold flex items-center gap-1"><FiLock size={10} /> Privat</span>
+                    <span className="text-[10px] bg-orange-100 text-[#FB991A] px-2 py-0.5 rounded-full font-bold flex items-center gap-1"><FiLock size={10} /> Konsultasi Pribadi</span>
                   ) : (
-                    <span className="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-bold flex items-center gap-1"><FiUnlock size={10} /> Publik</span>
+                    <span className="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-bold flex items-center gap-1"><FiUnlock size={10} /> Diskusi Terbuka</span>
                   )}
                 </div>
                 <h2 className="text-xl font-bold text-gray-900 mb-2">{selectedPost.title}</h2>
