@@ -26,13 +26,43 @@ import Typography from '@/components/Typography';
 import { TESTIMONIALS } from '@/contents/landing';
 import { sponsorList } from '@/contents/sponsor';
 import Layout from '@/layouts/Layout';
+import { useRouter } from 'next/router';
+import { getToken } from '@/lib/cookies';
 import api from '@/lib/api';
-import { FiPlay, FiStar, FiClock, FiBookOpen, FiChevronRight } from 'react-icons/fi';
+import { FiPlay, FiStar, FiClock, FiBookOpen, FiChevronRight, FiCheck, FiX } from 'react-icons/fi';
 
 export default function Home() {
   const aboutRef = useRef<HTMLElement>(null);
+  const router = useRouter();
   const [previewCourses, setPreviewCourses] = React.useState<any[]>([]);
   const [isLoadingCourses, setIsLoadingCourses] = React.useState(true);
+  const [pricingPlans, setPricingPlans] = React.useState<any[]>([]);
+  const [isLoadingPricing, setIsLoadingPricing] = React.useState(true);
+  const [selectedPreviewCourse, setSelectedPreviewCourse] = React.useState<any | null>(null);
+  const [activeFeatureTab, setActiveFeatureTab] = React.useState('scholra');
+
+  const handleSelectProduct = (productId: string, isPremium?: boolean) => {
+    if (isPremium) {
+      const message = encodeURIComponent(`Halo Raih Asa!
+Saya tertarik untuk berdiskusi mengenai paket Enterprise/Partnership.
+
+Nama:
+Nama Institusi:
+Asal Kota Institusi:
+Pertanyaan/Kebutuhan:
+
+Terima kasih!`);
+      window.open(`https://wa.me/6285117323893?text=${message}`, '_blank');
+      return;
+    }
+
+    const token = getToken();
+    if (!token) {
+      router.push(`/login?redirect=/payment/checkout?productId=${productId}`);
+      return;
+    }
+    router.push(`/payment/checkout?productId=${productId}`);
+  };
 
   // Animation Refs
   const pillRef = useRef<HTMLDivElement>(null);
@@ -61,11 +91,43 @@ export default function Home() {
         setIsLoadingCourses(false);
       }
     };
+
+    const fetchPricingPlans = async () => {
+      try {
+        const response = await api.get('/pricing/plans');
+        const raw = response.data;
+        const result = raw?.data || raw;
+        const plans = result?.plans || result || [];
+        setPricingPlans(plans);
+      } catch (error) {
+        console.error('Failed to fetch pricing plans', error);
+      } finally {
+        setIsLoadingPricing(false);
+      }
+    };
+
     fetchPreviewCourses();
+    fetchPricingPlans();
   }, []);
 
   return (
     <Layout withNavbar={true} withFooter={true}>
+      {/* Top WhatsApp Community Announcement Banner */}
+      <div className='fixed top-0 inset-x-0 z-[110] h-10 bg-gradient-to-r from-[#25D366] to-[#1B7691] flex items-center justify-center text-white text-xs md:text-sm font-semibold shadow-sm px-4'>
+        <a
+          href='https://whatsapp.com/channel/0029VbAylifBA1euNUV6LN09'
+          target='_blank'
+          rel='noreferrer'
+          className='flex items-center gap-2 hover:underline'
+        >
+          <FaWhatsapp className='w-4 h-4 text-white' />
+          <span>Ayo join Community bareng 66 ribu Peraih Asa Lainnya!</span>
+          <span className='inline-block px-2 py-0.5 ml-1 text-[10px] font-bold uppercase bg-white/20 rounded border border-white/30 backdrop-blur-sm'>
+            Join
+          </span>
+        </a>
+      </div>
+
       <SEO title='Home' />
       <PromoPopup />
 
@@ -352,8 +414,9 @@ export default function Home() {
             <div className='grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8'>
 
               {/* Card 1 - Scholra */}
-              <div
-                className='bg-white rounded-2xl p-6 md:p-8 border border-gray-200 hover:border-[#1B7691]/30 hover:shadow-lg transition-all duration-300'
+              <Link
+                href='/scholra'
+                className='block bg-white rounded-2xl p-6 md:p-8 border border-gray-200 hover:border-[#1B7691]/30 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer'
                 data-aos='fade-up'
               >
                 <div className='w-14 h-14 rounded-xl bg-[#1B7691] flex items-center justify-center mb-5'>
@@ -371,13 +434,12 @@ export default function Home() {
                 <span className='inline-flex items-center gap-1 text-[#1B7691] text-sm font-medium hover:gap-2 transition-all cursor-pointer'>
                   Pelajari <FaArrowRightLong className='text-xs' />
                 </span>
-              </div>
-
-
+              </Link>
 
               {/* Card 3 - BISA Learning */}
-              <div
-                className='bg-white rounded-2xl p-6 md:p-8 border border-gray-200 hover:border-[#1B7691]/30 hover:shadow-lg transition-all duration-300'
+              <Link
+                href='/bisa-learning'
+                className='block bg-white rounded-2xl p-6 md:p-8 border border-gray-200 hover:border-[#1B7691]/30 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer'
                 data-aos='fade-up'
                 data-aos-delay='200'
               >
@@ -396,10 +458,12 @@ export default function Home() {
                 <span className='inline-flex items-center gap-1 text-[#1B7691] text-sm font-medium hover:gap-2 transition-all cursor-pointer'>
                   Akses <FaArrowRightLong className='text-xs' />
                 </span>
-              </div>
+              </Link>
+
               {/* Card 2 - Dreamshub */}
-              <div
-                className='bg-white rounded-2xl p-6 md:p-8 border border-gray-200 hover:border-[#FB991A]/30 hover:shadow-lg transition-all duration-300'
+              <Link
+                href='/dreamshub'
+                className='block bg-white rounded-2xl p-6 md:p-8 border border-gray-200 hover:border-[#FB991A]/30 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer'
                 data-aos='fade-up'
                 data-aos-delay='100'
               >
@@ -418,6 +482,118 @@ export default function Home() {
                 <span className='inline-flex items-center gap-1 text-[#FB991A] text-sm font-medium hover:gap-2 transition-all cursor-pointer'>
                   Gabung <FaArrowRightLong className='text-xs' />
                 </span>
+              </Link>
+            </div>
+
+            {/* Interactive Feature Showcase Section */}
+            <div className='mt-16 bg-gradient-to-br from-[#1B7691]/5 to-[#FB991A]/5 rounded-3xl p-6 md:p-10 border border-gray-100 shadow-inner' data-aos='fade-up'>
+              <div className='text-center mb-8'>
+                <span className='text-xs font-bold text-[#FB991A] uppercase tracking-wider bg-[#FB991A]/10 px-3 py-1 rounded-full'>
+                  Interactive Demo
+                </span>
+                <Typography as='h3' className='text-2xl md:text-3xl font-bold text-gray-900 mt-2'>
+                  Lihat Bagaimana Fitur Kami Membantumu
+                </Typography>
+              </div>
+
+              <div className='grid grid-cols-1 lg:grid-cols-12 gap-8 items-center'>
+                {/* Tab Controls - Left 4 Columns */}
+                <div className='lg:col-span-4 flex flex-col gap-3'>
+                  {[
+                    {
+                      id: 'scholra',
+                      title: 'Scholra AI',
+                      tag: 'AI Assistant',
+                      desc: 'Analisis profil instan & rekomendasi beasiswa personal.',
+                      color: 'border-[#1B7691]',
+                      bg: 'bg-[#1B7691]/10',
+                      text: 'text-[#1B7691]',
+                    },
+                    {
+                      id: 'bisa-learning',
+                      title: 'BISA Learning',
+                      tag: 'Learning Hub',
+                      desc: 'Ratusan materi video premium dan e-book lolos beasiswa.',
+                      color: 'border-[#1B7691]',
+                      bg: 'bg-[#1B7691]/10',
+                      text: 'text-[#1B7691]',
+                    },
+                    {
+                      id: 'dreamshub',
+                      title: 'Dreamshub',
+                      tag: 'Forum & Mentor',
+                      desc: 'Tanya jawab langsung dengan mentor dan review dokumen.',
+                      color: 'border-[#FB991A]',
+                      bg: 'bg-[#FB991A]/10',
+                      text: 'text-[#FB991A]',
+                    },
+                  ].map((tab) => (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveFeatureTab(tab.id)}
+                      className={`text-left p-5 rounded-2xl border transition-all duration-300 ${activeFeatureTab === tab.id
+                        ? `bg-white border-gray-200 shadow-md scale-[1.02] ${tab.color}`
+                        : 'bg-transparent border-transparent hover:bg-white/50'
+                        }`}
+                    >
+                      <div className='flex justify-between items-center mb-1'>
+                        <span className='font-bold text-gray-900 text-lg'>{tab.title}</span>
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${tab.bg} ${tab.text}`}>
+                          {tab.tag}
+                        </span>
+                      </div>
+                      <p className='text-sm text-gray-500 leading-relaxed'>{tab.desc}</p>
+                    </button>
+                  ))}
+                </div>
+
+                {/* macOS Browser Mockup - Right 8 Columns */}
+                <div className='lg:col-span-8 bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden flex flex-col h-[400px] md:h-[450px] relative transition-all duration-500'>
+                  {/* macOS Header */}
+                  <div className='bg-gray-50 border-b border-gray-200 px-4 py-3 flex items-center justify-between shrink-0'>
+                    <div className='flex items-center gap-1.5'>
+                      <span className='w-3 h-3 rounded-full bg-red-400'></span>
+                      <span className='w-3 h-3 rounded-full bg-yellow-400'></span>
+                      <span className='w-3 h-3 rounded-full bg-green-400'></span>
+                    </div>
+                    <div className='bg-white border border-gray-200 rounded-md py-1 px-8 text-[11px] text-gray-400 font-mono w-1/2 text-center select-none truncate'>
+                      raihasa.id/{activeFeatureTab}
+                    </div>
+                    <div className='w-12'></div>
+                  </div>
+
+                  {/* Browser Content Frame - Video Placeholder */}
+                  <div className='flex-1 bg-black relative overflow-hidden h-full w-full'>
+                    {(() => {
+                      const activeTab = [
+                        { id: 'scholra', videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-software-developer-working-on-code-screen-close-up-34281-large.mp4' },
+                        { id: 'bisa-learning', videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-woman-working-on-a-laptop-at-home-42289-large.mp4' },
+                        { id: 'dreamshub', videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-man-working-on-a-laptop-with-a-large-screen-34255-large.mp4' }
+                      ].find(t => t.id === activeFeatureTab);
+
+                      return (
+                        <video
+                          key={activeFeatureTab}
+                          src={activeTab?.videoUrl}
+                          className='w-full h-full object-cover opacity-90 animate-fade-in'
+                          autoPlay
+                          loop
+                          muted
+                          playsInline
+                        />
+                      );
+                    })()}
+
+                    <div className='absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none' />
+                    <div className='absolute bottom-4 left-4 right-4 bg-white/10 backdrop-blur-md border border-white/20 px-4 py-2.5 rounded-xl text-white text-xs font-semibold flex items-center justify-between shadow-md'>
+                      <span className='capitalize font-bold'>{activeFeatureTab} Demo Video</span>
+                      <span className='flex items-center gap-1.5'>
+                        <span className='w-2 h-2 rounded-full bg-[#1B7691] animate-pulse'></span>
+                        Preview Mode
+                      </span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -486,9 +662,14 @@ export default function Home() {
                       data-aos='fade-up'
                       data-aos-delay={idx * 100}
                       className='group bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-md hover:shadow-xl transition-all duration-500 hover:-translate-y-2 flex flex-col h-full cursor-pointer'
-                      onClick={() => window.location.href = '/products'}
+                      onClick={() => setSelectedPreviewCourse(course)}
                     >
                       <div className='relative h-56 overflow-hidden'>
+                        {/* Dynamic Floating CTA Badge to invite user to watch video preview */}
+                        <div className='absolute top-3 left-3 bg-[#1B7691] backdrop-blur-md text-white text-[10px] font-bold px-3 py-1.5 rounded-full shadow-md z-20 flex items-center gap-1.5 transition-all duration-300 group-hover:bg-[#FB991A] group-hover:scale-105'>
+                          <FiPlay className='w-3 h-3 fill-white animate-pulse' />
+                          Tonton Preview
+                        </div>
                         <div className='absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-all duration-300 z-10 flex items-center justify-center'>
                           <div className='bg-white/90 backdrop-blur w-12 h-12 rounded-full flex items-center justify-center transform scale-90 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-300'>
                             <FiPlay className='w-5 h-5 ml-1 text-[#1B7691] fill-[#1B7691]' />
@@ -541,12 +722,142 @@ export default function Home() {
                 })}
               </div>
             ) : null}
-            
+
             <div className='mt-10 text-center md:hidden'>
               <ButtonLink href='/products' variant='primary' className='w-full'>
                 Gabung Sekarang
               </ButtonLink>
             </div>
+          </div>
+        </section>
+
+        {/* PRICING PLANS SECTION */}
+        <section className='relative px-4 md:px-10 py-16 md:py-20 bg-gray-50/50 overflow-hidden border-t border-b border-gray-100'>
+          <div className='container mx-auto max-w-6xl'>
+            {/* Section Header */}
+            <div className='text-center mb-14 md:mb-20' data-aos='fade-up'>
+              <Typography className='text-sm md:text-base font-medium text-[#1B7691] uppercase tracking-widest mb-3'>
+                BISA Membership Plans
+              </Typography>
+              <Typography as='h2' className='text-3xl md:text-4xl lg:text-[42px] font-bold text-gray-900 leading-tight'>
+                Pilih Paket Belajar Terbaik
+                <span className='block text-[#FB991A]'>Sesuai Kebutuhan Beasiswamu</span>
+              </Typography>
+            </div>
+
+            {isLoadingPricing ? (
+              <div className='grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch'>
+                {[1, 2, 3].map(i => (
+                  <div key={i} className='h-[450px] bg-white rounded-3xl animate-pulse shadow-sm border border-gray-100'></div>
+                ))}
+              </div>
+            ) : pricingPlans.length > 0 ? (
+              <div className='grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch'>
+                {pricingPlans.map((product, index) => {
+                  const isPopular = product.is_popular;
+                  const isEnterprise = product.is_enterprise;
+                  const isBasic = !isPopular && !isEnterprise;
+
+                  return (
+                    <div
+                      key={product.id}
+                      data-aos="fade-up"
+                      data-aos-delay={index * 100}
+                      className={`flex flex-col p-8 rounded-2xl transition-all duration-300 relative group h-full ${isPopular
+                        ? 'border-2 border-[#FB991A] bg-[#FFFBF5] shadow-xl scale-[1.02] z-20'
+                        : isEnterprise
+                          ? 'border border-gray-100 bg-white shadow-sm hover:border-[#1B7691]/30 hover:shadow-xl hover:shadow-blue-500/5'
+                          : 'border border-gray-100 bg-white shadow-sm hover:border-[#FB991A]/30 hover:shadow-xl hover:shadow-orange-500/5'
+                        }`}
+                    >
+                      {product.tag && (
+                        <div className={`absolute -top-4 left-1/2 -translate-x-1/2 ${isPopular ? 'bg-gradient-to-r from-[#FB991A] to-[#DB4B24] text-white' : 'bg-gray-100 text-gray-700'} text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider shadow-md whitespace-nowrap`}>
+                          {product.tag}
+                        </div>
+                      )}
+
+                      <div className={`mb-6 ${product.tag ? 'mt-2' : ''}`}>
+                        <Typography
+                          weight="bold"
+                          className={`text-xl font-bold ${isPopular ? 'text-[#DB4B24]' : 'text-gray-900'} ${isBasic ? 'group-hover:text-[#FB991A] transition-all duration-300' : ''}`}
+                        >
+                          {product.name}
+                        </Typography>
+                        <p className={`text-sm mt-2 leading-relaxed ${isPopular ? 'text-[#d97706]/80' : 'text-gray-500'}`}>
+                          {product.description || ''}
+                        </p>
+                      </div>
+
+                      <div className="mb-8 pb-6 border-b border-gray-100">
+                        <div className="flex items-baseline gap-1">
+                          {isEnterprise ? (
+                            <span className="text-2xl font-bold text-gray-900">Custom</span>
+                          ) : (
+                            <>
+                              {product.original_price && product.original_price > product.price && (
+                                <span className="text-base text-gray-400 line-through mr-2">
+                                  {Math.floor(product.original_price / 1000)}k
+                                </span>
+                              )}
+                              <span className={`font-bold text-gray-900 ${isPopular ? 'text-4xl' : 'text-3xl'}`}>
+                                {Math.floor(product.price / 1000)}k
+                              </span>
+                              <span className="text-gray-400 text-sm font-medium ml-1">/ {product.duration_months} bulan</span>
+                            </>
+                          )}
+                        </div>
+                        {!isEnterprise && product.original_price && product.original_price > product.price && (
+                          <div className="mt-3">
+                            <span className={`inline-block text-[11px] font-bold px-2.5 py-1 rounded-full ${isPopular ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-700'}`}>
+                              Hemat {Math.round(((product.original_price - product.price) / product.original_price) * 100)}% {isPopular && "• Offer Ends Soon!"}
+                            </span>
+                          </div>
+                        )}
+                        {isEnterprise && <p className="text-sm text-gray-400 mt-2">Harga menyesuaikan kebutuhan</p>}
+                      </div>
+
+                      <ul className="space-y-3.5 mb-8 flex-1">
+                        {product.features?.map((feature: string, i: number) => (
+                          <li key={i} className={`flex gap-3 text-sm leading-relaxed ${isPopular ? 'text-gray-800' : 'text-gray-600'}`}>
+                            <div className={`mt-0.5 shrink-0 ${isPopular ? 'w-5 h-5 rounded-full bg-[#FB991A] flex items-center justify-center' : ''}`}>
+                              {isPopular ? (
+                                <FiCheck className="w-3 h-3 text-white" />
+                              ) : (
+                                <FiCheck className="w-4 h-4 text-[#FB991A]" />
+                              )}
+                            </div>
+                            <span className={isPopular ? 'font-medium' : ''}>{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+
+                      <button
+                        onClick={() => handleSelectProduct(product.id, isEnterprise)}
+                        className={`w-full py-3.5 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${isPopular
+                          ? 'text-white bg-gradient-to-r from-[#FB991A] to-[#DB4B24] hover:shadow-lg hover:shadow-orange-500/30'
+                          : isEnterprise
+                            ? 'text-[#1B7691] border border-[#1B7691]/20 bg-[#1B7691]/5 hover:bg-[#1B7691] hover:text-white'
+                            : 'text-[#FB991A] bg-[#FB991A]/10 hover:bg-[#FB991A] hover:text-white'
+                          }`}
+                      >
+                        {isEnterprise ? (
+                          <>
+                            <FaWhatsapp className="w-5 h-5" />
+                            Hubungi Kami
+                          </>
+                        ) : (
+                          `Pilih Paket`
+                        )}
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className='text-center text-gray-500 py-10'>
+                Belum ada paket membership tersedia saat ini.
+              </div>
+            )}
           </div>
         </section>
 
@@ -915,9 +1226,136 @@ export default function Home() {
             .hover\\:pause-animation:hover .animate-marquee {
               animation-play-state: paused;
             }
+
+            /* Adjust layouts for top announcement banner */
+            header {
+              top: 40px !important;
+              transition: top 0.3s ease;
+            }
+            main {
+              margin-top: 40px !important;
+            }
+
+            @keyframes fadeIn {
+              from { opacity: 0; }
+              to { opacity: 1; }
+            }
+            @keyframes scaleUp {
+              from { transform: scale(0.95); opacity: 0; }
+              to { transform: scale(1); opacity: 1; }
+            }
+            .animate-fade-in {
+              animation: fadeIn 0.2s ease-out forwards;
+            }
+            .animate-scale-up {
+              animation: scaleUp 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            }
           `}</style>
         </section>
       </main>
+
+      {/* Mini Preview Modal for Course Cards */}
+      {selectedPreviewCourse && (
+        <div className='fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in'>
+          <div className='bg-white rounded-3xl overflow-hidden w-full max-w-xl shadow-2xl border border-gray-100 flex flex-col relative max-h-[85vh] md:max-h-[80vh] animate-scale-up'>
+            {/* Close Button */}
+            <button
+              onClick={() => setSelectedPreviewCourse(null)}
+              className='absolute top-3 right-3 z-50 p-2 rounded-full bg-white/80 hover:bg-white text-gray-700 hover:text-gray-900 border border-gray-100 shadow transition-all hover:scale-105'
+              title='Tutup'
+            >
+              <FiX className='w-4 h-4' />
+            </button>
+
+            {/* Video / Thumbnail Area */}
+            <div className='relative aspect-video w-full bg-black shrink-0'>
+              {selectedPreviewCourse.videoId ? (
+                <>
+                  <iframe
+                    src={`https://www.youtube.com/embed/${selectedPreviewCourse.videoId}?autoplay=1&rel=0&start=240&end=270`}
+                    title={selectedPreviewCourse.name}
+                    className='w-full h-full border-0'
+                    allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
+                    allowFullScreen
+                  ></iframe>
+                  {/* Transparent click blocker to protect the video URL from direct access */}
+                  <div className='absolute inset-0 bg-transparent z-10 cursor-default' />
+                </>
+              ) : (
+                <div className='w-full h-full relative'>
+                  <img
+                    src={selectedPreviewCourse.ThumbnailModule || `https://img.youtube.com/vi/${selectedPreviewCourse.videoId}/maxresdefault.jpg`}
+                    alt={selectedPreviewCourse.name}
+                    className='w-full h-full object-cover opacity-85'
+                  />
+                  <div className='absolute inset-0 bg-black/40 flex items-center justify-center'>
+                    <div className='w-16 h-16 rounded-full bg-[#1B7691] border border-[#1B7691]/20 flex items-center justify-center text-white shadow-lg shadow-[#1B7691]/30'>
+                      <FiPlay className='w-6 h-6 ml-1 fill-white' />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Content Details Area */}
+            <div className='p-5 md:p-6 flex flex-col flex-grow overflow-y-auto'>
+              <div className='flex flex-wrap items-center gap-2 mb-2'>
+                <span className='text-[9px] font-bold text-[#1B7691] bg-[#1B7691]/10 px-2.5 py-1 rounded-full uppercase'>
+                  BISA Learning Preview
+                </span>
+                <div className='flex items-center gap-1 ml-auto text-[11px] text-gray-500'>
+                  <div className='flex gap-0.5'>
+                    {[1, 2, 3, 4, 5].map(i => <FiStar key={i} className='w-2.5 h-2.5 text-[#FB991A] fill-[#FB991A]' />)}
+                  </div>
+                  <span className='font-bold text-gray-700'>({selectedPreviewCourse.rating || '4.5'})</span>
+                </div>
+              </div>
+
+              <Typography as='h3' className='text-lg md:text-xl font-bold text-gray-900 leading-snug mb-2'>
+                {selectedPreviewCourse.name}
+              </Typography>
+
+              <div className='flex flex-wrap items-center gap-x-5 gap-y-2 mb-4 pb-3 border-b border-gray-100 text-[11px] text-gray-500'>
+                <div className='flex items-center gap-2'>
+                  <div className='w-5 h-5 rounded-full bg-[#1B7691]/10 flex items-center justify-center font-bold text-[#1B7691] text-[10px]'>
+                    {selectedPreviewCourse.instructor ? selectedPreviewCourse.instructor.charAt(0).toUpperCase() : 'M'}
+                  </div>
+                  <div>
+                    <span className='text-gray-400 block leading-none'>Mentor</span>
+                    <span className='font-semibold text-gray-800 leading-tight block mt-0.5'>{selectedPreviewCourse.instructor || '-'}</span>
+                  </div>
+                </div>
+                <div>
+                  <span className='text-gray-400 block leading-none'>Durasi</span>
+                  <span className='font-semibold text-gray-800 flex items-center gap-1 mt-0.5 leading-tight'><FiClock className='w-3 h-3 text-gray-400' /> {selectedPreviewCourse.duration || 'N/A'}</span>
+                </div>
+                <div>
+                  <span className='text-gray-400 block leading-none'>Kurikulum</span>
+                  <span className='font-semibold text-gray-800 flex items-center gap-1 mt-0.5 leading-tight'><FiBookOpen className='w-3 h-3 text-gray-400' /> {selectedPreviewCourse.lessons_count || 0} Bab</span>
+                </div>
+              </div>
+
+              {/* Modal CTA */}
+              <div className='pt-4 border-t border-gray-100 flex flex-col sm:flex-row items-center gap-4 shrink-0'>
+                <div className='text-center sm:text-left'>
+                  <p className='text-xs text-gray-400 font-medium'>Dapatkan Akses Lengkap Modul Ini</p>
+                  <p className='text-sm font-bold text-[#FB991A]'>Gabung BISA Membership Sekarang</p>
+                </div>
+                <button
+                  onClick={() => {
+                    setSelectedPreviewCourse(null);
+                    router.push('/products');
+                  }}
+                  className='sm:ml-auto w-full sm:w-auto px-6 py-3.5 bg-gradient-to-r from-[#1B7691] to-[#0d5a6e] hover:from-[#FB991A] hover:to-[#DB4B24] text-white text-sm font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2 group'
+                >
+                  Gabung Sekarang
+                  <FiChevronRight className='w-4 h-4 transition-transform group-hover:translate-x-1' />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </Layout>
   );
 }

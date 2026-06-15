@@ -159,9 +159,9 @@ export default function Navbar() {
                       : 'text-gray-700 hover:text-[#1B7691] hover:bg-[#1B7691]/5'
                   )}
                 >
-                  Scholra
-                  <span className='px-1.5 py-0.5 text-[10px] font-bold bg-gradient-to-r from-[#1B7691] to-[#0d5a6e] text-white rounded'>AI</span>
-                </UnstyledLink>
+                   Scholra
+                   <span className='px-1.5 py-0.5 text-[10px] font-bold bg-gradient-to-r from-[#1B7691] to-[#0d5a6e] text-white rounded'>AI</span>
+                 </UnstyledLink>
               </li>
               <li>
                 <UnstyledLink

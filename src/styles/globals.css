@@ -23,9 +23,18 @@
   --color-primary-yellow: #ffd600;
   --color-primary-orange: #fb991a;
 
+  /* Refined ink palette for editorial feel */
+  --color-ink-900: #0a0a0f;
+  --color-ink-700: #2d2d33;
+  --color-ink-500: #5c5c66;
+  --color-paper: #faf9f6;
+  --color-paper-warm: #f5f1ea;
+
   /* Font */
   --font-primary: "Poppins", sans-serif;
   --font-secondary: "Roboto", sans-serif;
+  --font-display: "Fraunces", "Playfair Display", Georgia, serif;
+  --font-mono: "JetBrains Mono", "Courier New", monospace;
 
   /* Shadow */
   --shadow-20: 0px 0.5px 2px rgba(65, 78, 98, 0.12),
@@ -43,7 +52,79 @@
 @layer base {
   html, body {
     font-family: 'Poppins', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
+}
+
+/* Editorial typography utilities */
+.font-display {
+  font-family: 'Fraunces', 'Playfair Display', Georgia, serif;
+  font-feature-settings: "ss01", "ss02";
+  letter-spacing: -0.02em;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', monospace;
+  font-feature-settings: "calt", "liga";
+}
+
+/* Grain texture overlay — adds subtle paper feel */
+.grain-overlay {
+  position: relative;
+}
+
+.grain-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  mix-blend-mode: multiply;
+}
+
+/* Editorial number badge (replaces generic AI pill) */
+.editorial-number {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-weight: 300;
+  letter-spacing: -0.04em;
+}
+
+/* Magnetic hover for interactive elements */
+.magnetic {
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.magnetic:hover {
+  transform: translateY(-2px);
+}
+
+/* Underline animation for links */
+.editorial-link {
+  position: relative;
+  display: inline-block;
+}
+
+.editorial-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.editorial-link:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
 }
 
 @font-face {
@@ -388,4 +469,76 @@
 
 .animate-float {
   animation: float 3s ease-in-out infinite alternate;
+}
+
+/* ============================================================
+   Editorial Utility Additions — client-editorial-redesign
+   ============================================================ */
+
+/* 1.1 Background color aliases for Palet_Tinta tokens */
+.bg-ink-900   { background-color: var(--color-ink-900); }
+.bg-paper     { background-color: var(--color-paper); }
+.bg-paper-warm { background-color: var(--color-paper-warm); }
+
+/* 1.2 Text color aliases for Palet_Tinta tokens */
+.text-ink-900 { color: var(--color-ink-900); }
+.text-ink-700 { color: var(--color-ink-700); }
+.text-ink-500 { color: var(--color-ink-500); }
+
+/* 1.3 Border color alias */
+.border-ink-900 { border-color: var(--color-ink-900); }
+
+/* 1.4 Mono uppercase eyebrow shortcut */
+.eyebrow-mono {
+  font-family: 'JetBrains Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+/* 1.5 Brutalist hard shadow utility */
+.brutalist-shadow {
+  box-shadow: 6px 6px 0 0 var(--color-ink-900);
+  transition: box-shadow 300ms ease-out, transform 300ms ease-out;
+}
+
+.brutalist-shadow:hover {
+  box-shadow: 8px 8px 0 0 var(--color-ink-900);
+  transform: translateY(-2px);
+}
+
+/* 1.6 Calendar editorial overrides (react-big-calendar) */
+.calendar-editorial .rbc-toolbar-label {
+  font-family: 'Fraunces', serif;
+  font-size: 1.5rem;
+  letter-spacing: -0.02em;
+}
+
+.calendar-editorial .rbc-header {
+  font-family: 'JetBrains Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.7rem;
+  border-bottom: 2px solid var(--color-ink-900);
+}
+
+.calendar-editorial .rbc-date-cell {
+  font-family: 'Fraunces', serif;
+  font-weight: 300;
+}
+
+/* 1.7 Reduced-motion gates for non-essential animations */
+@media (prefers-reduced-motion: reduce) {
+  .animate-float {
+    animation: none !important;
+  }
+
+  .magnetic {
+    transition: none !important;
+  }
+
+  .editorial-link::after {
+    transition: none !important;
+  }
 }
