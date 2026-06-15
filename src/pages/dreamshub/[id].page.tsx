@@ -93,6 +93,11 @@ export default function PostDetailPage() {
     };
 
     useEffect(() => {
+        const token = getAuthToken();
+        if (!token && postId) {
+            router.push(`/login?redirect=/dreamshub/${postId}`);
+            return;
+        }
         if (postId) fetchPost();
         fetchUserTokens();
     }, [postId]);

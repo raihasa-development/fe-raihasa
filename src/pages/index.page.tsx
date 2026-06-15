@@ -1298,7 +1298,7 @@ Terima kasih!`);
             </div>
 
             {/* Content Details Area */}
-            <div className='p-5 md:p-6 flex flex-col flex-grow overflow-y-auto'>
+            <div className='p-5 md:p-6 pb-4 flex flex-col flex-grow overflow-y-auto'>
               <div className='flex flex-wrap items-center gap-2 mb-2'>
                 <span className='text-[9px] font-bold text-[#1B7691] bg-[#1B7691]/10 px-2.5 py-1 rounded-full uppercase'>
                   BISA Learning Preview
@@ -1314,44 +1314,51 @@ Terima kasih!`);
               <Typography as='h3' className='text-lg md:text-xl font-bold text-gray-900 leading-snug mb-2'>
                 {selectedPreviewCourse.name}
               </Typography>
+              {selectedPreviewCourse.instructor && (
+                <div className='flex items-center gap-1.5 text-xs text-gray-500'>
+                  <span>Mentor:</span>
+                  <span className='font-semibold text-gray-800'>{selectedPreviewCourse.instructor}</span>
+                </div>
+              )}
+            </div>
 
-              <div className='flex flex-wrap items-center gap-x-5 gap-y-2 mb-4 pb-3 border-b border-gray-100 text-[11px] text-gray-500'>
-                <div className='flex items-center gap-2'>
-                  <div className='w-5 h-5 rounded-full bg-[#1B7691]/10 flex items-center justify-center font-bold text-[#1B7691] text-[10px]'>
-                    {selectedPreviewCourse.instructor ? selectedPreviewCourse.instructor.charAt(0).toUpperCase() : 'M'}
+            {/* Modal CTA (Fixed at bottom) */}
+            <div className='p-5 bg-gray-50 border-t border-gray-100 flex flex-col sm:flex-row items-center gap-4 shrink-0 mt-auto'>
+              {selectedPreviewCourse.is_free ? (
+                <>
+                  <div className='text-center sm:text-left'>
+                    <p className='text-xs text-gray-400 font-medium'>Akses Gratis Modul Persiapan Ini</p>
+                    <p className='text-sm font-bold text-[#1B7691]'>Masuk atau Daftar Akun Sekarang</p>
                   </div>
-                  <div>
-                    <span className='text-gray-400 block leading-none'>Mentor</span>
-                    <span className='font-semibold text-gray-800 leading-tight block mt-0.5'>{selectedPreviewCourse.instructor || '-'}</span>
+                  <button
+                    onClick={() => {
+                      setSelectedPreviewCourse(null);
+                      router.push(`/login?redirect=/bisa-learning/${selectedPreviewCourse.id}`);
+                    }}
+                    className='sm:ml-auto w-full sm:w-auto px-6 py-3.5 bg-[#1B7691] hover:bg-[#0d5a6e] text-white text-sm font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2 group'
+                  >
+                    Masuk / Daftar
+                    <FiChevronRight className='w-4 h-4 transition-transform group-hover:translate-x-1' />
+                  </button>
+                </>
+              ) : (
+                <>
+                  <div className='text-center sm:text-left'>
+                    <p className='text-xs text-gray-400 font-medium'>Dapatkan Akses Lengkap Modul Ini</p>
+                    <p className='text-sm font-bold text-[#FB991A]'>Gabung BISA Membership Sekarang</p>
                   </div>
-                </div>
-                <div>
-                  <span className='text-gray-400 block leading-none'>Durasi</span>
-                  <span className='font-semibold text-gray-800 flex items-center gap-1 mt-0.5 leading-tight'><FiClock className='w-3 h-3 text-gray-400' /> {selectedPreviewCourse.duration || 'N/A'}</span>
-                </div>
-                <div>
-                  <span className='text-gray-400 block leading-none'>Kurikulum</span>
-                  <span className='font-semibold text-gray-800 flex items-center gap-1 mt-0.5 leading-tight'><FiBookOpen className='w-3 h-3 text-gray-400' /> {selectedPreviewCourse.lessons_count || 0} Bab</span>
-                </div>
-              </div>
-
-              {/* Modal CTA */}
-              <div className='pt-4 border-t border-gray-100 flex flex-col sm:flex-row items-center gap-4 shrink-0'>
-                <div className='text-center sm:text-left'>
-                  <p className='text-xs text-gray-400 font-medium'>Dapatkan Akses Lengkap Modul Ini</p>
-                  <p className='text-sm font-bold text-[#FB991A]'>Gabung BISA Membership Sekarang</p>
-                </div>
-                <button
-                  onClick={() => {
-                    setSelectedPreviewCourse(null);
-                    router.push('/products');
-                  }}
-                  className='sm:ml-auto w-full sm:w-auto px-6 py-3.5 bg-gradient-to-r from-[#1B7691] to-[#0d5a6e] hover:from-[#FB991A] hover:to-[#DB4B24] text-white text-sm font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2 group'
-                >
-                  Gabung Sekarang
-                  <FiChevronRight className='w-4 h-4 transition-transform group-hover:translate-x-1' />
-                </button>
-              </div>
+                  <button
+                    onClick={() => {
+                      setSelectedPreviewCourse(null);
+                      router.push('/products');
+                    }}
+                    className='sm:ml-auto w-full sm:w-auto px-6 py-3.5 bg-gradient-to-r from-[#1B7691] to-[#0d5a6e] hover:from-[#FB991A] hover:to-[#DB4B24] text-white text-sm font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2 group'
+                  >
+                    Gabung Sekarang
+                    <FiChevronRight className='w-4 h-4 transition-transform group-hover:translate-x-1' />
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>

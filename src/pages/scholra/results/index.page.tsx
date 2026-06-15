@@ -309,4 +309,4 @@ const ScholraResultsPage = () => {
     );
 };
 
-export default withAuth(ScholraResultsPage, 'user');
+export default withAuth(ScholraResultsPage, 'optional');

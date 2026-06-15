@@ -1,6 +1,7 @@
+import { useRouter } from 'next/router';
 import React, { useState, useEffect } from 'react';
 import {
-	FiPlay, FiAward, FiClock, FiUsers, FiSearch, FiStar, FiChevronRight, FiTrendingUp, FiBookOpen, FiCheckCircle, FiLock, FiAlertCircle, FiUnlock
+	FiPlay, FiAward, FiClock, FiUsers, FiSearch, FiStar, FiChevronRight, FiTrendingUp, FiBookOpen, FiCheckCircle, FiLock, FiAlertCircle, FiUnlock, FiX
 } from 'react-icons/fi';
 
 import withAuth from '@/components/hoc/withAuth';
@@ -17,10 +18,12 @@ const courseCategories = [
 	{ id: 'LUAR_NEGERI', title: 'Luar Negeri', color: 'bg-green-600' },
 ];
 
-export default withAuth(BISALearningPage, 'user');
+export default withAuth(BISALearningPage, 'optional');
 
 function BISALearningPage() {
+	const router = useRouter();
 	const [selectedCategory, setSelectedCategory] = useState('all');
+	const [selectedPreviewCourse, setSelectedPreviewCourse] = useState<any | null>(null);
 	const [searchQuery, setSearchQuery] = useState('');
 	const [lastViewed, setLastViewed] = useState<any>(null);
 	const [membership, setMembership] = useState<{ active: boolean; until: string | null; loading: boolean }>({
@@ -119,6 +122,20 @@ function BISALearningPage() {
                 .no-scrollbar {
                     -ms-overflow-style: none;
                     scrollbar-width: none;
+                }
+                @keyframes fadeIn {
+                  from { opacity: 0; }
+                  to { opacity: 1; }
+                }
+                @keyframes scaleUp {
+                  from { transform: scale(0.95); opacity: 0; }
+                  to { transform: scale(1); opacity: 1; }
+                }
+                .animate-fade-in {
+                  animation: fadeIn 0.2s ease-out forwards;
+                }
+                .animate-scale-up {
+                  animation: scaleUp 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
                 }
             `}</style>
 
@@ -294,7 +311,9 @@ function BISALearningPage() {
 							) : filteredCourses.length > 0 ? (
 								<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
 									{filteredCourses.map((course) => {
-										const isLocked = !course.is_authorize;
+										const isLoggedIn = typeof window !== 'undefined' && Boolean(getToken());
+										const shouldShowPreview = !isLoggedIn || !course.is_authorize;
+										const isLocked = !course.is_authorize && !course.is_free;
 										const thumbnail = course.ThumbnailModule || (course.videoId ? `https://img.youtube.com/vi/${course.videoId}/maxresdefault.jpg` : '');
 										
 										return (
@@ -304,7 +323,13 @@ function BISALearningPage() {
 											>
 												{/* Card Image */}
 												<div
-													onClick={() => window.location.href = isLocked ? '/products' : `/bisa-learning/${course.id}`}
+													onClick={() => {
+														if (shouldShowPreview) {
+															setSelectedPreviewCourse(course);
+														} else {
+															window.location.href = `/bisa-learning/${course.id}`;
+														}
+													}}
 													className='relative h-56 overflow-hidden cursor-pointer'
 												>
 													<div className='absolute inset-0 bg-gray-900/10 group-hover:bg-gray-900/0 transition-colors z-10'></div>
@@ -329,7 +354,7 @@ function BISALearningPage() {
 															}
 														}}
 													/>
-													{!isLocked && (
+													{!shouldShowPreview && (
 														<div className='absolute top-4 left-4 z-20'>
 															<span className='px-3 py-1 bg-white/90 backdrop-blur rounded-lg text-xs font-bold text-[#1B7691] flex items-center gap-1 shadow-sm'>
 																<FiPlay className='fill-[#1B7691]' /> Video Course
@@ -399,12 +424,12 @@ function BISALearningPage() {
 
 													{/* Action Button */}
 													<div className="mt-4">
-														{isLocked ? (
+														{shouldShowPreview ? (
 															<button
-																onClick={() => window.location.href = '/products'}
-																className='w-full bg-[#FB991A] hover:bg-orange-600 text-white px-5 py-3 rounded-xl text-sm font-bold shadow-lg transition-all flex items-center justify-center gap-2 z-10 relative'
+																onClick={() => setSelectedPreviewCourse(course)}
+																className='w-full bg-gradient-to-r from-[#1B7691] to-[#0d5a6e] hover:from-[#FB991A] hover:to-[#DB4B24] text-white px-5 py-3.5 rounded-xl text-sm font-bold shadow-lg transition-all flex items-center justify-center gap-2 z-10 relative'
 															>
-																<FiLock /> Buka Akses
+																<FiPlay className='w-3 h-3 fill-white' /> Tonton Preview
 															</button>
 														) : (
 															<ButtonLink
@@ -445,6 +470,117 @@ function BISALearningPage() {
 
 				</div>
 			</main>
+
+			{/* Mini Preview Modal for Course Cards */}
+			{selectedPreviewCourse && (
+				<div className='fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in'>
+					<div className='bg-white rounded-3xl overflow-hidden w-full max-w-xl shadow-2xl border border-gray-100 flex flex-col relative max-h-[85vh] md:max-h-[80vh] animate-scale-up'>
+						{/* Close Button */}
+						<button
+							onClick={() => setSelectedPreviewCourse(null)}
+							className='absolute top-3 right-3 z-50 p-2 rounded-full bg-white/80 hover:bg-white text-gray-700 hover:text-gray-900 border border-gray-100 shadow transition-all hover:scale-105'
+							title='Tutup'
+						>
+							<FiX className='w-4 h-4' />
+						</button>
+
+						{/* Video / Thumbnail Area */}
+						<div className='relative aspect-video w-full bg-black shrink-0'>
+							{selectedPreviewCourse.videoId ? (
+								<>
+									<iframe
+										src={`https://www.youtube.com/embed/${selectedPreviewCourse.videoId}?autoplay=1&rel=0&start=240&end=270`}
+										title={selectedPreviewCourse.name}
+										className='w-full h-full border-0'
+										allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
+										allowFullScreen
+									></iframe>
+									{/* Transparent click blocker to protect the video URL from direct access */}
+									<div className='absolute inset-0 bg-transparent z-10 cursor-default' />
+								</>
+							) : (
+								<div className='w-full h-full relative'>
+									<img
+										src={selectedPreviewCourse.ThumbnailModule || `https://img.youtube.com/vi/${selectedPreviewCourse.videoId}/maxresdefault.jpg`}
+										alt={selectedPreviewCourse.name}
+										className='w-full h-full object-cover opacity-85'
+									/>
+									<div className='absolute inset-0 bg-black/40 flex items-center justify-center'>
+										<div className='w-16 h-16 rounded-full bg-[#1B7691] border border-[#1B7691]/20 flex items-center justify-center text-white shadow-lg shadow-[#1B7691]/30'>
+											<FiPlay className='w-6 h-6 ml-1 fill-white' />
+										</div>
+									</div>
+								</div>
+							)}
+						</div>
+
+						{/* Content Details Area */}
+						<div className='p-5 md:p-6 pb-4 flex flex-col flex-grow overflow-y-auto'>
+							<div className='flex flex-wrap items-center gap-2 mb-2'>
+								<span className='text-[9px] font-bold text-[#1B7691] bg-[#1B7691]/10 px-2.5 py-1 rounded-full uppercase'>
+									BISA Learning Preview
+								</span>
+								<div className='flex items-center gap-1 ml-auto text-[11px] text-gray-500'>
+									<div className='flex gap-0.5'>
+										{[1, 2, 3, 4, 5].map(i => <FiStar key={i} className='w-2.5 h-2.5 text-[#FB991A] fill-[#FB991A]' />)}
+									</div>
+									<span className='font-bold text-gray-700'>({selectedPreviewCourse.rating || '4.5'})</span>
+								</div>
+							</div>
+
+							<Typography as='h3' className='text-lg md:text-xl font-bold text-gray-900 leading-snug mb-2'>
+								{selectedPreviewCourse.name}
+							</Typography>
+
+							{selectedPreviewCourse.instructor && (
+								<div className='flex items-center gap-1.5 text-xs text-gray-500'>
+									<span>Mentor:</span>
+									<span className='font-semibold text-gray-800'>{selectedPreviewCourse.instructor}</span>
+								</div>
+							)}
+						</div>
+
+						{/* Modal CTA (Fixed at bottom) */}
+						<div className='p-5 bg-gray-50 border-t border-gray-100 flex flex-col sm:flex-row items-center gap-4 shrink-0 mt-auto'>
+							{selectedPreviewCourse.is_free ? (
+								<>
+									<div className='text-center sm:text-left'>
+										<p className='text-xs text-gray-400 font-medium'>Akses Gratis Modul Persiapan Ini</p>
+										<p className='text-sm font-bold text-[#1B7691]'>Masuk atau Daftar Akun Sekarang</p>
+									</div>
+									<button
+										onClick={() => {
+											setSelectedPreviewCourse(null);
+											router.push(`/login?redirect=/bisa-learning/${selectedPreviewCourse.id}`);
+										}}
+										className='sm:ml-auto w-full sm:w-auto px-6 py-3.5 bg-[#1B7691] hover:bg-[#0d5a6e] text-white text-sm font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2 group'
+									>
+										Masuk / Daftar
+										<FiChevronRight className='w-4 h-4 transition-transform group-hover:translate-x-1' />
+									</button>
+								</>
+							) : (
+								<>
+									<div className='text-center sm:text-left'>
+										<p className='text-xs text-gray-400 font-medium'>Dapatkan Akses Lengkap Modul Ini</p>
+										<p className='text-sm font-bold text-[#FB991A]'>Gabung BISA Membership Sekarang</p>
+									</div>
+									<button
+										onClick={() => {
+											setSelectedPreviewCourse(null);
+											router.push('/products');
+										}}
+										className='sm:ml-auto w-full sm:w-auto px-6 py-3.5 bg-gradient-to-r from-[#1B7691] to-[#0d5a6e] hover:from-[#FB991A] hover:to-[#DB4B24] text-white text-sm font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2 group'
+									>
+										Gabung Sekarang
+										<FiChevronRight className='w-4 h-4 transition-transform group-hover:translate-x-1' />
+									</button>
+								</>
+							)}
+						</div>
+					</div>
+				</div>
+			)}
 		</Layout>
 	);
 }

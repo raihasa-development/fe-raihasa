@@ -136,6 +136,19 @@ export default function Navbar() {
                   Calendar
                 </UnstyledLink>
               </li>
+              <li>
+                <UnstyledLink
+                  href='/products'
+                  className={clsxm(
+                    'relative px-4 py-2 text-sm font-medium rounded-full transition-all duration-300',
+                    router.pathname.startsWith('/products')
+                      ? 'text-[#1B7691] bg-[#1B7691]/10 font-bold shadow-sm ring-1 ring-[#1B7691]/20'
+                      : 'text-gray-700 hover:text-[#1B7691] hover:bg-[#1B7691]/5'
+                  )}
+                >
+                  Pricing
+                </UnstyledLink>
+              </li>
               {/* <li>
                 <UnstyledLink
                   href='/list-scholarship'
@@ -326,6 +339,21 @@ export default function Navbar() {
                   className='py-4 pl-4'
                 >
                   Home
+                </Typography>
+              </UnstyledLink>
+            </li>
+            <li>
+              <UnstyledLink
+                href='/products'
+                className='flex rounded-xl hover:bg-[#1B7691]/5 hover:text-[#1B7691] transition-colors'
+                onClick={toggleShowNav}
+              >
+                <Typography
+                  color='inline'
+                  variant='bt'
+                  className='py-4 pl-4'
+                >
+                  Pricing
                 </Typography>
               </UnstyledLink>
             </li>
