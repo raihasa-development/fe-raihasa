@@ -17,6 +17,7 @@ import {
 
 import withAuth from '@/components/hoc/withAuth';
 import ButtonLink from '@/components/links/ButtonLink';
+import PromoWidget from '@/components/Popups/PromoPopups';
 import SEO from '@/components/SEO';
 import Typography from '@/components/Typography';
 import Layout from '@/layouts/Layout';
@@ -139,6 +140,7 @@ function UserHomePage() {
   return (
     <Layout withNavbar={true} withFooter={true}>
       <SEO title='Home - Raihasa' />
+      <PromoWidget />
 
       <main className='min-h-screen bg-[#F8FAFC] pb-20'>
         <style jsx global>{`
