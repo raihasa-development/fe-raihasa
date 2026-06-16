@@ -752,9 +752,15 @@ Terima kasih!`);
               </div>
             ) : null}
 
-            <div className='mt-10 text-center md:hidden'>
-              <ButtonLink href='/products' variant='primary' className='w-full'>
-                Gabung Sekarang
+            <div className='mt-10 text-center md:hidden px-4'>
+              <ButtonLink
+                href='/products'
+                variant='unstyled'
+                className='w-full block'
+              >
+                <div className='w-full py-3.5 text-center text-sm md:text-base font-bold text-white bg-gradient-to-r from-[#1B7691] to-[#0e5c71] rounded-xl shadow-lg active:scale-[0.98] transition-all duration-200'>
+                  Gabung Sekarang
+                </div>
               </ButtonLink>
             </div>
           </div>
