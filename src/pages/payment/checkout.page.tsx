@@ -123,6 +123,10 @@ export default function CheckoutPage() {
       return res.data.data;
     },
     onSuccess: (data) => {
+      if (data.token === 'free_checkout_bypass') {
+        router.push(data.redirect_url || `/payment/success?orderId=${data.order_id}&amount=0`);
+        return;
+      }
       setPaymentStatus('pending');
       if (window.snap) {
         // @ts-ignore

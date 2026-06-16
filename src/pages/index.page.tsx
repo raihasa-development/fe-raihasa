@@ -122,7 +122,7 @@ Terima kasih!`);
           className='flex items-center gap-2 hover:underline'
         >
           <FaWhatsapp className='w-4 h-4 text-white' />
-          <span>Join Channel Peraih Beasiswa dan dapatkan penawaran terbatas</span>
+          <span>Join Channel Peraih Beasiswa Indonesia</span>
           <span className='inline-block px-2 py-0.5 ml-1 text-[10px] font-bold uppercase bg-white/20 rounded border border-white/30 backdrop-blur-sm'>
             Join
           </span>
@@ -560,7 +560,7 @@ Terima kasih!`);
                     <button
                       key={tab.id}
                       onClick={() => setActiveFeatureTab(tab.id)}
-                      className={`text-left p-5 rounded-2xl border transition-all duration-300 ${activeFeatureTab === tab.id
+                      className={`cursor-pointer text-left p-5 rounded-2xl border transition-all duration-300 ${activeFeatureTab === tab.id
                         ? `bg-white border-gray-200 shadow-md scale-[1.02] ${tab.color}`
                         : 'bg-transparent border-transparent hover:bg-white/50'
                         }`}
