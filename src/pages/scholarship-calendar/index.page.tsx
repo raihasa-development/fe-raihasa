@@ -199,7 +199,7 @@ export default function ScholarshipCalendarPage() {
   const allJenjang = useMemo(() => {
     if (!scholarshipData?.data) return [];
     const jenjangSet = new Set<string>();
-    scholarshipData.data.forEach(s => s.jenjang.forEach(j => jenjangSet.add(j)));
+    scholarshipData.data.forEach(s => (s.jenjang ?? []).forEach(j => jenjangSet.add(j)));
     return Array.from(jenjangSet).sort();
   }, [scholarshipData]);
 
@@ -216,7 +216,7 @@ export default function ScholarshipCalendarPage() {
 
     if (selectedJenjang.length > 0) {
       filtered = filtered.filter(s =>
-        s.jenjang.some(j => selectedJenjang.includes(j))
+        s.jenjang?.some(j => selectedJenjang.includes(j))
       );
     }
 
@@ -410,7 +410,7 @@ export default function ScholarshipCalendarPage() {
       icsContent += `DTSTART:${formatDate(event.start)}\n`;
       icsContent += `DTEND:${formatDate(event.end)}\n`;
       icsContent += `SUMMARY:${event.title}\n`;
-      icsContent += `DESCRIPTION:${event.resource.penyelenggara}\\nLevels: ${event.resource.jenjang.join(', ')}\n`;
+      icsContent += `DESCRIPTION:${event.resource.penyelenggara}\\nLevels: ${(event.resource.jenjang ?? []).join(', ')}\n`;
       icsContent += 'END:VEVENT\n';
     });
 
