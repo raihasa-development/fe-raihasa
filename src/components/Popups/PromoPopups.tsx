@@ -85,6 +85,7 @@ const PromoWidget: React.FC = () => {
   const [expanded, setExpanded] = useState(false);   // false = minimized pill
   const router                   = useRouter();
   const user                     = useAuthStore.useUser() as User | null;
+  const isAuthenticated          = useAuthStore.useIsAuthenticated();
 
   const { data: pricingData } = useQuery<PricingPlansResponse>({
     queryKey: ['pricing-plans-popup', user?.id || 'guest'],
@@ -101,7 +102,7 @@ const PromoWidget: React.FC = () => {
   const { h, m, s, pad } = useCountdown(user?.id);
 
   useEffect(() => {
-    if (!popupEnabled || !pricingData) return;
+    if (!isAuthenticated || !popupEnabled || !pricingData) return;
 
     const check = async () => {
       try {
@@ -119,7 +120,7 @@ const PromoWidget: React.FC = () => {
     };
 
     check();
-  }, [pricingData, popupEnabled, user?.id]);
+  }, [pricingData, popupEnabled, user?.id, isAuthenticated]);
 
   const minimize = () => {
     setExpanded(false);
@@ -137,7 +138,7 @@ const PromoWidget: React.FC = () => {
       '_blank',
     );
 
-  if (!popupEnabled || !visible) return null;
+  if (!isAuthenticated || !popupEnabled || !visible) return null;
 
   return (
     <>

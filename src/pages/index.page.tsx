@@ -40,6 +40,7 @@ export default function Home() {
   const [isLoadingPricing, setIsLoadingPricing] = React.useState(true);
   const [selectedPreviewCourse, setSelectedPreviewCourse] = React.useState<any | null>(null);
   const [activeFeatureTab, setActiveFeatureTab] = React.useState('scholra');
+  const [showChatTooltip, setShowChatTooltip] = React.useState(true);
 
   const handleSelectProduct = (productId: string, isPremium?: boolean) => {
     if (isPremium) {
@@ -121,7 +122,7 @@ Terima kasih!`);
           className='flex items-center gap-2 hover:underline'
         >
           <FaWhatsapp className='w-4 h-4 text-white' />
-          <span>Ayo join Community bareng 66 ribu Peraih Asa Lainnya!</span>
+          <span>Join Channel Peraih Beasiswa dan dapatkan penawaran terbatas</span>
           <span className='inline-block px-2 py-0.5 ml-1 text-[10px] font-bold uppercase bg-white/20 rounded border border-white/30 backdrop-blur-sm'>
             Join
           </span>
@@ -131,16 +132,44 @@ Terima kasih!`);
       <SEO title='Home' />
       <PromoPopup />
 
-      {/* Floating WhatsApp Button */}
-      <a
-        href='https://wa.me/6285117323893?text=Halo%20Kak%20Admin%20Raih%20Asa!%0AAku%20mau%20tanya-tanya%20soal%20paket%2Fbimbingan%20beasiswanya%20dong.%0A%0ANama%3A%20%0AAsal%20Univ%2FSekolah%3A%0APertanyaan%3A%0A%0AMakasih%20Kak!'
-        target='_blank'
-        rel='noreferrer'
-        className='fixed z-[999] bottom-6 right-6 md:bottom-10 md:right-10 flex items-center justify-center w-14 h-14 md:w-16 md:h-16 bg-[#25D366] rounded-full shadow-lg hover:shadow-xl transition-transform hover:scale-110 cursor-pointer'
-        title='Hubungi Kami di WhatsApp'
-      >
-        <FaWhatsapp className='w-8 h-8 text-white md:w-10 md:h-10' />
-      </a>
+      {/* Floating WhatsApp Button with Tooltip */}
+      <div className='fixed z-[999] bottom-6 right-6 md:bottom-10 md:right-10 flex flex-col items-end gap-3'>
+        {showChatTooltip && (
+          <div
+            className='bg-white text-gray-800 text-xs md:text-sm font-semibold px-4 py-2.5 rounded-2xl shadow-xl border border-gray-200 flex items-center gap-2 max-w-[220px] relative'
+            style={{
+              animation: 'slideUp 0.38s cubic-bezier(.22,.68,0,1.25) both',
+            }}
+          >
+            <button
+              onClick={() => setShowChatTooltip(false)}
+              className='absolute -top-1.5 -left-1.5 bg-gray-100 hover:bg-gray-200 text-gray-500 rounded-full p-0.5 border border-gray-200 transition-colors cursor-pointer'
+              title='Tutup'
+            >
+              <FiX className='w-3.5 h-3.5' />
+            </button>
+            <FaWhatsapp className='w-4 h-4 text-[#25D366] shrink-0' />
+            <span className='pr-1'>Tanya Haira via WhatsApp!</span>
+            {/* Tooltip arrow pointing down */}
+            <div className='absolute bottom-[-6px] right-5 md:right-6 w-3 h-3 bg-white border-r border-b border-gray-200 rotate-45'></div>
+          </div>
+        )}
+
+        <a
+          href='https://wa.me/6285117323893?text=Halo%20Kak%20Admin%20Raih%20Asa!%0AAku%20mau%20tanya-tanya%20soal%20paket%2Fbimbingan%20beasiswanya%20dong.%0A%0ANama%3A%20%0AAsal%20Univ%2FSekolah%3A%0APertanyaan%3A%0A%0AMakasih%20Kak!'
+          target='_blank'
+          rel='noreferrer'
+          onMouseEnter={() => setShowChatTooltip(true)}
+          className='flex items-center justify-center w-14 h-14 md:w-16 md:h-16 bg-white border border-gray-100 shadow-xl hover:shadow-2xl rounded-full transition-transform hover:scale-110 cursor-pointer'
+          title='Hubungi Kami di WhatsApp'
+        >
+          <img
+            src='/images/detail-program/haira-head.png'
+            alt='Haira'
+            className='w-10 h-10 md:w-12 md:h-12 object-contain'
+          />
+        </a>
+      </div>
 
       <main className='scroll-smooth overflow-hidden bg-[#fff]'>
         <section className='relative min-h-screen pt-8 pb-16 md:pt-12 md:pb-24 mt-16 md:mt-20'>
