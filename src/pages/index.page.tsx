@@ -1175,13 +1175,11 @@ Terima kasih!`);
                 s.alt.toLowerCase().includes('puspresnas') ||
                 s.alt.toLowerCase().includes('pertamuda')
               ).map((sponsor, idx) => (
-                <div key={idx} className='relative w-[220px] h-[120px] md:w-[260px] md:h-[140px] flex items-center justify-center group select-none'>
-                  <NextImage
+                <div key={idx} className='relative w-[180px] h-[90px] md:w-[220px] md:h-[110px] flex items-center justify-center group select-none'>
+                  <img
                     src={sponsor.src}
-                    width={260}
-                    height={140}
                     alt={sponsor.alt}
-                    className='object-contain max-w-full max-h-[100px] md:max-h-[120px] transition-all duration-300 group-hover:scale-105 filter drop-shadow-sm'
+                    className='object-contain max-w-full max-h-full transition-all duration-300 group-hover:scale-105 filter drop-shadow-sm'
                     draggable={false}
                   />
                 </div>
@@ -1216,10 +1214,8 @@ Terima kasih!`);
                         className='relative group w-[180px] h-[100px] shrink-0 flex flex-col items-center justify-center select-none'
                       >
                         <div className="w-[140px] h-[70px] flex items-center justify-center transition-all duration-300 grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110">
-                          <NextImage
+                          <img
                             src={sponsor.src}
-                            width={140}
-                            height={70}
                             alt={sponsor.alt}
                             className='object-contain max-w-[120px] max-h-[60px]'
                             draggable={false}
