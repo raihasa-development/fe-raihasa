@@ -1,11 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { FiCheckCircle, FiXCircle, FiSearch, FiGift, FiClock, FiSlash, FiMail, FiSend, FiUsers, FiAlertCircle } from 'react-icons/fi';
+import { FaWhatsapp } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 
 import withAuth from '@/components/hoc/withAuth';
 import AdminDashboard from '@/layouts/AdminDashboard';
 import Typography from '@/components/Typography';
 import api from '@/lib/api';
+
+const formatWaLink = (num: string) => {
+  let formatted = num.replace(/[^0-9]/g, '');
+  if (formatted.startsWith('0')) {
+    formatted = '62' + formatted.slice(1);
+  }
+  return `https://wa.me/${formatted}`;
+};
 
 type User = {
   id: string;
@@ -14,6 +23,9 @@ type User = {
   role: 'USER' | 'ADMIN';
   is_email_verified: boolean;
   forum_tokens: number;
+  whatsapp?: string;
+  created_at?: string;
+  last_login_at?: string;
   UserProgram?: {
     ProductProgram: {
       name: string;
@@ -59,6 +71,11 @@ function AdminUsersPage() {
   const [broadcastSubject, setBroadcastSubject] = useState('');
   const [broadcastBody, setBroadcastBody] = useState('');
   const [isBroadcasting, setIsBroadcasting] = useState(false);
+
+  // WhatsApp Broadcast States
+  const [isWABroadcastModalOpen, setIsWABroadcastModalOpen] = useState(false);
+  const [waBroadcastBody, setWaBroadcastBody] = useState('');
+  const [waSentStatus, setWaSentStatus] = useState<Record<string, boolean>>({});
 
   const fetchStats = async () => {
     try {
@@ -380,6 +397,13 @@ function AdminUsersPage() {
               <span>Kirim Email Broadcast / Promo</span>
             </button>
             <button
+              onClick={() => setIsWABroadcastModalOpen(true)}
+              className="bg-green-600 hover:bg-green-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition-all shadow-xs flex items-center gap-1.5"
+            >
+              <FaWhatsapp className="w-3.5 h-3.5" />
+              <span>Kirim WA Broadcast / Promo</span>
+            </button>
+            <button
               onClick={() => setSelectedUserIds([])}
               className="text-gray-400 hover:text-gray-600 text-xs font-semibold px-2 py-2"
             >
@@ -442,6 +466,46 @@ function AdminUsersPage() {
                     <td className='p-4'>
                       <div className='font-bold text-gray-900'>{user.name}</div>
                       <div className='text-xs text-gray-500'>{user.email}</div>
+                      {user.whatsapp && (
+                        <div className='text-xs text-green-600 font-bold mt-1 flex items-center gap-1'>
+                          <FaWhatsapp className="text-green-500" />
+                          <a
+                            href={formatWaLink(user.whatsapp)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="hover:underline"
+                            title="Chat WhatsApp"
+                          >
+                            {user.whatsapp}
+                          </a>
+                        </div>
+                      )}
+                      <div className='flex flex-col gap-0.5 mt-1 text-[10px] text-gray-400'>
+                        {user.created_at && (
+                          <span>
+                            Reg: {new Date(user.created_at).toLocaleDateString('id-ID', {
+                              day: 'numeric',
+                              month: 'short',
+                              year: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })}
+                          </span>
+                        )}
+                        {user.last_login_at ? (
+                          <span className='text-[#1B7691] font-medium'>
+                            Last Active: {new Date(user.last_login_at).toLocaleDateString('id-ID', {
+                              day: 'numeric',
+                              month: 'short',
+                              year: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })}
+                          </span>
+                        ) : (
+                          <span className='italic text-gray-300'>Never accessed/logged in</span>
+                        )}
+                      </div>
                     </td>
                     <td className='p-4'>
                       <span className={`px-2 py-1 rounded text-[10px] font-bold ${user.role === 'ADMIN' ? 'bg-purple-100 text-purple-600' : 'bg-gray-100 text-gray-600'}`}>
@@ -575,6 +639,87 @@ function AdminUsersPage() {
               >
                 <FiSend className="w-3.5 h-3.5" />
                 <span>{isBroadcasting ? 'Mengirim...' : 'Kirim Broadcast'}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* WhatsApp Broadcast Modal */}
+      {isWABroadcastModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 animate-fade-in">
+          <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-lg max-h-[90vh] flex flex-col">
+            <div className="flex items-center gap-3 border-b border-gray-150 pb-4 mb-4 flex-shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center text-green-600">
+                <FaWhatsapp className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-gray-900">Kirim WhatsApp Broadcast / Promo</h3>
+                <p className="text-xs text-gray-500">Pesan akan disiapkan untuk {users.filter(u => selectedUserIds.includes(u.id)).length} user terpilih.</p>
+              </div>
+            </div>
+
+            <div className="space-y-4 overflow-y-auto flex-1 pr-1">
+              <div>
+                <label className="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">Isi Pesan WhatsApp</label>
+                <textarea
+                  value={waBroadcastBody}
+                  onChange={(e) => setWaBroadcastBody(e.target.value)}
+                  rows={4}
+                  className="w-full border border-gray-200 px-4 py-2.5 rounded-xl focus:ring-2 focus:ring-green-500/20 focus:border-green-500 outline-none text-xs font-medium resize-none leading-relaxed"
+                  placeholder="Ketik isi pesan WhatsApp di sini..."
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-2">Daftar Penerima</label>
+                <div className="space-y-2 max-h-48 overflow-y-auto border border-gray-100 rounded-xl p-3 bg-gray-50/50">
+                  {users.filter(u => selectedUserIds.includes(u.id)).map((user) => {
+                    const hasWa = !!user.whatsapp;
+                    const isSent = !!waSentStatus[user.id];
+                    return (
+                      <div key={user.id} className="flex items-center justify-between gap-4 p-2 bg-white rounded-lg border border-gray-100">
+                        <div className="min-w-0">
+                          <p className="text-xs font-bold text-gray-800 truncate">{user.name}</p>
+                          <p className="text-[10px] text-gray-400">{user.whatsapp || 'No WhatsApp number'}</p>
+                        </div>
+                        <div>
+                          {hasWa ? (
+                            <a
+                              href={`${formatWaLink(user.whatsapp!)}?text=${encodeURIComponent(waBroadcastBody)}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={() => setWaSentStatus(prev => ({ ...prev, [user.id]: true }))}
+                              className={`text-[10px] font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 transition-all ${
+                                isSent
+                                  ? 'bg-gray-100 text-gray-500 border border-gray-200'
+                                  : 'bg-green-600 hover:bg-green-700 text-white shadow-xs'
+                              }`}
+                            >
+                              <FaWhatsapp />
+                              <span>{isSent ? 'Terkirim' : 'Kirim'}</span>
+                            </a>
+                          ) : (
+                            <span className="text-[10px] text-red-500 font-semibold italic">Missing WA</span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-2 pt-6 border-t border-gray-100 mt-6 flex-shrink-0">
+              <button
+                onClick={() => {
+                  setIsWABroadcastModalOpen(false);
+                  setWaSentStatus({});
+                }}
+                className="px-5 py-2.5 text-gray-500 hover:bg-gray-50 rounded-xl text-xs font-bold transition-all"
+              >
+                Tutup
               </button>
             </div>
           </div>

@@ -109,7 +109,7 @@ export default function CheckoutPage() {
         const res = await api.get<{ data: any }>(`/pricing/plans/${productId}`);
         const plan = res.data.data;
         if (!plan) return null;
-        return { id: plan.id, nama: plan.name, harga: toSafeNumber(plan.price, 0), deskripsi: plan.description || '', masa_aktif: toSafeNumber(plan.duration_months, 0), jenis: plan.is_enterprise ? 'private' : (plan.is_popular ? 'ideal' : 'basic'), new_user_offer: plan.new_user_offer } as ProductData;
+        return { id: plan.id, nama: plan.name, harga: toSafeNumber(plan.price, 0), deskripsi: plan.description || '', masa_aktif: toSafeNumber(plan.duration_days, 0), jenis: plan.is_enterprise ? 'private' : (plan.is_popular ? 'ideal' : 'basic'), new_user_offer: plan.new_user_offer } as ProductData;
       } catch { return null; }
     },
     enabled: !!productId,
@@ -224,7 +224,7 @@ export default function CheckoutPage() {
                 <div className="flex items-center justify-between mb-4">
                   <div>
                     <h1 className="text-lg font-bold text-gray-900">{product.nama}</h1>
-                    <p className="text-sm text-gray-500 mt-0.5">Akses {product.masa_aktif} bulan</p>
+                    <p className="text-sm text-gray-500 mt-0.5">Akses {product.masa_aktif} hari</p>
                   </div>
                   <div className="text-right">
                     {hasDiscount && <p className="text-sm text-gray-400 line-through">{fmt(baseAmount)}</p>}
@@ -279,7 +279,7 @@ export default function CheckoutPage() {
                 <p className="text-sm font-semibold text-gray-700 mb-3">Rincian Pembayaran</p>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between text-gray-500">
-                    <span>{product.nama} ({product.masa_aktif} bln)</span>
+                    <span>{product.nama} ({product.masa_aktif} hari)</span>
                     <span className="text-gray-700 font-medium">{fmt(baseAmount)}</span>
                   </div>
                   {autoDiscount > 0 && (

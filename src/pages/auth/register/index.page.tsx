@@ -22,6 +22,7 @@ type RegisterForm = {
   email: string;
   name: string;
   password: string;
+  whatsapp: string;
 };
 
 export default function RegisterPage() {
@@ -170,6 +171,19 @@ export default function RegisterPage() {
                         value: REG_PASSWORD,
                         message:
                           'Min. 8 karakter, kombinasi huruf besar, kecil, & angka',
+                      },
+                    }}
+                  />
+                  <Input
+                    id='whatsapp'
+                    label='Nomor WhatsApp'
+                    placeholder='Cth: 081234567890'
+                    validation={{
+                      required: 'Nomor WhatsApp harus diisi',
+                      pattern: {
+                        value: /^(0|62|\+62)8[1-9][0-9]{6,12}$/,
+                        message:
+                          'Nomor WhatsApp tidak valid (Gunakan format 08xxxxxxxxxx atau +62xxxxxxxxxx)',
                       },
                     }}
                   />

@@ -837,7 +837,7 @@ Terima kasih!`);
                               <span className={`font-bold text-gray-900 ${isPopular ? 'text-4xl' : 'text-3xl'}`}>
                                 {Math.floor(product.price / 1000)}k
                               </span>
-                              <span className="text-gray-400 text-sm font-medium ml-1">/ {product.duration_months} bulan</span>
+                              <span className="text-gray-400 text-sm font-medium ml-1">/ {product.duration_days} hari</span>
                             </>
                           )}
                         </div>
