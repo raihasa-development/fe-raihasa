@@ -462,7 +462,11 @@ export default function DreamshubPage() {
                               router.push(`/dreamshub/${post.id}`);
                             }
                           }}
-                          className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:border-[#1B7691]/20 hover:shadow-md transition-all duration-300 cursor-pointer group relative overflow-hidden flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+                          className={`bg-white p-6 rounded-2xl shadow-sm border border-gray-100 transition-all duration-300 cursor-pointer group relative overflow-hidden flex flex-col md:flex-row md:items-center md:justify-between gap-4 ${
+                            !isAuthenticated
+                              ? 'filter blur-[1.5px] opacity-70 select-none hover:blur-[0.5px] hover:opacity-90 transition-all duration-300'
+                              : 'hover:border-[#1B7691]/20 hover:shadow-md'
+                          }`}
                         >
                           <div className="absolute top-0 left-0 w-1.5 h-full bg-[#1B7691] opacity-0 group-hover:opacity-100 transition-opacity"></div>
 
