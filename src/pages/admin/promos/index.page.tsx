@@ -18,6 +18,7 @@ type PromoCode = {
     is_active: boolean;
     affiliate_id: string | null;
     affiliate_commission_pct: number | null;
+    allowed_plan_ids?: string[];
     Affiliate?: { id: string; name: string; email: string } | null;
     _count?: { Redemptions: number };
 };
@@ -52,6 +53,7 @@ type AffiliateSummary = {
 const AdminPromoManagement = () => {
     const [promos, setPromos] = useState<PromoCode[]>([]);
     const [affiliateStats, setAffiliateStats] = useState<AffiliateStat[]>([]);
+    const [plans, setPlans] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
@@ -66,10 +68,11 @@ const AdminPromoManagement = () => {
         valid_from: '',
         valid_until: '',
         affiliate_commission_pct: 0,
+        allowed_plan_ids: [] as string[],
     });
 
     useEffect(() => {
-        Promise.all([fetchPromos(), fetchAffiliateStats()]).finally(() => setIsLoading(false));
+        Promise.all([fetchPromos(), fetchAffiliateStats(), fetchPlans()]).finally(() => setIsLoading(false));
     }, []);
 
     const fetchPromos = async () => {
@@ -90,6 +93,15 @@ const AdminPromoManagement = () => {
         }
     };
 
+    const fetchPlans = async () => {
+        try {
+            const response = await api.get('/pricing/admin/plans');
+            setPlans(response.data?.data || []);
+        } catch (error) {
+            console.error('Failed to fetch plans:', error);
+        }
+    };
+
     const handleOpenModal = () => {
         setModalMode('create');
         setEditingPromoId(null);
@@ -106,6 +118,7 @@ const AdminPromoManagement = () => {
             valid_from: now.toISOString().slice(0, 16),
             valid_until: nextYear.toISOString().slice(0, 16),
             affiliate_commission_pct: 0,
+            allowed_plan_ids: [],
         });
         setIsModalOpen(true);
     };
@@ -123,6 +136,7 @@ const AdminPromoManagement = () => {
             valid_from: new Date(promo.valid_from).toISOString().slice(0, 16),
             valid_until: new Date(promo.valid_until).toISOString().slice(0, 16),
             affiliate_commission_pct: promo.affiliate_commission_pct || 0,
+            allowed_plan_ids: promo.allowed_plan_ids || [],
         });
 
         setIsModalOpen(true);
@@ -174,6 +188,7 @@ const AdminPromoManagement = () => {
                 type: formData.type,
                 valid_from: new Date(formData.valid_from).toISOString(),
                 valid_until: new Date(formData.valid_until).toISOString(),
+                allowed_plan_ids: formData.allowed_plan_ids,
             };
 
             if (formData.discount_percent > 0) {
@@ -200,7 +215,7 @@ const AdminPromoManagement = () => {
             handleCloseModal();
             await Promise.all([fetchPromos(), fetchAffiliateStats()]);
         } catch (error: any) {
-            alert(error.response?.data?.message || 'Gagal membuat kode promo');
+            alert(error.response?.data?.message || 'Gagal menyimpan kode promo');
             console.error(error);
         }
     };
@@ -343,6 +358,17 @@ const AdminPromoManagement = () => {
                                                 <span className={`text-[10px] px-2.5 py-1 rounded-full font-bold ${typeColor(promo.type)}`}>
                                                     {typeLabel(promo.type)}
                                                 </span>
+                                                {promo.allowed_plan_ids && promo.allowed_plan_ids.length > 0 ? (
+                                                    <div className="text-[10px] text-gray-500 mt-1.5 leading-tight">
+                                                        <span className="font-semibold text-gray-600 block">Khusus paket:</span>
+                                                        {promo.allowed_plan_ids.map(pid => {
+                                                            const p = plans.find(pl => pl.id === pid);
+                                                            return <div key={pid} className="bg-gray-50 px-1 py-0.5 rounded border border-gray-100 inline-block mr-1 mt-0.5">{p?.name || 'Loading plan...'}</div>;
+                                                        })}
+                                                    </div>
+                                                ) : (
+                                                    <div className="text-[10px] text-gray-400 mt-1 font-medium italic">Semua paket</div>
+                                                )}
                                             </td>
                                             <td className="p-4 text-sm font-medium text-gray-900">
                                                 {promo.discount_percent ? `${promo.discount_percent}%` : ''}
@@ -586,6 +612,36 @@ const AdminPromoManagement = () => {
                                     <p>Isi salah satu: Diskon (%) atau Diskon (Rp).</p>
                                     <p>Diskon (%) dihitung dari harga plan: harga x persen / 100.</p>
                                     <p>Diskon (Rp) memotong nominal tetap, maksimal sampai harga plan.</p>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="text-sm font-bold text-gray-700">Batasi ke Paket Tertentu (Opsional)</label>
+                                    <p className="text-[11px] text-gray-400">Pilih paket mana saja yang boleh menggunakan kode ini. Jika tidak dicentang, kode promo berlaku untuk semua paket.</p>
+                                    <div className="border border-gray-200 rounded-xl bg-gray-50 p-4 max-h-40 overflow-y-auto space-y-2">
+                                        {plans.length === 0 ? (
+                                            <p className="text-xs text-gray-400 italic">Memuat data pricing plans...</p>
+                                        ) : (
+                                            plans.map((plan: any) => (
+                                                <label key={plan.id} className="flex items-center gap-3 cursor-pointer p-1.5 hover:bg-gray-100/55 rounded-lg transition-colors">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={formData.allowed_plan_ids.includes(plan.id)}
+                                                        onChange={() => {
+                                                            setFormData(prev => {
+                                                                const ids = prev.allowed_plan_ids;
+                                                                if (ids.includes(plan.id)) {
+                                                                    return { ...prev, allowed_plan_ids: ids.filter(id => id !== plan.id) };
+                                                                }
+                                                                return { ...prev, allowed_plan_ids: [...ids, plan.id] };
+                                                            });
+                                                        }}
+                                                        className="w-4 h-4 rounded border-gray-300 text-[#1B7691] focus:ring-[#1B7691]"
+                                                    />
+                                                    <span className="text-xs font-semibold text-gray-800">{plan.name}</span>
+                                                </label>
+                                            ))
+                                        )}
+                                    </div>
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-4">

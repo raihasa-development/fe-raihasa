@@ -11,11 +11,12 @@ type PricingPlan = {
     name: string;
     price: number;
     original_price: number | null;
-    duration_months: number;
+    duration_days: number;
     description: string | null;
     features: string[];
     forum_tokens: number;
     allowed_schema_types: string[];
+    allowed_module_ids: string[];
     is_active: boolean;
     sort_order: number;
     tag: string | null;
@@ -25,6 +26,7 @@ type PricingPlan = {
 
 const AdminPricingManagement = () => {
     const [plans, setPlans] = useState<PricingPlan[]>([]);
+    const [courses, setCourses] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -36,11 +38,12 @@ const AdminPricingManagement = () => {
         name: '',
         price: 0,
         original_price: 0,
-        duration_months: 3,
+        duration_days: 30,
         description: '',
         features: '',
         forum_tokens: 0,
         allowed_schema_types: ['DALAM_NEGERI'] as string[],
+        allowed_module_ids: [] as string[],
         tag: '',
         is_popular: false,
         is_enterprise: false,
@@ -49,7 +52,17 @@ const AdminPricingManagement = () => {
 
     useEffect(() => {
         fetchPlans();
+        fetchCourses();
     }, []);
+
+    const fetchCourses = async () => {
+        try {
+            const response = await api.get('/lms/modul');
+            setCourses(response.data?.data || []);
+        } catch (error) {
+            console.error('Failed to fetch courses:', error);
+        }
+    };
 
     const formatNumberInput = (value: number | string) => {
         const numeric = String(value ?? '').replace(/\D/g, '');
@@ -83,11 +96,12 @@ const AdminPricingManagement = () => {
                 name: plan.name,
                 price: plan.price,
                 original_price: plan.original_price || 0,
-                duration_months: plan.duration_months,
+                duration_days: plan.duration_days,
                 description: plan.description || '',
                 features: (plan.features || []).join('\n'),
                 forum_tokens: plan.forum_tokens,
                 allowed_schema_types: plan.allowed_schema_types || ['DALAM_NEGERI'],
+                allowed_module_ids: plan.allowed_module_ids || [],
                 tag: plan.tag || '',
                 is_popular: plan.is_popular,
                 is_enterprise: plan.is_enterprise,
@@ -101,11 +115,12 @@ const AdminPricingManagement = () => {
                 name: '',
                 price: 0,
                 original_price: 0,
-                duration_months: 3,
+                duration_days: 30,
                 description: '',
                 features: '',
                 forum_tokens: 0,
                 allowed_schema_types: ['DALAM_NEGERI'],
+                allowed_module_ids: [],
                 tag: '',
                 is_popular: false,
                 is_enterprise: false,
@@ -128,11 +143,12 @@ const AdminPricingManagement = () => {
                 name: formData.name,
                 price: Number(formData.price),
                 original_price: Number(formData.original_price) || null,
-                duration_months: Number(formData.duration_months),
+                duration_days: Number(formData.duration_days),
                 description: formData.description || null,
                 features: formData.features.split('\n').filter((f: string) => f.trim()),
                 forum_tokens: Number(formData.forum_tokens),
                 allowed_schema_types: formData.allowed_schema_types,
+                allowed_module_ids: formData.allowed_module_ids,
                 tag: formData.tag || null,
                 is_popular: formData.is_popular,
                 is_enterprise: formData.is_enterprise,
@@ -192,6 +208,16 @@ const AdminPricingManagement = () => {
         });
     };
 
+    const toggleModuleSelection = (id: string) => {
+        setFormData(prev => {
+            const current = prev.allowed_module_ids;
+            if (current.includes(id)) {
+                return { ...prev, allowed_module_ids: current.filter(item => item !== id) };
+            }
+            return { ...prev, allowed_module_ids: [...current, id] };
+        });
+    };
+
     const formatCurrency = (value: number) =>
         new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(value);
 
@@ -246,7 +272,7 @@ const AdminPricingManagement = () => {
                                             )}
                                         </div>
                                         <div className="flex items-center gap-3 mt-1 flex-wrap">
-                                            <span className="text-xs bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-semibold">{plan.duration_months} bulan</span>
+                                            <span className="text-xs bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-semibold">{plan.duration_days} hari</span>
                                             <span className="text-xs bg-green-50 text-green-600 px-2 py-0.5 rounded-full font-semibold">{plan.forum_tokens} token</span>
                                             {plan.allowed_schema_types.map(t => (
                                                 <span key={t} className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full font-semibold">{t === 'DALAM_NEGERI' ? '🇮🇩 DN' : '🌍 LN'}</span>
@@ -384,22 +410,26 @@ const AdminPricingManagement = () => {
 
                                 <div className="grid grid-cols-3 gap-4">
                                     <div className="space-y-2">
-                                        <label className="text-sm font-bold text-gray-700">Durasi (Bulan)</label>
+                                        <label className="text-sm font-bold text-gray-700">Durasi (Hari)</label>
                                         <input
                                             type="number"
+                                            min={0}
                                             required
-                                            value={formData.duration_months}
-                                            onChange={e => setFormData({ ...formData, duration_months: Number(e.target.value) })}
+                                            value={formData.duration_days}
+                                            onWheel={e => (e.target as HTMLInputElement).blur()}
+                                            onChange={e => setFormData({ ...formData, duration_days: Math.max(0, Number(e.target.value) || 0) })}
                                             className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#1B7691] text-gray-800"
-                                            placeholder="3"
+                                            placeholder="30"
                                         />
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-sm font-bold text-gray-700">Forum Tokens</label>
                                         <input
                                             type="number"
+                                            min={0}
                                             value={formData.forum_tokens}
-                                            onChange={e => setFormData({ ...formData, forum_tokens: Number(e.target.value) })}
+                                            onWheel={e => (e.target as HTMLInputElement).blur()}
+                                            onChange={e => setFormData({ ...formData, forum_tokens: Math.max(0, Number(e.target.value) || 0) })}
                                             className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#1B7691] text-gray-800"
                                             placeholder="5"
                                         />
@@ -408,8 +438,10 @@ const AdminPricingManagement = () => {
                                         <label className="text-sm font-bold text-gray-700">Sort Order</label>
                                         <input
                                             type="number"
+                                            min={0}
                                             value={formData.sort_order}
-                                            onChange={e => setFormData({ ...formData, sort_order: Number(e.target.value) })}
+                                            onWheel={e => (e.target as HTMLInputElement).blur()}
+                                            onChange={e => setFormData({ ...formData, sort_order: Math.max(0, Number(e.target.value) || 0) })}
                                             className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#1B7691] text-gray-800"
                                             placeholder="1"
                                         />
@@ -433,6 +465,31 @@ const AdminPricingManagement = () => {
                                         >
                                             🌍 Luar Negeri
                                         </button>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="text-sm font-bold text-gray-700">Akses Spesifik Beasiswa / Modul (Opsional)</label>
+                                    <p className="text-[11px] text-gray-400">Jika dicentang, plan ini HANYA membuka modul-modul terpilih. Jika kosong, plan membuka skema DN/LN secara keseluruhan.</p>
+                                    <div className="border border-gray-200 rounded-xl bg-gray-50 p-4 max-h-48 overflow-y-auto space-y-2">
+                                        {courses.length === 0 ? (
+                                            <p className="text-xs text-gray-400 italic">Memuat data kursus...</p>
+                                        ) : (
+                                            courses.map(course => (
+                                                <label key={course.id} className="flex items-start gap-3 cursor-pointer p-1.5 hover:bg-gray-100/50 rounded-lg transition-colors">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={formData.allowed_module_ids.includes(course.id)}
+                                                        onChange={() => toggleModuleSelection(course.id)}
+                                                        className="w-4 h-4 rounded mt-0.5 border-gray-300 text-[#1B7691] focus:ring-[#1B7691]"
+                                                    />
+                                                    <div className="flex flex-col">
+                                                        <span className="text-xs font-semibold text-gray-800">{course.name}</span>
+                                                        <span className="text-[10px] text-gray-400 uppercase font-medium">{course.schema_type === 'DALAM_NEGERI' ? '🇮🇩 DN' : '🌍 LN'} • {course.categoryId || 'Uncategorized'}</span>
+                                                    </div>
+                                                </label>
+                                            ))
+                                        )}
                                     </div>
                                 </div>
 

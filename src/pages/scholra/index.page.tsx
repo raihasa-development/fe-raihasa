@@ -52,4 +52,4 @@ const ScholraTestingPage = () => {
     );
 };
 
-export default withAuth(ScholraTestingPage, 'user');
+export default withAuth(ScholraTestingPage, 'optional');

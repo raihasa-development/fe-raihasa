@@ -14,6 +14,7 @@ import Layout from '@/layouts/Layout';
 import { forumApi } from '@/lib/api/forum';
 import type { ForumPost, ForumComment } from '@/types/forum';
 import { Linkify } from '@/components/Linkify';
+import { getToken } from '@/lib/cookies';
 
 // Helper: Format Time
 const formatTimestamp = (dateString: string) => {
@@ -40,7 +41,7 @@ export default function PostDetailPage() {
     // Helper: Get Auth
     const getAuthToken = () => {
         if (typeof window === 'undefined') return null;
-        return localStorage.getItem('token') || localStorage.getItem('accessToken');
+        return getToken() || localStorage.getItem('token') || localStorage.getItem('accessToken');
     };
 
     const getUserInfo = () => {
@@ -93,6 +94,11 @@ export default function PostDetailPage() {
     };
 
     useEffect(() => {
+        const token = getAuthToken();
+        if (!token && postId) {
+            router.push(`/login?redirect=/dreamshub/${postId}`);
+            return;
+        }
         if (postId) fetchPost();
         fetchUserTokens();
     }, [postId]);

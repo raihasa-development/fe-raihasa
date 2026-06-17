@@ -110,9 +110,10 @@ type PricingPlan = {
   name: string;
   price: number;
   original_price: number | null;
-  duration_months: number;
+  duration_days: number;
   description: string | null;
   features: string[];
+  allowed_module_ids?: string[];
   tag: string | null;
   is_popular: boolean;
   is_enterprise: boolean;
@@ -294,7 +295,7 @@ Terima kasih!`);
                             <span className={`font-bold text-gray-900 ${isPopular ? 'text-4xl' : 'text-3xl'}`}>
                               {Math.floor(product.price / 1000)}k
                             </span>
-                            <span className="text-gray-400 text-sm font-medium ml-1">/ {product.duration_months} bulan</span>
+                            <span className="text-gray-400 text-sm font-medium ml-1">/ {product.duration_days} hari</span>
                           </>
                         )}
                       </div>
@@ -390,8 +391,12 @@ Terima kasih!`);
                     </tr>
                     <tr className="hover:bg-gray-50 transition-colors">
                       <td className="px-6 py-4 font-medium text-gray-700">Durasi Akses</td>
-                      <td className="px-6 py-4 text-center text-gray-600">3 Bulan</td>
-                      <td className="px-6 py-4 text-center text-[#FB991A] font-bold bg-orange-50/30">12 Bulan</td>
+                      <td className="px-6 py-4 text-center text-gray-600">
+                        {products.find((p: any) => p.slug === 'basic')?.duration_days || 90} Hari
+                      </td>
+                      <td className="px-6 py-4 text-center text-[#FB991A] font-bold bg-orange-50/30">
+                        {products.find((p: any) => p.slug === 'plus')?.duration_days || 360} Hari
+                      </td>
                       <td className="px-6 py-4 text-center text-gray-600">Fleksibel</td>
                     </tr>
                     <tr className="hover:bg-gray-50 transition-colors">
