@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  FiBookOpen, FiUsers, FiAward, FiCpu, FiArrowRight, FiDollarSign, FiUserCheck, FiActivity, FiCreditCard, FiSettings
+  FiBookOpen, FiUsers, FiAward, FiCpu, FiArrowRight, FiDollarSign, FiUserCheck, FiActivity, FiCreditCard, FiSettings, FiFileText
 } from 'react-icons/fi';
 
 import withAuth from '@/components/hoc/withAuth';
@@ -38,6 +38,20 @@ const modules = [
     icon: FiCreditCard,
     href: '/admin/payments',
     color: 'bg-teal-50 text-teal-600',
+  },
+  {
+    title: 'Generate Kuitansi',
+    description: 'Buat kuitansi PDF untuk mentor secara dinamis dan kirim langsung ke email.',
+    icon: FiFileText,
+    href: '/admin/payments/receipt',
+    color: 'bg-rose-50 text-rose-600',
+  },
+  {
+    title: 'Kelola Mentor',
+    description: 'Kelola database mentor (nama, status, alamat, bank) untuk auto-fill kuitansi.',
+    icon: FiUsers,
+    href: '/admin/mentors',
+    color: 'bg-amber-50 text-amber-600',
   },
   {
     title: 'Manajemen Beasiswa',

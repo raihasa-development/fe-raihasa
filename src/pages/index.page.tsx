@@ -41,6 +41,50 @@ export default function Home() {
   const [selectedPreviewCourse, setSelectedPreviewCourse] = React.useState<any | null>(null);
   const [activeFeatureTab, setActiveFeatureTab] = React.useState('scholra');
   const [showChatTooltip, setShowChatTooltip] = React.useState(true);
+  const [activeFaqIndex, setActiveFaqIndex] = React.useState<number | null>(null);
+
+  const faqList = [
+    {
+      question: "Apa itu BISA Membership?",
+      answer: "BISA Membership adalah ekosistem persiapan beasiswa yang membantumu dari tahap mencari beasiswa, belajar strategi lolos, menyusun dokumen, hingga mendapatkan feedback dari awardee. Semua kebutuhan persiapan beasiswa dalam satu tempat."
+    },
+    {
+      question: "Bedanya BISA Membership dengan mentoring beasiswa lain?",
+      answer: "Banyak program hanya fokus pada konsultasi atau review dokumen. Di BISA Membership, kamu mendapatkan akses ke informasi beasiswa terpersonalisasi, roadmap belajar terstruktur, materi dari awardee, komunitas, dan proofreading dalam satu ekosistem."
+    },
+    {
+      question: "Saya bingung mencari beasiswa yang cocok. Bisa dibantu?",
+      answer: "Bisa. Scholarship Matching Tool akan membantu menampilkan peluang beasiswa yang sesuai dengan profil, jurusan, dan latar belakangmu sehingga kamu tidak perlu lagi menghabiskan waktu mencari dari puluhan sumber berbeda."
+    },
+    {
+      question: "Apakah saya harus follow banyak akun beasiswa lagi?",
+      answer: "Tidak perlu. Informasi beasiswa dikumpulkan dalam satu tempat dan selalu diperbarui, sehingga kamu tidak perlu khawatir ketinggalan deadline penting atau informasi terbaru."
+    },
+    {
+      question: "Saya belum punya banyak prestasi. Apakah masih bisa ikut?",
+      answer: "Tentu. Banyak penerima beasiswa bukan hanya unggul karena prestasi, tetapi karena mampu menunjukkan potensi, dampak, dan cerita diri dengan baik. Kami membantu kamu menemukan dan menyusun kekuatan tersebut."
+    },
+    {
+      question: "Kampus saya bukan kampus top. Apakah masih punya peluang?",
+      answer: "Ya. Banyak beasiswa menilai lebih dari sekadar nama kampus. Yang lebih penting adalah kecocokan profil, motivasi, kontribusi, dan kualitas aplikasi yang kamu kirimkan."
+    },
+    {
+      question: "Apakah saya dijamin lolos beasiswa?",
+      answer: "Tidak ada pihak yang bisa menjamin kelolosan beasiswa. Namun, kami membantu memastikan proses persiapanmu lebih terarah, dokumen lebih kuat, dan strategimu lebih tepat dibanding jika kamu berjalan sendiri."
+    },
+    {
+      question: "Siapa mentor di BISA Membership?",
+      answer: "Kamu akan belajar dari awardee berbagai program beasiswa nasional dan internasional yang telah melewati proses seleksi secara langsung dan memahami tantangan yang kamu hadapi."
+    },
+    {
+      question: "Bagaimana cara mendapatkan feedback untuk CV dan esai?",
+      answer: "Melalui DreamsHub, kamu bisa mengirim draft CV atau esai untuk mendapatkan masukan dan proofreading dari mentor serta awardee."
+    },
+    {
+      question: "Apakah materi cocok untuk pemula?",
+      answer: "Sangat cocok. Materi disusun dari dasar hingga lanjutan sehingga bisa diikuti bahkan jika kamu baru mulai mencari informasi beasiswa hari ini."
+    }
+  ];
 
   const handleSelectProduct = (productId: string, isPremium?: boolean) => {
     if (isPremium) {
@@ -766,6 +810,144 @@ Terima kasih!`);
           </div>
         </section>
 
+        {/* COMPARISON SECTION */}
+        <section className="relative px-4 md:px-10 py-16 md:py-20 bg-white overflow-hidden border-t border-gray-100">
+          <div className="container mx-auto max-w-5xl">
+            {/* Section Header */}
+            <div className="text-center mb-12 md:mb-16" data-aos="fade-up">
+              <span className="text-xs font-bold text-[#1B7691] uppercase tracking-wider bg-[#1B7691]/10 px-3.5 py-1.5 rounded-full">
+                Perbandingan Persiapan
+              </span>
+              <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mt-3 leading-tight">
+                Trial error sendiri atau <span className="text-[#FB991A]">Pakai Sistem yang Terbukti?</span>
+              </h2>
+              <p className="text-gray-500 mt-3 text-sm md:text-base max-w-2xl mx-auto leading-relaxed">
+                Ribuan pencari beasiswa belum berhasil bukan karena kurang pintar, tapi karena berjalan tanpa strategi.
+              </p>
+            </div>
+
+            {/* Comparison Table / Cards for Mobile & Desktop */}
+            <div className="bg-white border border-gray-200 rounded-3xl overflow-hidden shadow-xl" data-aos="fade-up" data-aos-delay="100">
+              {/* Desktop View */}
+              <div className="hidden md:block">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-slate-50 border-b border-gray-200">
+                      <th className="p-6 text-sm font-bold text-gray-700 uppercase tracking-wider w-1/4">Aspek</th>
+                      <th className="p-6 text-sm font-bold text-red-600 uppercase tracking-wider w-3/8 bg-red-50/30">
+                        <span className="inline-flex items-center gap-2">❌ Jalan Sendiri</span>
+                      </th>
+                      <th className="p-6 text-sm font-bold text-[#1B7691] uppercase tracking-wider w-3/8 bg-[#1B7691]/5">
+                        <span className="inline-flex items-center gap-2">✅ Dengan BISA Membership</span>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {[
+                      {
+                        aspect: "Info Beasiswa",
+                        alone: "Harus memilah info dari banyak sumber dan rawan scam",
+                        bisa: "Beasiswa dipersonalisasi, resmi, dan selalu up-to-date",
+                      },
+                      {
+                        aspect: "Deadline Pendaftaran",
+                        alone: "Harus follow banyak akun dan sering telat tahu informasi penting",
+                        bisa: "Semua peluang dan deadline terpantau dalam satu sistem",
+                      },
+                      {
+                        aspect: "Roadmap Persiapan",
+                        alone: "Persiapan acak tanpa arah yang jelas",
+                        bisa: "Roadmap step-by-step dari persiapan hingga pendaftaran",
+                      },
+                      {
+                        aspect: "Esai & CV",
+                        alone: "Menebak kualitas dokumen sendiri",
+                        bisa: "Dapat feedback dan proofreading dari awardee berpengalaman",
+                      },
+                      {
+                        aspect: "Belajar Beasiswa",
+                        alone: "Belajar dari konten internet yang random",
+                        bisa: "Materi terstruktur dari dasar",
+                      },
+                      {
+                        aspect: "Support System",
+                        alone: "Berjuang dan overthinking sendirian",
+                        bisa: "Didukung komunitas awardee dan forum konsultasi mentor",
+                      },
+                      {
+                        aspect: "Biaya",
+                        alone: "Bisa menghabiskan ratusan ribu hingga jutaan rupiah per beasiswa",
+                        bisa: "Mulai dari Rp0/bulan untuk persiapan komprehensif",
+                      },
+                    ].map((row, idx) => (
+                      <tr key={idx} className="hover:bg-slate-50/50 transition-colors">
+                        <td className="p-6 text-sm font-bold text-gray-900">{row.aspect}</td>
+                        <td className="p-6 text-sm text-gray-500 bg-red-50/10">{row.alone}</td>
+                        <td className="p-6 text-sm text-gray-800 font-medium bg-[#1B7691]/[0.02]">{row.bisa}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Mobile View */}
+              <div className="block md:hidden divide-y divide-gray-200">
+                {[
+                  {
+                    aspect: "Info Beasiswa",
+                    alone: "Harus memilah info dari banyak sumber dan rawan scam",
+                    bisa: "Beasiswa dipersonalisasi, resmi, dan selalu up-to-date",
+                  },
+                  {
+                    aspect: "Deadline Pendaftaran",
+                    alone: "Harus follow banyak akun dan sering telat tahu informasi penting",
+                    bisa: "Semua peluang dan deadline terpantau dalam satu sistem",
+                  },
+                  {
+                    aspect: "Roadmap Persiapan",
+                    alone: "Persiapan acak tanpa arah yang jelas",
+                    bisa: "Roadmap step-by-step dari persiapan hingga pendaftaran",
+                  },
+                  {
+                    aspect: "Esai & CV",
+                    alone: "Menebak kualitas dokumen sendiri",
+                    bisa: "Dapat feedback dan proofreading dari awardee berpengalaman",
+                  },
+                  {
+                    aspect: "Belajar Beasiswa",
+                    alone: "Belajar dari konten internet yang random",
+                    bisa: "Materi terstruktur dari dasar",
+                  },
+                  {
+                    aspect: "Support System",
+                    alone: "Berjuang dan overthinking sendirian",
+                    bisa: "Didukung komunitas awardee dan forum konsultasi mentor",
+                  },
+                  {
+                    aspect: "Biaya",
+                    alone: "Bisa menghabiskan ratusan ribu hingga jutaan rupiah per beasiswa",
+                    bisa: "Mulai dari Rp0/bulan untuk persiapan komprehensif",
+                  },
+                ].map((row, idx) => (
+                  <div key={idx} className="p-6 space-y-4">
+                    <h4 className="text-sm font-bold text-gray-950 uppercase tracking-wider">{row.aspect}</h4>
+                    <div className="grid grid-cols-1 gap-3">
+                      <div className="bg-red-50/50 p-4 rounded-xl border border-red-100/50">
+                        <span className="text-xs font-bold text-red-600 block mb-1">❌ Jalan Sendiri</span>
+                        <p className="text-xs text-gray-500">{row.alone}</p>
+                      </div>
+                      <div className="bg-indigo-50/30 p-4 rounded-xl border border-indigo-100/30">
+                        <span className="text-xs font-bold text-[#1B7691] block mb-1">✅ Dengan BISA Membership</span>
+                        <p className="text-xs text-gray-800 font-medium">{row.bisa}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* PRICING PLANS SECTION */}
         <section className='relative px-4 md:px-10 py-16 md:py-20 bg-gray-50/50 overflow-hidden border-t border-b border-gray-100'>
           <div className='container mx-auto max-w-6xl'>
@@ -1108,56 +1290,69 @@ Terima kasih!`);
           </div>
         </section>
 
-        {/* <section className='w-screen mt-12 mb-24' id='FAQ'>
-          <div className='flex flex-col items-center justify-center gap-6 mx-auto'>
-            <Typography
-              data-aos='fade-up'
-              className='text-[#FB991A] text-3xl lg:text-6xl uppercase font-bold text-center px-4'
-            >
-              FREQUENTLY ASKED QUESTIONS
-            </Typography>
-            <div className='lg:w-[920px]  w-full rounded-xl bg-white py-2 px-4 flex flex-col gap-y-4'>
-              {FAQ.map((e, index) => {
+        {/* FAQ SECTION */}
+        <section className="relative py-20 bg-gray-50/50 overflow-hidden border-t border-b border-gray-100" id="FAQ">
+          <div className="container mx-auto px-4 max-w-4xl">
+            {/* Section Header */}
+            <div className="text-center mb-16" data-aos="fade-up">
+              <span className="text-xs font-bold text-[#FB991A] uppercase tracking-wider bg-[#FB991A]/10 px-3 py-1.5 rounded-full">
+                FAQ
+              </span>
+              <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mt-4 leading-tight">
+                Frequently Asked Questions
+              </h2>
+              <p className="text-gray-500 mt-3 text-sm md:text-base">
+                Masih punya pertanyaan seputar BISA Membership? Temukan jawabannya di bawah ini.
+              </p>
+            </div>
+
+            {/* Accordion Container */}
+            <div className="space-y-4" data-aos="fade-up" data-aos-delay="100">
+              {faqList.map((item, index) => {
+                const isOpen = activeFaqIndex === index;
                 return (
-                  <Disclosure as='div' key={index}>
-                    {({ open }) => (
-                      <>
-                        <Disclosure.Button
-                          data-aos='fade-up'
-                          data-aos-delay='400'
-                          className={`${
-                            open ? 'font-bold' : 'font-medium'
-                          } shadow-md flex w-full justify-between items-center rounded-lg bg-[#1B7691] px-6 py-4 text-left text-xl md:text-2xl  text-[#f5f5f5]  focus:outline-none`}
-                        >
-                          <span className='w-fit '>{e.title}</span>
-                          <HiChevronUp
-                            className={`${
-                              open
-                                ? 'rotate-180 transform transition ease-in-out duration-200 '
-                                : ''
-                            }  text-[#f5f5f5] h-8 w-8`}
-                          />
-                        </Disclosure.Button>
-                        <Transition
-                          enter='transition duration-100 ease-out'
-                          enterFrom='transform scale-95 opacity-0'
-                          enterTo='transform scale-100 opacity-100'
-                          leave='transition duration-75 ease-out'
-                          leaveFrom='transform scale-100 opacity-100'
-                          leaveTo='transform scale-95 opacity-0'
-                        >
-                          <Disclosure.Panel className='shadow-md px-4 pb-2 pt-4 text-base text-black-100 border bg-[#f5f5f5] rounded-b-lg'>
-                            {e.content}
-                          </Disclosure.Panel>
-                        </Transition>
-                      </>
-                    )}
-                  </Disclosure>
+                  <div
+                    key={index}
+                    className={`bg-white rounded-2xl border transition-all duration-300 overflow-hidden ${
+                      isOpen
+                        ? "border-[#1B7691]/40 shadow-md shadow-[#1B7691]/5"
+                        : "border-gray-200/80 hover:border-gray-300"
+                    }`}
+                  >
+                    <button
+                      onClick={() => setActiveFaqIndex(isOpen ? null : index)}
+                      className="w-full flex items-center justify-between p-6 text-left cursor-pointer focus:outline-none"
+                    >
+                      <span className={`text-base md:text-lg font-bold text-gray-950 pr-4 transition-colors ${isOpen ? 'text-[#1B7691]' : ''}`}>
+                        {item.question}
+                      </span>
+                      <span
+                        className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 transition-all duration-300 ${
+                          isOpen ? "bg-[#1B7691] text-white rotate-180" : "bg-gray-100 text-gray-500"
+                        }`}
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </span>
+                    </button>
+                    <div
+                      className={`transition-all duration-300 ease-in-out overflow-hidden`}
+                      style={{
+                        maxHeight: isOpen ? "400px" : "0px",
+                        opacity: isOpen ? 1 : 0,
+                      }}
+                    >
+                      <div className="px-6 pb-6 pt-1 text-sm md:text-base text-gray-600 leading-relaxed border-t border-gray-50">
+                        {item.answer}
+                      </div>
+                    </div>
+                  </div>
                 );
               })}
             </div>
           </div>
-        </section> */}
+        </section>
         <section className='bg-white py-16 md:py-20 overflow-hidden border-t border-gray-100'>
 
           {/* SECTION 1: AS SEEN ON (Static, Premium, Trusted) */}

@@ -15,6 +15,7 @@ import nProgress from 'nprogress';
 import { useEffect } from 'react';
 
 import GoogleAnalytics from '@/components/GoogleAnalytics';
+import MetaPixel from '@/components/MetaPixel';
 import Toast from '@/components/Toast';
 import api from '@/lib/api';
 import SEO from '@/seo.config';
@@ -51,6 +52,7 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <QueryClientProvider client={queryClient}>
       <GoogleAnalytics />
+      <MetaPixel />
       <Toast />
       <DefaultSeo {...SEO} />
       <HeroUIProvider>

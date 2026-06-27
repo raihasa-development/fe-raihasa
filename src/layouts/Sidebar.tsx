@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { FaChevronDown, FaUsers, FaBookReader } from 'react-icons/fa';
 import { HiHome, HiLogout, HiUserGroup, HiCurrencyDollar } from 'react-icons/hi';
 import { IoSparkles, IoBulbOutline, IoSettingsOutline } from 'react-icons/io5';
+import { FiX } from 'react-icons/fi';
 
 import UnstyledLink from '@/components/links/UnstyledLink';
 import NextImage from '@/components/NextImage';
@@ -10,7 +11,12 @@ import Typography from '@/components/Typography';
 import clsxm from '@/lib/clsxm';
 import useAuthStore from '@/store/useAuthStore';
 
-export default function Sidebar() {
+type SidebarProps = {
+  isOpen?: boolean;
+  onClose?: () => void;
+};
+
+export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const user = useAuthStore().user;
   const logout = useAuthStore().logout;
   const router = useRouter();
@@ -27,7 +33,7 @@ export default function Sidebar() {
     if (pathName.includes('scholra') || pathName.includes('dreamshub') || pathName.includes('bisa-learning')) {
       setIsServicesOpen(true);
       setActiveSection('services');
-    } else if (pathName.includes('users') || pathName.includes('payments') || pathName.includes('manajemen-beasiswa') || pathName.includes('courses') || pathName.includes('pricing') || pathName.includes('promos') || pathName.includes('config')) {
+    } else if (pathName.includes('users') || pathName.includes('mentors') || pathName.includes('payments') || pathName.includes('manajemen-beasiswa') || pathName.includes('courses') || pathName.includes('pricing') || pathName.includes('promos') || pathName.includes('config')) {
       setIsManagementOpen(true);
       setActiveSection('management');
     }
@@ -53,6 +59,12 @@ export default function Sidebar() {
           paths: ['/admin/users']
         },
         {
+          title: 'Kelola Mentor',
+          href: '/admin/mentors',
+          icon: HiUserGroup,
+          paths: ['/admin/mentors']
+        },
+        {
           title: 'Manage Courses',
           href: '/admin/courses',
           icon: FaBookReader,
@@ -75,6 +87,12 @@ export default function Sidebar() {
           href: '/admin/payments',
           icon: HiCurrencyDollar,
           paths: ['/admin/payments']
+        },
+        {
+          title: 'Generate Kuitansi',
+          href: '/admin/payments/receipt',
+          icon: HiCurrencyDollar,
+          paths: ['/admin/payments/receipt']
         },
         {
           title: 'Manajemen Beasiswa',
@@ -131,9 +149,34 @@ export default function Sidebar() {
   const menuSections = isAdmin ? [...adminMenu, ...userMenu] : userMenu;
 
   return (
-    <div className='hidden xl:block fixed left-0 top-0 h-screen w-72 bg-white border-r border-gray-200 shadow-sm flex flex-col z-40 overflow-hidden'>
-      {/* Header */}
-      <div className='flex-shrink-0 px-6 py-6 border-b border-gray-100'>
+    <>
+      {/* Mobile Backdrop overlay */}
+      <div
+        className={clsxm(
+          'fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-40 transition-opacity duration-300 xl:hidden',
+          isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        )}
+        onClick={onClose}
+      />
+
+      {/* Sidebar container */}
+      <div
+        className={clsxm(
+          'fixed left-0 top-0 h-screen w-72 bg-white border-r border-gray-200 shadow-sm flex flex-col z-40 overflow-hidden transition-transform duration-300',
+          isOpen ? 'translate-x-0' : '-translate-x-full xl:translate-x-0'
+        )}
+      >
+        {/* Header */}
+        <div className='flex-shrink-0 px-6 py-6 border-b border-gray-100 relative'>
+          {onClose && (
+            <button
+              onClick={onClose}
+              className='xl:hidden absolute right-4 top-4 p-2 rounded-lg hover:bg-gray-100 text-gray-500 transition-colors'
+              aria-label='Close sidebar'
+            >
+              <FiX className='w-5 h-5' />
+            </button>
+          )}
         <div className='text-center mb-6'>
           <NextImage
             src='/images/logo.png'
@@ -331,5 +374,6 @@ export default function Sidebar() {
         </button>
       </div>
     </div>
+    </>
   );
 }
