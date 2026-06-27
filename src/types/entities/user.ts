@@ -4,6 +4,8 @@ export interface User {
   angkatan: string | null;
   asal_instansi: string | null;
   email: string;
+  is_email_verified?: boolean;
+  google_id?: string | null;
   jurusan: string | null;
   name: string;
   // user_id: string;
