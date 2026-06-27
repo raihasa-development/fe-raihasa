@@ -128,7 +128,7 @@ export default function RegisterPage() {
               alt='Raih Asa Logo'
               width={160}
               height={110}
-              className='opacity-90 object-contain'
+              className='opacity-90 object-contain pointer-events-none select-none'
             />
           </div>
 
@@ -162,7 +162,7 @@ export default function RegisterPage() {
           <div className="w-full max-w-md space-y-8">
             <div className="text-center lg:text-left">
               <div className="lg:hidden flex justify-center mb-6">
-                <NextImage src='/images/logo_white.svg' alt='logo' width={140} height={100} className="brightness-0" />
+                <NextImage src='/images/logo_white.svg' alt='logo' width={140} height={100} className="brightness-0 pointer-events-none select-none" />
               </div>
               <h2 className="text-3xl font-bold text-gray-900">Buat Akun Baru</h2>
               <p className="mt-3 text-base text-gray-600">Mulai langkah pertamamu meraih beasiswa impian.</p>
