@@ -6,6 +6,7 @@ import {
 import api from '@/lib/api';
 import { useRouter } from 'next/router';
 import Typography from '@/components/Typography';
+import useActivityTracker from '@/hooks/useActivityTracker';
 
 interface Question {
     id: string;
@@ -82,6 +83,7 @@ const ScholraMascot = ({ isThinking }: { isThinking: boolean }) => {
 
 export default function ScholraFlow() {
     const router = useRouter();
+    const { trackAction } = useActivityTracker();
     const [answers, setAnswers] = useState<Record<string, any>>({});
     const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
     const [results, setResults] = useState<ScholarshipResult[]>([]);
@@ -138,6 +140,7 @@ export default function ScholraFlow() {
         const newAnswers = { ...answers, [questionId]: value };
         setHistory(prev => [...prev, answers]);
         setAnswers(newAnswers);
+        trackAction('SCHOLRA_SUBMIT', { questionId, step: history.length + 1 });
         fetchNextStep(newAnswers);
         setInputValue('');
     };
@@ -365,7 +368,10 @@ export default function ScholraFlow() {
                                 </Typography>
 
                                 <button
-                                    onClick={() => router.push('/scholra/results')}
+                                    onClick={() => {
+                                        trackAction('SCHOLRA_COMPLETE');
+                                        router.push('/scholra/results');
+                                    }}
                                     className="w-full sm:w-auto px-8 py-4 bg-white text-[#1B7691] rounded-xl font-bold text-base shadow-sm hover:shadow-md hover:scale-105 active:scale-95 transition-all duration-300 flex items-center justify-center gap-3 relative z-10"
                                 >
                                     Lihat Hasil Akhir <FiArrowRight className="w-5 h-5" />

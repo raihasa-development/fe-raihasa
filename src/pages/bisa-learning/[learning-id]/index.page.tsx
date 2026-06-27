@@ -11,12 +11,14 @@ import Layout from '@/layouts/Layout';
 import SEO from '@/components/SEO';
 import api from '@/lib/api';
 import { getToken } from '@/lib/cookies';
+import useActivityTracker from '@/hooks/useActivityTracker';
 
 export default withAuth(LearningDetailPage, 'user');
 
 function LearningDetailPage() {
   const router = useRouter();
   const { 'learning-id': learningId } = router.query;
+  const { trackAction } = useActivityTracker();
   const [activeTab, setActiveTab] = useState('overview');
   const [activeLesson, setActiveLesson] = useState(0);
 
@@ -90,6 +92,11 @@ function LearningDetailPage() {
         const response = await api.get(`/lms/modul/${learningId}`);
         const data = response.data.data;
         setCanAccessModule(Boolean(data?.is_authorize));
+        
+        // Log course access activity
+        if (data) {
+          trackAction('ACCESS_COURSE', { courseId: data.id, courseName: data.name });
+        }
         
         // Transform data to match required UI structure
         const transformed = {

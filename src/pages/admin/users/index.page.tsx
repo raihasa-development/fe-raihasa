@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FiCheckCircle, FiXCircle, FiSearch, FiGift, FiClock, FiSlash, FiMail, FiSend, FiUsers, FiAlertCircle } from 'react-icons/fi';
+import { FiCheckCircle, FiXCircle, FiSearch, FiGift, FiClock, FiSlash, FiMail, FiSend, FiUsers, FiAlertCircle, FiActivity } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 
@@ -20,6 +20,7 @@ type User = {
   id: string;
   name: string;
   email: string;
+  google_id?: string | null;
   role: 'USER' | 'ADMIN';
   is_email_verified: boolean;
   forum_tokens: number;
@@ -51,6 +52,7 @@ function AdminUsersPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [isTokenModalOpen, setIsTokenModalOpen] = useState(false);
   const [isMembershipModalOpen, setIsMembershipModalOpen] = useState(false);
+  const [isActivityModalOpen, setIsActivityModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [tokenAmount, setTokenAmount] = useState<number>(0);
 
@@ -279,6 +281,11 @@ function AdminUsersPage() {
     setIsMembershipModalOpen(true);
   };
 
+  const openActivityModal = (user: User) => {
+    setSelectedUser(user);
+    setIsActivityModalOpen(true);
+  };
+
   return (
     <AdminDashboard withSidebar>
       {/* Count Metrics Grid */}
@@ -434,6 +441,7 @@ function AdminUsersPage() {
                   />
                 </th>
                 <th className='p-4 text-xs font-bold text-gray-500 uppercase tracking-wider'>User</th>
+                <th className='p-4 text-xs font-bold text-gray-500 uppercase tracking-wider'>Registrasi</th>
                 <th className='p-4 text-xs font-bold text-gray-500 uppercase tracking-wider'>Role</th>
                 <th className='p-4 text-xs font-bold text-gray-500 uppercase tracking-wider'>Verified</th>
                 <th className='p-4 text-xs font-bold text-gray-500 uppercase tracking-wider'>Tokens</th>
@@ -443,9 +451,9 @@ function AdminUsersPage() {
             </thead>
             <tbody className='divide-y divide-gray-50'>
               {loading ? (
-                <tr><td colSpan={7} className="p-8 text-center text-gray-400">Loading users...</td></tr>
+                <tr><td colSpan={8} className="p-8 text-center text-gray-400">Loading users...</td></tr>
               ) : users.length === 0 ? (
-                <tr><td colSpan={7} className="p-8 text-center text-gray-400">No users found.</td></tr>
+                <tr><td colSpan={8} className="p-8 text-center text-gray-400">No users found.</td></tr>
               ) : (
                 users.map((user) => (
                   <tr key={user.id} className={`hover:bg-gray-50/50 transition-colors ${selectedUserIds.includes(user.id) ? 'bg-blue-50/10' : ''}`}>
@@ -487,25 +495,21 @@ function AdminUsersPage() {
                               day: 'numeric',
                               month: 'short',
                               year: 'numeric',
-                              hour: '2-digit',
-                              minute: '2-digit',
                             })}
                           </span>
-                        )}
-                        {user.last_login_at ? (
-                          <span className='text-[#1B7691] font-medium'>
-                            Last Active: {new Date(user.last_login_at).toLocaleDateString('id-ID', {
-                              day: 'numeric',
-                              month: 'short',
-                              year: 'numeric',
-                              hour: '2-digit',
-                              minute: '2-digit',
-                            })}
-                          </span>
-                        ) : (
-                          <span className='italic text-gray-300'>Never accessed/logged in</span>
                         )}
                       </div>
+                    </td>
+                    <td className='p-4'>
+                      {user.google_id ? (
+                        <span className='px-2.5 py-1 text-[10px] font-black text-red-600 bg-red-50 rounded-full border border-red-100 flex items-center gap-1 w-fit uppercase tracking-wider'>
+                          Google
+                        </span>
+                      ) : (
+                        <span className='px-2.5 py-1 text-[10px] font-black text-gray-600 bg-gray-50 rounded-full border border-gray-150 flex items-center gap-1 w-fit uppercase tracking-wider'>
+                          Email
+                        </span>
+                      )}
                     </td>
                     <td className='p-4'>
                       <span className={`px-2 py-1 rounded text-[10px] font-bold ${user.role === 'ADMIN' ? 'bg-purple-100 text-purple-600' : 'bg-gray-100 text-gray-600'}`}>
@@ -557,6 +561,13 @@ function AdminUsersPage() {
                         title="Toggle Verification"
                       >
                         {user.is_email_verified ? 'Unverify' : 'Verify'}
+                      </button>
+                      <button
+                        onClick={() => openActivityModal(user)}
+                        className='text-xs text-[#1B7691] hover:text-[#15627a] font-medium border border-[#1B7691]/20 px-3 py-1.5 rounded-lg hover:bg-[#1B7691]/5 transition-colors flex items-center gap-1'
+                        title="Detail Aktivitas"
+                      >
+                        <FiActivity /> Aktivitas
                       </button>
                     </td>
                   </tr>
@@ -756,6 +767,13 @@ function AdminUsersPage() {
           fetchStats();
         }}
       />
+
+      {/* Activity Modal */}
+      <UserActivityModal
+        isOpen={!!isActivityModalOpen && !!selectedUser}
+        onClose={() => setIsActivityModalOpen(false)}
+        user={selectedUser}
+      />
     </AdminDashboard>
   );
 }
@@ -891,6 +909,105 @@ function MembershipModal({ isOpen, onClose, user, onSuccess }: { isOpen: boolean
             className="px-4 py-2 bg-blue-600 text-white rounded text-sm font-medium hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
           >
             {loading ? 'Processing...' : 'Assign Membership'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function UserActivityModal({ isOpen, onClose, user }: { isOpen: boolean; onClose: () => void; user: User | null }) {
+  const [logs, setLogs] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (isOpen && user) {
+      setLoading(true);
+      api.get(`/auth/users/${user.id}/activities`)
+        .then(({ data }) => {
+          setLogs(data?.data || []);
+        })
+        .catch(() => {
+          toast.error('Gagal memuat log aktivitas');
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }
+  }, [isOpen, user]);
+
+  if (!isOpen || !user) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+      <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-2xl max-h-[80vh] flex flex-col">
+        <div className="flex items-center justify-between border-b border-gray-100 pb-4 mb-4 flex-shrink-0">
+          <div>
+            <h3 className="text-lg font-bold text-gray-900">Log Aktivitas Pengguna</h3>
+            <p className="text-xs text-gray-500">{user.name} ({user.email})</p>
+          </div>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 font-bold text-2xl">×</button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto pr-1 py-2 space-y-4">
+          {loading ? (
+            <p className="text-center text-gray-400 py-10 text-xs">Memuat log aktivitas...</p>
+          ) : logs.length === 0 ? (
+            <p className="text-center text-gray-400 py-10 text-xs">Belum ada aktivitas tercatat.</p>
+          ) : (
+            <div className="relative border-l border-gray-150 ml-3 pl-6 space-y-6 py-2">
+              {logs.map((log) => {
+                const date = new Date(log.created_at);
+                const timeStr = date.toLocaleString('id-ID', {
+                  day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                });
+                
+                let badgeColor = 'bg-blue-50 text-[#1B7691] border border-blue-100';
+                if (log.action === 'SCHOLRA_COMPLETE') badgeColor = 'bg-green-50 text-green-600 border border-green-100';
+                if (log.action === 'DREAMSHUB_POST') badgeColor = 'bg-pink-50 text-pink-600 border border-pink-100';
+                if (log.action === 'ACCESS_COURSE') badgeColor = 'bg-indigo-50 text-indigo-600 border border-indigo-100';
+                
+                return (
+                  <div key={log.id} className="relative">
+                    {/* Timeline dot */}
+                    <div className="absolute -left-[33px] top-1 w-3 h-3 rounded-full bg-white border-2 border-[#1B7691]" />
+                    
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase ${badgeColor}`}>
+                          {log.action}
+                        </span>
+                        <span className="text-[10px] font-mono text-gray-500 bg-gray-50 px-2 py-0.5 rounded">
+                          {log.page_url}
+                        </span>
+                      </div>
+                      <span className="text-[10px] text-gray-400 font-semibold">{timeStr}</span>
+                    </div>
+
+                    {/* Metadata Detail */}
+                    {log.metadata && Object.keys(log.metadata).length > 0 && (
+                      <div className="mt-2 p-3 bg-gray-50/75 rounded-xl text-xs text-gray-600 font-semibold border border-gray-100">
+                        {log.metadata.courseName && (
+                          <p>Membuka Kelas: <span className="font-bold text-[#1B7691]">{log.metadata.courseName}</span></p>
+                        )}
+                        {log.metadata.title && (
+                          <p>Membuat Diskusi: <span className="font-bold text-gray-800">"{log.metadata.title}"</span></p>
+                        )}
+                        {log.metadata.questionId && (
+                          <p>Mengisi Scholra: Step {log.metadata.step || '-'} (Q: {log.metadata.questionId})</p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        <div className="flex justify-end pt-4 border-t border-gray-100 mt-4 flex-shrink-0">
+          <button onClick={onClose} className="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-xs font-bold transition-all">
+            Tutup
           </button>
         </div>
       </div>

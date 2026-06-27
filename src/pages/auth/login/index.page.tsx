@@ -20,6 +20,7 @@ import useAuthStore from '@/store/useAuthStore';
 import withAuth from '@/components/hoc/withAuth';
 import { ApiError } from '@/types/api';
 import { AxiosError } from 'axios';
+import { GoogleLogin } from '@react-oauth/google';
 
 type LoginForm = {
   email: string;
@@ -86,6 +87,40 @@ function LoginPage() {
 
   const { mutate: loginMutation, isPending } =
     useMutationToast<void, LoginForm>(mutation);
+
+  const googleMutation = useMutation<void, AxiosError<ApiError>, string>({
+    mutationFn: async (googleToken: string) => {
+      removeToken();
+
+      const { data: res } = await api.post('/auth/google-login', {
+        token: googleToken,
+      });
+
+      if (!res?.data) throw new Error('Sesi login tidak valid');
+
+      const { token, ...user } = res.data;
+
+      setToken(token);
+      login({ ...user, token });
+      showToast('Berhasil login dengan Google', SUCCESS_TOAST);
+
+      const queryRedirect = router.query.redirect as string | undefined;
+      const sessionRedirect = sessionStorage.getItem('redirectAfterLogin');
+      const target = queryRedirect || sessionRedirect || '/';
+
+      if (sessionRedirect) sessionStorage.removeItem('redirectAfterLogin');
+
+      router.push(target);
+    },
+  });
+
+  const { mutate: googleLoginMutation } = useMutationToast<void, string>(googleMutation);
+
+  const handleGoogleSuccess = (credentialResponse: any) => {
+    if (credentialResponse.credential) {
+      googleLoginMutation(credentialResponse.credential);
+    }
+  };
 
   const onSubmit = (data: LoginForm) => {
     loginMutation(data);
@@ -228,6 +263,16 @@ function LoginPage() {
                     <div className="relative flex justify-center text-sm">
                       <span className="px-2 bg-white text-gray-400">Atau</span>
                     </div>
+                  </div>
+
+                  <div className="flex justify-center w-full">
+                    <GoogleLogin
+                      onSuccess={handleGoogleSuccess}
+                      onError={() => {
+                        showToast('Login Google gagal. Coba lagi.', DANGER_TOAST);
+                      }}
+                      useOneTap
+                    />
                   </div>
 
                   <p className='text-center text-gray-600'>

@@ -1,6 +1,7 @@
 import '@/styles/globals.css'    
 import '@/styles/nprogress.css';
 import "aos/dist/aos.css";
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 import { HeroUIProvider } from '@heroui/react';
 import {
@@ -19,6 +20,7 @@ import MetaPixel from '@/components/MetaPixel';
 import Toast from '@/components/Toast';
 import api from '@/lib/api';
 import SEO from '@/seo.config';
+import useActivityTracker from '@/hooks/useActivityTracker';
 
 Router.events.on('routeChangeStart', nProgress.start);
 Router.events.on('routeChangeError', nProgress.done);
@@ -37,6 +39,7 @@ const queryClient = new QueryClient({
 });
 
 export default function App({ Component, pageProps }: AppProps) {
+  useActivityTracker();
   useEffect(() => {
     const handleWheel = (e: WheelEvent) => {
       const target = e.target as HTMLElement;
@@ -50,14 +53,16 @@ export default function App({ Component, pageProps }: AppProps) {
   }, []);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <GoogleAnalytics />
-      <MetaPixel />
-      <Toast />
-      <DefaultSeo {...SEO} />
-      <HeroUIProvider>
-        <Component {...pageProps} />
-      </HeroUIProvider>
-    </QueryClientProvider>
+    <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ''}>
+      <QueryClientProvider client={queryClient}>
+        <GoogleAnalytics />
+        <MetaPixel />
+        <Toast />
+        <DefaultSeo {...SEO} />
+        <HeroUIProvider>
+          <Component {...pageProps} />
+        </HeroUIProvider>
+      </QueryClientProvider>
+    </GoogleOAuthProvider>
   );
 }
