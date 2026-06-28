@@ -85,7 +85,10 @@ export default function Navbar() {
   const isBluePage = router.pathname.startsWith('/bisa-learning') || router.pathname.startsWith('/dreamshub');
 
   return (
-    <header className='fixed top-0 z-[100] w-full py-4 px-4 md:px-8 font-primary'>
+    <header className={clsxm(
+      'fixed z-[100] w-full py-4 px-4 md:px-8 font-primary transition-all duration-300',
+      router.pathname === '/' ? 'top-10' : 'top-0'
+    )}>
       {/* Glass Pill Navbar - Solid White on Blue Pages, Glassy on others */}
       <div className={clsxm(
         'max-w-6xl mx-auto rounded-full border shadow-lg transition-all duration-500',
@@ -140,13 +143,13 @@ export default function Navbar() {
                 <UnstyledLink
                   href='/products'
                   className={clsxm(
-                    'relative px-4 py-2 text-sm font-medium rounded-full transition-all duration-300',
+                    'px-4 py-1.5 text-sm font-bold rounded-full transition-all duration-300 inline-block',
                     router.pathname.startsWith('/products')
-                      ? 'text-[#1B7691] bg-[#1B7691]/10 font-bold shadow-sm ring-1 ring-[#1B7691]/20'
-                      : 'text-gray-700 hover:text-[#1B7691] hover:bg-[#1B7691]/5'
+                      ? 'text-white bg-[#FB991A] shadow-md shadow-orange-500/10 ring-1 ring-[#FB991A]'
+                      : 'text-[#FB991A] border border-[#FB991A]/60 bg-[#FB991A]/5 hover:bg-[#FB991A] hover:text-white hover:border-[#FB991A] shadow-sm shadow-orange-500/5'
                   )}
                 >
-                  Pricing
+                  Package
                 </UnstyledLink>
               </li>
               {/* <li>
@@ -303,248 +306,205 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Nav */}
+      {/* Mobile Nav Backdrop Overlay */}
+      {isOpen && (
+        <div
+          className='fixed inset-0 z-[90] bg-black/40 backdrop-blur-sm md:hidden transition-all duration-300'
+          onClick={toggleShowNav}
+        />
+      )}
+
+      {/* Mobile Nav Drawer */}
       <div
         className={clsxm(
-          'fixed left-0 top-0 flex flex-col items-center gap-12',
-          'w-full h-screen shadow-xl px-4 pt-10 pb-24 md:hidden bg-primary-white overflow-y-auto overflow-x-clip',
-          'transition ease-in-out duration-300',
-          isOpen ? 'translate-x-0' : '-translate-x-full'
+          'fixed right-0 top-0 z-[100] flex flex-col gap-6',
+          'w-[85%] max-w-[320px] h-screen shadow-2xl px-6 pb-12 md:hidden bg-white/95 backdrop-blur-lg border-l border-white/20 overflow-y-auto',
+          router.pathname === '/' ? 'pt-16' : 'pt-6',
+          'transition-transform duration-300 ease-in-out',
+          isOpen ? 'translate-x-0' : 'translate-x-full'
         )}
       >
-        <UnstyledLink
-          href={homeHref}
-          className='flex flex-row items-center gap-2 md:gap-4'
-        >
-          <NextImage
-            src='/images/logo.png'
-            alt='logo'
-            width='254'
-            height='177'
-            className='w-16 md:w-24'
+        {/* Drawer Header */}
+        <div className='flex items-center justify-between w-full pb-4 border-b border-gray-100'>
+          <UnstyledLink
+            href={homeHref}
+            className='flex flex-row items-center gap-2'
+            onClick={toggleShowNav}
+          >
+            <NextImage
+              src='/images/logo.png'
+              alt='logo'
+              width='254'
+              height='177'
+              className='w-12'
+            />
+          </UnstyledLink>
+          <IconButton
+            variant='unstyled'
+            icon={MdClose}
+            size='sm'
+            className='text-gray-500 hover:text-gray-800'
+            iconClassName='w-6 h-6 text-gray-500'
+            onClick={toggleShowNav}
           />
-        </UnstyledLink>
+        </div>
 
+        {/* Drawer Links */}
         <nav className='flex-1 w-full'>
-          <ul className='space-y-2'>
+          <ul className='space-y-1.5'>
             <li>
               <UnstyledLink
                 href={homeHref}
-                className='flex rounded-xl hover:bg-[#1B7691]/5 hover:text-[#1B7691] transition-colors'
+                className={clsxm(
+                  'flex items-center w-full px-4 py-3 text-sm font-semibold rounded-xl transition-all',
+                  router.pathname === homeHref
+                    ? 'text-[#1B7691] bg-[#1B7691]/5 font-bold'
+                    : 'text-gray-600 hover:text-[#1B7691] hover:bg-[#1B7691]/5'
+                )}
                 onClick={toggleShowNav}
               >
-                <Typography
-                  color='inline'
-                  variant='bt'
-                  className='py-4 pl-4'
-                >
-                  Home
-                </Typography>
+                Home
               </UnstyledLink>
             </li>
             <li>
               <UnstyledLink
                 href='/products'
-                className='flex rounded-xl hover:bg-[#1B7691]/5 hover:text-[#1B7691] transition-colors'
+                className={clsxm(
+                  'flex items-center w-full px-4 py-3 text-sm font-bold rounded-xl transition-all border',
+                  router.pathname.startsWith('/products')
+                    ? 'bg-[#FB991A] text-white border-[#FB991A] shadow-md shadow-orange-500/10'
+                    : 'bg-[#FB991A]/5 text-[#FB991A] border-[#FB991A]/20 hover:bg-[#FB991A]/10'
+                )}
                 onClick={toggleShowNav}
               >
-                <Typography
-                  color='inline'
-                  variant='bt'
-                  className='py-4 pl-4'
-                >
-                  Pricing
-                </Typography>
+                Package
               </UnstyledLink>
             </li>
-            {/* <li>
-              <UnstyledLink
-                href='/scholarship-calendar'
-                className='flex rounded-xl hover:bg-[#1B7691]/5 hover:text-[#1B7691] transition-colors'
-                onClick={toggleShowNav}
-              >
-                <Typography
-                  color='inline'
-                  variant='bt'
-                  className='py-4 pl-4'
-                >
-                  Calendar
-                </Typography>
-              </UnstyledLink>
-            </li> */}
             <li>
               <UnstyledLink
                 href='/list-scholarship'
-                className='flex rounded-xl hover:bg-[#1B7691]/5 hover:text-[#1B7691] transition-colors'
+                className={clsxm(
+                  'flex items-center w-full px-4 py-3 text-sm font-semibold rounded-xl transition-all',
+                  router.pathname.startsWith('/list-scholarship')
+                    ? 'text-[#1B7691] bg-[#1B7691]/5 font-bold'
+                    : 'text-gray-600 hover:text-[#1B7691] hover:bg-[#1B7691]/5'
+                )}
                 onClick={toggleShowNav}
               >
-                <Typography
-                  color='inline'
-                  variant='bt'
-                  className='py-4 pl-4'
-                >
-                  Scholarship List
-                </Typography>
+                Scholarship List
               </UnstyledLink>
             </li>
             <li>
               <UnstyledLink
                 href='/scholra'
-                className='flex items-center gap-2 rounded-xl hover:bg-[#1B7691]/5 hover:text-[#1B7691] transition-colors'
+                className={clsxm(
+                  'flex items-center gap-2 px-4 py-3 text-sm font-semibold rounded-xl transition-all',
+                  router.pathname.startsWith('/scholra')
+                    ? 'text-[#1B7691] bg-[#1B7691]/5 font-bold'
+                    : 'text-gray-600 hover:text-[#1B7691] hover:bg-[#1B7691]/5'
+                )}
                 onClick={toggleShowNav}
               >
-                <Typography
-                  color='inline'
-                  variant='bt'
-                  className='py-4 pl-4'
-                >
-                  Scholra
-                </Typography>
-                <span className='px-1.5 py-0.5 text-[10px] font-bold bg-gradient-to-r from-[#1B7691] to-[#0d5a6e] text-white rounded'>AI</span>
+                <span>Scholra</span>
+                <span className='px-1.5 py-0.5 text-[9px] font-bold bg-gradient-to-r from-[#1B7691] to-[#0d5a6e] text-white rounded'>AI</span>
               </UnstyledLink>
             </li>
             <li>
               <UnstyledLink
                 href='/dreamshub'
-                className='flex rounded-xl hover:bg-[#1B7691]/5 hover:text-[#1B7691] transition-colors'
+                className={clsxm(
+                  'flex items-center w-full px-4 py-3 text-sm font-semibold rounded-xl transition-all',
+                  router.pathname.startsWith('/dreamshub')
+                    ? 'text-[#1B7691] bg-[#1B7691]/5 font-bold'
+                    : 'text-gray-600 hover:text-[#1B7691] hover:bg-[#1B7691]/5'
+                )}
                 onClick={toggleShowNav}
               >
-                <Typography
-                  color='inline'
-                  variant='bt'
-                  className='py-4 pl-4'
-                >
-                  Dreamshub
-                </Typography>
+                Dreamshub
               </UnstyledLink>
             </li>
             <li>
               <UnstyledLink
                 href='/bisa-learning'
-                className='flex rounded-xl hover:bg-[#1B7691]/5 hover:text-[#1B7691] transition-colors'
+                className={clsxm(
+                  'flex items-center w-full px-4 py-3 text-sm font-semibold rounded-xl transition-all',
+                  router.pathname.startsWith('/bisa-learning')
+                    ? 'text-[#1B7691] bg-[#1B7691]/5 font-bold'
+                    : 'text-gray-600 hover:text-[#1B7691] hover:bg-[#1B7691]/5'
+                )}
                 onClick={toggleShowNav}
               >
-                <Typography
-                  color='inline'
-                  variant='bt'
-                  className='py-4 pl-4'
-                >
-                  BISA Learning
-                </Typography>
+                BISA Learning
               </UnstyledLink>
             </li>
 
-            {/* User-specific items */}
             {isLogin && user?.role === 'ADMIN' && (
               <li>
                 <UnstyledLink
                   href='/admin'
-                  className='flex rounded-xl hover:bg-[#1B7691]/5 hover:text-[#1B7691] transition-colors'
+                  className={clsxm(
+                    'flex items-center w-full px-4 py-3 text-sm font-semibold rounded-xl transition-all',
+                    router.pathname.startsWith('/admin')
+                      ? 'text-[#1B7691] bg-[#1B7691]/5 font-bold'
+                      : 'text-gray-600 hover:text-[#1B7691] hover:bg-[#1B7691]/5'
+                  )}
                   onClick={toggleShowNav}
                 >
-                  <Typography
-                    color='inline'
-                    variant='bt'
-                    className='py-4 pl-4'
-                  >
-                    Dashboard
-                  </Typography>
+                  Dashboard Admin
                 </UnstyledLink>
               </li>
             )}
-
           </ul>
-          <div className='flex flex-col gap-4'>
+
+          {/* Drawer CTA Action Buttons */}
+          <div className='flex flex-col gap-3 mt-8 w-full border-t border-gray-100 pt-6'>
             {!isLogin ? (
               <>
                 <ButtonLink
-                  href='/register'
-                  size='base'
-                  variant='primary'
-                  isOutline={false}
-                  className='py-4 hover:bg-transparent hover:text-primary-bluegreen'
-                >
-                  <Typography color='inline' variant='bt'>
-                    Daftar
-                  </Typography>
-                </ButtonLink>
-                <ButtonLink
                   href='/login'
                   size='base'
-                  variant='primary'
-                  isOutline={true}
-                  className='py-4 hover:bg-primary-bluegreen hover:text-white'
+                  variant='unstyled'
+                  className='w-full text-center py-2.5 text-sm font-bold text-[#1B7691] bg-[#1B7691]/5 hover:bg-[#1B7691]/10 rounded-xl transition-all'
+                  onClick={toggleShowNav}
                 >
-                  <Typography color='inline' variant='bt'>
-                    Masuk
-                  </Typography>
+                  Masuk
+                </ButtonLink>
+                <ButtonLink
+                  href='/register'
+                  size='base'
+                  variant='unstyled'
+                  className='w-full text-center py-2.5 text-sm font-bold text-white bg-gradient-to-r from-[#1B7691] to-[#0d5a6e] rounded-xl shadow-md hover:shadow-lg transition-all'
+                  onClick={toggleShowNav}
+                >
+                  Daftar Gratis
                 </ButtonLink>
               </>
             ) : (
               <>
-                <UnstyledLink
-                  href='/scholra'
-                  className='flex rounded-lg hover:bg-gray-100 hover:text-primary-bluegreen'
+                <div className='flex items-center gap-3 px-4 py-2.5 bg-gray-50 rounded-xl border border-gray-100'>
+                  <div className='w-8 h-8 rounded-full bg-gradient-to-br from-[#1B7691] to-[#0d5a6e] flex items-center justify-center text-white font-bold text-sm shadow-inner shrink-0'>
+                    {user?.name?.charAt(0).toUpperCase()}
+                  </div>
+                  <div className='flex flex-col items-start min-w-0'>
+                    <span className='text-sm font-bold text-gray-700 truncate w-full leading-tight'>
+                      {user?.name}
+                    </span>
+                    <span className='text-[10px] text-gray-400 font-medium leading-tight'>Member</span>
+                  </div>
+                </div>
+                <button
+                  className='w-full text-center py-2.5 text-sm font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 border border-rose-100 rounded-xl transition-all'
+                  onClick={() => {
+                    handleLogout();
+                    toggleShowNav();
+                  }}
                 >
-                  <Typography
-                    color='inline'
-                    variant='bt'
-                    className='px-4 py-4'
-                  >
-                    Info Beasiswa
-                  </Typography>
-                </UnstyledLink>
-                <Menu as='div' className='w-full '>
-                  <Menu.Button className='ring ring-primary-bluegreen w-full font-semibold rounded-md md:rounded-lg py-1.5 px-[14px]'>
-                    {() => (
-                      <div className='flex w-full h-[42px] py-2 px-4 justify-start items-center gap-2 text-primary-bluegreen cursor-pointer'>
-                        <HiUserCircle className='w-6 h-6' />
-                        <span className='text-lg font-semibold'>
-                          Hai, {user?.name}!
-                        </span>
-                      </div>
-                    )}
-                  </Menu.Button>
-                  <Transition
-                    as={React.Fragment}
-                    enter='transition ease-out duration-100'
-                    enterFrom='transform opacity-0 scale-95'
-                    enterTo='transform opacity-100 scale-100'
-                    leave='transition ease-in duration-75'
-                    leaveFrom='transform opacity-100 scale-100'
-                    leaveTo='transform opacity-0 scale-95'
-                  >
-                    <Menu.Items className='relative z-20 w-full flex flex-col py-4 px-2 mt-[14px] gap-2 bg-white rounded-md md:rounded-lg'>
-                      {/* <Menu.Item
-                        as='button'
-                        className='flex items-center justify-start w-full gap-2 px-4 py-2 text-lg font-semibold cursor-pointer text-primary-bluegreen'
-                        onClick={() => router.push('/profile-user')}
-                      >
-                        Profil Saya
-                      </Menu.Item> */}
-                      <Menu.Item
-                        as='button'
-                        className='flex items-center justify-start w-full gap-2 px-4 py-2 text-lg font-semibold border-2 rounded-lg cursor-pointer hover:text-rose-600 text-rose-800 hover:bg-rose-200 border-rose-200'
-                        onClick={handleLogout}
-                      >
-                        <span className='text-lg font-semibold'>Log out</span>
-                      </Menu.Item>
-                    </Menu.Items>
-                  </Transition>
-                </Menu>
+                  Log Out
+                </button>
               </>
             )}
           </div>
         </nav>
-
-        <IconButton
-          variant='unstyled'
-          icon={MdClose}
-          size='lg'
-          className='bg-transparent border-2 rounded-full border-[#1B7691]'
-          iconClassName='text-[#1B7691]'
-          onClick={toggleShowNav}
-        />
       </div>
     </header>
   );

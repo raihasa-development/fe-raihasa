@@ -216,11 +216,11 @@ Terima kasih!`);
       </div>
 
       <main className='scroll-smooth overflow-hidden bg-[#fff]'>
-        <section className='relative min-h-screen pt-8 pb-16 md:pt-12 md:pb-24 mt-16 md:mt-20'>
+        <section className='relative min-h-screen pt-4 pb-16 md:pt-12 md:pb-24 mt-28 md:mt-20'>
           {/* Main Hero Content */}
-          <div className='container relative z-20 grid grid-cols-1 gap-8 px-4 mx-auto md:px-10 xl:grid-cols-2 xl:gap-16 place-items-center'>
+          <div className='container relative z-20 grid grid-cols-1 gap-4 px-4 mx-auto md:px-10 xl:grid-cols-2 xl:gap-16 place-items-center'>
             {/* Left Column - Text Content */}
-            <div className='flex flex-col items-center order-2 w-full max-w-2xl gap-5 xl:order-1 xl:items-start md:gap-6'>
+            <div className='flex flex-col items-center order-2 w-full max-w-2xl gap-3.5 xl:order-1 xl:items-start md:gap-6'>
 
               {/* Awards Badges - Horizontal Pills */}
               <div className='flex flex-wrap items-center justify-center gap-2 md:gap-3 xl:justify-start' data-aos='fade-down' data-aos-delay='0'>
@@ -277,17 +277,17 @@ Terima kasih!`);
               </div>
 
               {/* Main Headline */}
-              <div ref={titleMainRef} data-aos='fade-up' data-aos-delay='300'>
+              <div ref={titleMainRef} className='hidden xl:block' data-aos='fade-up' data-aos-delay='300'>
                 <Typography
                   as='h1'
                   className='font-extrabold text-3xl md:text-4xl lg:text-5xl xl:text-6xl text-[#FB991A] leading-tight text-center xl:text-left'
                 >
-                  Raih Beasiswa Impianmu dengan Lebih Mudah
+                  Raih Beasiswa Impian Lebih Mudah
                 </Typography>
               </div>
 
               {/* Description */}
-              <div ref={descRef} data-aos='fade-up' data-aos-delay='400'>
+              <div ref={descRef} className='hidden xl:block' data-aos='fade-up' data-aos-delay='400'>
                 <Typography
                   className='text-sm md:text-base lg:text-lg text-[#1B7691]/80 text-center xl:text-left leading-relaxed max-w-lg'
                 >
@@ -358,14 +358,20 @@ Terima kasih!`);
                 />
               </div>
 
-              <div ref={imageMobileRef} className='block xl:hidden'>
+              <div ref={imageMobileRef} className='block xl:hidden text-center'>
+                <Typography
+                  as='h2'
+                  className='font-extrabold text-3xl text-[#FB991A] leading-tight text-center mb-4'
+                >
+                  Raih Beasiswa Impian <br /> Lebih Mudah
+                </Typography>
                 <NextImage
                   src='/images/landing/haira-hero-mobile.png'
                   width={295}
                   height={328}
                   quality={100}
                   alt='Haira Raih Asa'
-                  className='w-full max-w-sm mx-auto drop-shadow-xl animate-float'
+                  className='w-full max-w-[210px] mx-auto drop-shadow-xl animate-float'
                   imgClassName='w-auto h-auto object-contain'
                   priority
                 />
