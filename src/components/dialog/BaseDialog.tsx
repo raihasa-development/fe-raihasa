@@ -1,12 +1,7 @@
 import { Dialog, Transition } from '@headlessui/react';
 import clsx from 'clsx';
 import * as React from 'react';
-import {
-  HiExclamationCircle,
-  HiOutlineCheck,
-  HiOutlineExclamation,
-  HiOutlineX,
-} from 'react-icons/hi';
+import { HiOutlineX } from 'react-icons/hi';
 
 import Button from '@/components/buttons/Button';
 
@@ -29,27 +24,12 @@ export type DialogOptions = {
   submitText: React.ReactNode;
 };
 
-/**
- * Base Dialog for useDialog hook implementation.
- *
- * **Should be called with the hook, not by the component itself**
- *
- *
- * @see useDialogStore
- * @example ```tsx
- * const dialog = useDialog();
- *
- * dialog(options);
- * ```
- */
 export default function BaseDialog({
   open,
   onSubmit,
   onClose,
   options: { title, description, variant, submitText },
 }: BaseDialogProps) {
-  const current = colorVariant[variant];
-
   return (
     <Transition.Root show={open} as={React.Fragment}>
       <Dialog
@@ -79,6 +59,7 @@ export default function BaseDialog({
           >
             &#8203;
           </span>
+          
           <Transition.Child
             as={React.Fragment}
             enter='ease-out duration-300'
@@ -88,62 +69,67 @@ export default function BaseDialog({
             leaveFrom='opacity-100 translate-y-0 sm:scale-100'
             leaveTo='opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95'
           >
-            <div className='inline-block overflow-hidden z-auto px-4 pt-5 pb-4 w-full text-left align-bottom bg-white rounded-lg shadow-xl transition-all transform sm:p-6 sm:my-8 sm:max-w-lg sm:align-middle'>
-              <div className='hidden absolute top-0 right-0 pt-4 pr-4 sm:block'>
+            <div className='inline-block overflow-hidden z-auto px-6 pt-8 pb-6 w-full text-left align-bottom bg-white rounded-3xl shadow-2xl transition-all transform sm:p-8 sm:my-8 sm:max-w-sm sm:align-middle border border-gray-100'>
+              {/* Close Button */}
+              <div className='absolute top-0 right-0 pt-4 pr-4'>
                 <button
                   type='button'
-                  className={clsx(
-                    'text-gray-400 bg-white rounded-md hover:text-gray-500',
-                    'focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 focus:outline-none',
-                    'disabled:filter disabled:brightness-90 disabled:cursor-wait'
-                  )}
+                  className='text-gray-400 hover:text-gray-600 focus:outline-none transition-colors'
                   onClick={onClose}
                 >
                   <span className='sr-only'>Close</span>
-                  <HiOutlineX className='w-6 h-6' aria-hidden='true' />
+                  <HiOutlineX className='w-5 h-5' aria-hidden='true' />
                 </button>
               </div>
-              <div className='sm:flex sm:items-start'>
-                <div
-                  className={clsx(
-                    'flex flex-shrink-0 justify-center items-center rounded-full',
-                    'mx-auto w-12 h-12 sm:mx-0 sm:w-10 sm:h-10',
-                    current.bg.light
-                  )}
-                >
-                  <current.icon
-                    className={clsx('w-6 h-6', current.text.primary)}
-                    aria-hidden='true'
+
+              {/* Mascot & Content Layout */}
+              <div className='flex flex-col items-center text-center'>
+                {/* Haira Mascot */}
+                <div className='w-20 h-20 mb-3 flex justify-center items-center drop-shadow-xs'>
+                  <img
+                    src={variant === 'success' ? '/images/rekomendasi/haira-1.png' : '/images/rekomendasi/haira-3.png'}
+                    alt="Haira Mascot"
+                    className="w-full h-full object-contain"
                   />
                 </div>
-                <div className='mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left'>
-                  <Dialog.Title
-                    as='h3'
-                    className='text-lg font-medium leading-6 text-gray-900'
-                  >
-                    {title}
-                  </Dialog.Title>
-                  <div className='mt-2'>
-                    <p className='text-sm text-gray-500'>{description}</p>
-                  </div>
+
+                {/* Title */}
+                <Dialog.Title
+                  as='h3'
+                  className='text-lg font-black text-gray-900 tracking-tight mb-2'
+                >
+                  {title}
+                </Dialog.Title>
+
+                {/* Description */}
+                <div className='mt-1 px-2'>
+                  <p className='text-xs text-gray-500 font-bold leading-relaxed'>
+                    {description}
+                  </p>
                 </div>
               </div>
-              <div className='mt-5 sm:flex sm:flex-row-reverse sm:mt-4'>
+
+              {/* Action Buttons */}
+              <div className='mt-6 flex flex-col gap-2.5'>
                 <Button
                   onClick={onSubmit}
+                  variant={variant === 'warning' ? 'warning' : 'primary'}
                   className={clsx(
-                    '!font-medium justify-center items-center w-full sm:ml-3 sm:w-auto sm:text-sm'
+                    'w-full justify-center !rounded-xl py-3 text-xs font-black shadow-md tracking-wider',
+                    variant === 'success' && '!bg-[#1B7691] hover:!bg-[#15627a]',
+                    variant === 'warning' && '!bg-[#FB991A] hover:!bg-[#e08916]',
+                    variant === 'danger' && '!bg-red-600 hover:!bg-red-700 !text-white'
                   )}
                 >
                   {submitText}
                 </Button>
                 <Button
                   type='button'
-                  variant='primary'
+                  variant='unstyled'
                   onClick={onClose}
-                  className='!font-medium justify-center items-center mt-3 w-full sm:mt-0 sm:w-auto sm:text-sm'
+                  className='w-full justify-center border border-gray-200 text-gray-500 hover:text-gray-800 hover:bg-gray-50 !rounded-xl py-3 text-xs font-black'
                 >
-                  Cancel
+                  Batal
                 </Button>
               </div>
             </div>
@@ -153,33 +139,3 @@ export default function BaseDialog({
     </Transition.Root>
   );
 }
-
-const colorVariant = {
-  success: {
-    bg: {
-      light: 'bg-green-100',
-    },
-    text: {
-      primary: 'text-green-500',
-    },
-    icon: HiOutlineCheck,
-  },
-  warning: {
-    bg: {
-      light: 'bg-yellow-100',
-    },
-    text: {
-      primary: 'text-yellow-500',
-    },
-    icon: HiOutlineExclamation,
-  },
-  danger: {
-    bg: {
-      light: 'bg-red-100',
-    },
-    text: {
-      primary: 'text-red-500',
-    },
-    icon: HiExclamationCircle,
-  },
-};

@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/router';
 import React, { useState, useEffect } from 'react';
+import useActivityTracker from '@/hooks/useActivityTracker';
 import { FiArrowLeft, FiEdit3, FiTag, FiFileText, FiUnlock, FiLock, FiInfo, FiLink } from 'react-icons/fi';
 import SEO from '@/components/SEO';
 import Typography from '@/components/Typography';
@@ -32,6 +33,8 @@ function CreatePostPage() {
         loadCategories();
     }, []);
 
+    const { trackAction } = useActivityTracker();
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!title.trim() || !content.trim() || !categoryId) {
@@ -49,6 +52,7 @@ function CreatePostPage() {
                 attachment_url: attachmentUrl
             });
             // Success
+            trackAction('DREAMSHUB_POST', { title, categoryId });
             router.push('/dreamshub');
         } catch (error: any) {
             alert(error.message || 'Gagal membuat postingan');

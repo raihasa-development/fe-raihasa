@@ -9,14 +9,16 @@ import Input from '@/components/form/Input';
 import ButtonLink from '@/components/links/ButtonLink';
 import SEO from '@/components/SEO';
 import { DANGER_TOAST, showToast, SUCCESS_TOAST } from '@/components/Toast';
+import Typography from '@/components/Typography';
 import { REG_EMAIL, REG_PASSWORD } from '@/constants/regex';
 import useMutationToast from '@/hooks/useMutationToast';
 import Layout from '@/layouts/Layout';
 import api from '@/lib/api';
-import { setToken } from '@/lib/cookies';
+import { removeToken, setToken } from '@/lib/cookies';
 import useAuthStore from '@/store/useAuthStore';
 import { ApiError } from '@/types/api';
 import { AxiosError } from 'axios';
+import { GoogleLogin } from '@react-oauth/google';
 
 type RegisterForm = {
   email: string;
@@ -45,12 +47,15 @@ export default function RegisterPage() {
       router.push('/login');
     },
     onError: (error) => {
-      if (error.response?.data?.message === 'Email sudah terdaftar namun belum diverifikasi. Silakan cek email Anda.') {
-        methods.setError('email', {
-          message: error.response.data.message,
-          type: 'manual',
-        });
+      let errMsg = error.response?.data?.message || 'Gagal mendaftar. Coba cek koneksi internetmu, ya! 😊';
+      if (errMsg.includes('belum diverifikasi') || errMsg.includes('not verified')) {
+        errMsg = 'Email ini udah kedaftar tapi belum diverifikasi. Yuk cek inbox/spam email-mu buat klik tautan verifikasi! 💌';
+      } else if (errMsg.includes('terdaftar') || errMsg.includes('registered')) {
+        errMsg = 'Email ini udah punya akun, bestie. Yuk cuss langsung login aja! 😊';
       }
+      methods.setError('root', {
+        message: errMsg,
+      });
     },
   });
 
@@ -61,7 +66,7 @@ export default function RegisterPage() {
     },
   });
 
-  const { mutate: registerMutation, isPending } = useMutationToast<void, RegisterForm>(mutation);
+  const { mutate: registerMutation, isPending } = mutation;
   const { mutate: resendVerificationMutation } = resendMutation;
 
   const handleResendVerification = (email: string) => {
@@ -69,6 +74,34 @@ export default function RegisterPage() {
       resendVerificationMutation(email);
     } else {
       showToast('Masukkan email terlebih dahulu', DANGER_TOAST);
+    }
+  };
+
+  const googleMutation = useMutation<void, AxiosError<ApiError>, string>({
+    mutationFn: async (googleToken: string) => {
+      removeToken();
+
+      const { data: res } = await api.post('/auth/google-login', {
+        token: googleToken,
+      });
+
+      if (!res?.data) throw new Error('Sesi login tidak valid');
+
+      const { token, ...user } = res.data;
+
+      setToken(token);
+      login({ ...user, token });
+      showToast('Berhasil terdaftar dan masuk dengan Google', SUCCESS_TOAST);
+
+      router.push('/');
+    },
+  });
+
+  const { mutate: googleLoginMutation } = useMutationToast<void, string>(googleMutation);
+
+  const handleGoogleSuccess = (credentialResponse: any) => {
+    if (credentialResponse.credential) {
+      googleLoginMutation(credentialResponse.credential);
     }
   };
 
@@ -91,11 +124,11 @@ export default function RegisterPage() {
 
           <div className="relative z-10">
             <NextImage
-              src='/images/logo.png'
+              src='/images/logo_white.svg'
               alt='Raih Asa Logo'
-              width={180}
-              height={125}
-              className='brightness-0 invert opacity-90'
+              width={160}
+              height={110}
+              className='opacity-90 object-contain pointer-events-none select-none'
             />
           </div>
 
@@ -129,7 +162,7 @@ export default function RegisterPage() {
           <div className="w-full max-w-md space-y-8">
             <div className="text-center lg:text-left">
               <div className="lg:hidden flex justify-center mb-6">
-                <NextImage src='/images/logo.png' alt='logo' width={140} height={100} />
+                <NextImage src='/images/logo_white.svg' alt='logo' width={140} height={100} className="brightness-0 pointer-events-none select-none" />
               </div>
               <h2 className="text-3xl font-bold text-gray-900">Buat Akun Baru</h2>
               <p className="mt-3 text-base text-gray-600">Mulai langkah pertamamu meraih beasiswa impian.</p>
@@ -199,9 +232,45 @@ export default function RegisterPage() {
                     </Button>
                   </div>
 
+                  {methods.formState.errors.root?.message && (
+                    <div className='mt-3 text-center p-3 bg-red-50 rounded-xl border border-red-100'>
+                      <Typography variant='c2' className='text-red-600 block mb-1.5 font-normal'>
+                        {methods.formState.errors.root.message}
+                      </Typography>
+                      {methods.formState.errors.root.message.includes('belum diverifikasi') && (
+                        <button
+                          type='button'
+                          onClick={() => handleResendVerification(methods.getValues('email'))}
+                          className='text-[#1B7691] hover:underline disabled:opacity-50 text-xs mt-1 block mx-auto font-semibold'
+                        >
+                          Kirim Ulang Email Verifikasi 💌
+                        </button>
+                      )}
+                    </div>
+                  )}
+
                   <p className='text-center text-sm text-gray-500 mt-6'>
                     Dengan mendaftar, Anda menyetujui <a href="#" className="underline hover:text-gray-800">Syarat & Ketentuan</a> kami.
                   </p>
+
+                  <div className="relative my-6">
+                    <div className="absolute inset-0 flex items-center">
+                      <div className="w-full border-t border-gray-200"></div>
+                    </div>
+                    <div className="relative flex justify-center text-sm">
+                      <span className="px-2 bg-white text-gray-400">Atau daftar dengan</span>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-center w-full my-4">
+                    <GoogleLogin
+                      onSuccess={handleGoogleSuccess}
+                      onError={() => {
+                        showToast('Registrasi Google gagal. Coba lagi.', DANGER_TOAST);
+                      }}
+                      useOneTap
+                    />
+                  </div>
 
                   <div className="relative my-8">
                     <div className="absolute inset-0 flex items-center">

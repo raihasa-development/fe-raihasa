@@ -20,6 +20,7 @@ import useAuthStore from '@/store/useAuthStore';
 import withAuth from '@/components/hoc/withAuth';
 import { ApiError } from '@/types/api';
 import { AxiosError } from 'axios';
+import { GoogleLogin } from '@react-oauth/google';
 
 type LoginForm = {
   email: string;
@@ -69,11 +70,17 @@ function LoginPage() {
       router.push(target);
     },
     onError: (error) => {
-      if (error.response?.data?.message === 'Account not verified') {
-        methods.setError('root', {
-          message: 'Akun Anda belum diverifikasi.',
-        });
+      let errMsg = error.response?.data?.message || 'Gagal masuk. Coba cek koneksi internetmu, ya! 😊';
+      if (errMsg === 'Invalid credentials' || errMsg === 'Unauthorized') {
+        errMsg = 'Password-nya kurang pas nih, bestie. Coba cek lagi deh caps lock atau typo-nya, jangan sampai salah ketik ya! 😊';
+      } else if (errMsg === 'Credentials not found' || errMsg === 'Not Found' || errMsg === 'Credentials Not Found') {
+        errMsg = 'Waduh, email kamu belum terdaftar nih. Kalau belum punya akun, yuk daftar dulu biar bisa bareng-bareng kejar beasiswa impianmu! 🤗';
+      } else if (errMsg === 'Account not verified' || errMsg === 'Forbidden') {
+        errMsg = 'Akun kamu belum diverifikasi, nih. Yuk, cek inbox email-mu atau folder spam buat klik tautan verifikasinya! 💌';
       }
+      methods.setError('root', {
+        message: errMsg,
+      });
     },
   });
 
@@ -84,8 +91,41 @@ function LoginPage() {
     },
   });
 
-  const { mutate: loginMutation, isPending } =
-    useMutationToast<void, LoginForm>(mutation);
+  const { mutate: loginMutation, isPending } = mutation;
+
+  const googleMutation = useMutation<void, AxiosError<ApiError>, string>({
+    mutationFn: async (googleToken: string) => {
+      removeToken();
+
+      const { data: res } = await api.post('/auth/google-login', {
+        token: googleToken,
+      });
+
+      if (!res?.data) throw new Error('Sesi login tidak valid');
+
+      const { token, ...user } = res.data;
+
+      setToken(token);
+      login({ ...user, token });
+      showToast('Berhasil login dengan Google', SUCCESS_TOAST);
+
+      const queryRedirect = router.query.redirect as string | undefined;
+      const sessionRedirect = sessionStorage.getItem('redirectAfterLogin');
+      const target = queryRedirect || sessionRedirect || '/';
+
+      if (sessionRedirect) sessionStorage.removeItem('redirectAfterLogin');
+
+      router.push(target);
+    },
+  });
+
+  const { mutate: googleLoginMutation } = useMutationToast<void, string>(googleMutation);
+
+  const handleGoogleSuccess = (credentialResponse: any) => {
+    if (credentialResponse.credential) {
+      googleLoginMutation(credentialResponse.credential);
+    }
+  };
 
   const onSubmit = (data: LoginForm) => {
     loginMutation(data);
@@ -114,11 +154,11 @@ function LoginPage() {
 
           <div className="relative z-10">
             <NextImage
-              src='/images/logo.png'
+              src='/images/logo_white.svg'
               alt='Raih Asa Logo'
-              width={180}
-              height={125}
-              className='brightness-0 invert opacity-90'
+              width={160}
+              height={110}
+              className='opacity-90 object-contain pointer-events-none select-none'
             />
           </div>
 
@@ -159,7 +199,7 @@ function LoginPage() {
           <div className="w-full max-w-md space-y-8">
             <div className="text-center lg:text-left">
               <div className="lg:hidden flex justify-center mb-6">
-                <NextImage src='/images/logo.png' alt='logo' width={140} height={100} />
+                <NextImage src='/images/logo_white.svg' alt='logo' width={140} height={100} className="brightness-0 pointer-events-none select-none" />
               </div>
               <h2 className="text-3xl font-bold text-gray-900">Masuk Akun</h2>
               <p className="mt-3 text-base text-gray-600">Silakan masukkan detail akun Anda</p>
@@ -205,19 +245,21 @@ function LoginPage() {
                     Masuk
                   </Button>
 
-                  {methods.formState.errors.root?.message === 'Akun Anda belum diverifikasi.' && (
-                    <div className='mt-2 text-center'>
-                      <Typography variant='c1' className='text-gray-600'>
-                        {methods.formState.errors.root.message}{' '}
+                  {methods.formState.errors.root?.message && (
+                    <div className='mt-3 text-center p-3 bg-red-50 rounded-xl border border-red-100'>
+                      <Typography variant='c2' className='text-red-600 block mb-1.5 font-normal'>
+                        {methods.formState.errors.root.message}
+                      </Typography>
+                      {methods.formState.errors.root.message.includes('belum diverifikasi') && (
                         <button
                           type='button'
                           onClick={handleResend}
                           disabled={resendMutation.isPending}
-                          className='font-semibold text-[#1B7691] hover:underline disabled:opacity-50'
+                          className='text-[#1B7691] hover:underline disabled:opacity-50 text-xs mt-1 block mx-auto font-semibold'
                         >
-                          {resendMutation.isPending ? 'Mengirim...' : 'Kirim Ulang Email Verifikasi'}
+                          {resendMutation.isPending ? 'Mengirim...' : 'Kirim Ulang Email Verifikasi 💌'}
                         </button>
-                      </Typography>
+                      )}
                     </div>
                   )}
 
@@ -228,6 +270,16 @@ function LoginPage() {
                     <div className="relative flex justify-center text-sm">
                       <span className="px-2 bg-white text-gray-400">Atau</span>
                     </div>
+                  </div>
+
+                  <div className="flex justify-center w-full">
+                    <GoogleLogin
+                      onSuccess={handleGoogleSuccess}
+                      onError={() => {
+                        showToast('Login Google gagal. Coba lagi.', DANGER_TOAST);
+                      }}
+                      useOneTap
+                    />
                   </div>
 
                   <p className='text-center text-gray-600'>

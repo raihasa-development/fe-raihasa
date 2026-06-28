@@ -11,6 +11,7 @@ import { MdOutlinePushPin } from 'react-icons/md';
 import SEO from '@/components/SEO';
 import Typography from '@/components/Typography';
 import Layout from '@/layouts/Layout';
+import useActivityTracker from '@/hooks/useActivityTracker';
 import { forumApi } from '@/lib/api/forum';
 import type { ForumPost, ForumComment } from '@/types/forum';
 import { Linkify } from '@/components/Linkify';
@@ -28,6 +29,7 @@ export default function PostDetailPage() {
     const router = useRouter();
     const { id } = router.query;
     const postId = id as string;
+    const { trackAction } = useActivityTracker();
 
     const [post, setPost] = useState<ForumPost | null>(null);
     const [comments, setComments] = useState<ForumComment[]>([]);
@@ -114,6 +116,7 @@ export default function PostDetailPage() {
             }) : null);
 
             await forumApi.toggleLikePost(post.id);
+            trackAction('DREAMSHUB_LIKE', { postId: post.id });
         } catch (error) {
             console.error('Like failed', error);
             fetchPost(); // Revert on error
@@ -133,6 +136,7 @@ export default function PostDetailPage() {
             setIsSubmitting(true);
             await forumApi.createComment(post.id, { content: commentContent });
             setCommentContent('');
+            trackAction('DREAMSHUB_REPLY', { postId: post.id });
             fetchPost();
             fetchUserTokens(); // Refresh tokens
         } catch (error: any) {
