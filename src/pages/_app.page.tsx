@@ -15,6 +15,7 @@ import { DefaultSeo } from 'next-seo';
 import nProgress from 'nprogress';
 import { useEffect } from 'react';
 
+import { Analytics } from '@vercel/analytics/react';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
 import MetaPixel from '@/components/MetaPixel';
 import Toast from '@/components/Toast';
@@ -57,6 +58,7 @@ export default function App({ Component, pageProps }: AppProps) {
       <QueryClientProvider client={queryClient}>
         <GoogleAnalytics />
         <MetaPixel />
+        <Analytics />
         <Toast />
         <DefaultSeo {...SEO} />
         <HeroUIProvider>
