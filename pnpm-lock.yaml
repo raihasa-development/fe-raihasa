@@ -41,6 +41,9 @@ importers:
       '@types/react-big-calendar':
         specifier: ^1.16.3
         version: 1.16.3
+      '@vercel/analytics':
+        specifier: ^2.0.1
+        version: 2.0.1(next@16.0.7(@playwright/test@1.61.0)(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(react@19.2.1)
       animejs:
         specifier: ^4.2.2
         version: 4.2.2
@@ -1851,6 +1854,35 @@ packages:
 
   '@types/warning@3.0.3':
     resolution: {integrity: sha512-D1XC7WK8K+zZEveUPY+cf4+kgauk8N4eHr/XIHXGlGYkHLud6hK9lYfZk1ry1TNh798cZUCgb6MqGEG8DkJt6Q==}
+
+  '@vercel/analytics@2.0.1':
+    resolution: {integrity: sha512-MTQG6V9qQrt1tsDeF+2Uoo5aPjqbVPys1xvnIftXSJYG2SrwXRHnqEvVoYID7BTruDz4lCd2Z7rM1BdkUehk2g==}
+    peerDependencies:
+      '@remix-run/react': ^2
+      '@sveltejs/kit': ^1 || ^2
+      next: '>= 13'
+      nuxt: '>= 3'
+      react: ^18 || ^19 || ^19.0.0-rc
+      svelte: '>= 4'
+      vue: ^3
+      vue-router: ^4
+    peerDependenciesMeta:
+      '@remix-run/react':
+        optional: true
+      '@sveltejs/kit':
+        optional: true
+      next:
+        optional: true
+      nuxt:
+        optional: true
+      react:
+        optional: true
+      svelte:
+        optional: true
+      vue:
+        optional: true
+      vue-router:
+        optional: true
 
   adler-32@1.3.1:
     resolution: {integrity: sha512-ynZ4w/nUUv5rrsR8UUGoe1VC9hZj6V5hU9Qw1HlMDJGEJw5S7TfTErWTjMys6M7vr0YWcPqs3qAr4ss0nDfP+A==}
@@ -5284,6 +5316,11 @@ snapshots:
   '@types/use-sync-external-store@0.0.6': {}
 
   '@types/warning@3.0.3': {}
+
+  '@vercel/analytics@2.0.1(next@16.0.7(@playwright/test@1.61.0)(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(react@19.2.1)':
+    optionalDependencies:
+      next: 16.0.7(@playwright/test@1.61.0)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
+      react: 19.2.1
 
   adler-32@1.3.1: {}
 
