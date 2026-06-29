@@ -120,6 +120,7 @@ function DashboardAdminPage() {
   const [loading, setLoading] = useState(true);
   const [scholarshipMap, setScholarshipMap] = useState<Record<string, { name: string; url: string }>>({});
   const [courseMap, setCourseMap] = useState<Record<string, { id: string; name: string }>>({});
+  const [unansweredPostsCount, setUnansweredPostsCount] = useState<number | null>(null);
 
   const fetchAnalytics = useCallback(async (start: string, end: string) => {
     try {
@@ -143,15 +144,23 @@ function DashboardAdminPage() {
         const schList = schRes?.data || [];
         const sMap: Record<string, { name: string; url: string }> = {};
         schList.forEach((s: any) => {
-          sMap[s.id] = {
-            name: s.nama,
-            url: `/list-scholarship/${s.id}`
-          };
-          const slug = s.nama.toLowerCase().replace(/ /g, '-');
-          sMap[slug] = {
-            name: s.nama,
-            url: `/scholarship-info/${s.id}`
-          };
+          if (s.id) {
+            sMap[s.id.toLowerCase().trim()] = {
+              name: s.nama,
+              url: `/list-scholarship/${s.id}`
+            };
+          }
+          if (s.nama) {
+            const slug = s.nama.toLowerCase().replace(/ /g, '-').trim();
+            sMap[slug] = {
+              name: s.nama,
+              url: `/scholarship-info/${s.id}`
+            };
+            sMap[s.nama.toLowerCase().trim()] = {
+              name: s.nama,
+              url: `/list-scholarship/${s.id}`
+            };
+          }
         });
         setScholarshipMap(sMap);
 
@@ -160,16 +169,30 @@ function DashboardAdminPage() {
         const lmsList = lmsRes?.data || [];
         const cMap: Record<string, { id: string; name: string }> = {};
         lmsList.forEach((c: any) => {
-          cMap[c.nama] = {
-            id: c.id,
-            name: c.nama
-          };
-          cMap[c.id] = {
-            id: c.id,
-            name: c.nama
-          };
+          if (c.nama) {
+            cMap[c.nama.toLowerCase().trim()] = {
+              id: c.id,
+              name: c.nama
+            };
+          }
+          if (c.id) {
+            cMap[c.id.toLowerCase().trim()] = {
+              id: c.id,
+              name: c.nama
+            };
+          }
         });
         setCourseMap(cMap);
+
+        // Fetch dreamshub posts to find unanswered ones
+        try {
+          const { data: postsRes } = await api.get('/posts?limit=100');
+          const postsList = postsRes?.data || [];
+          const unanswered = postsList.filter((p: any) => (p._count?.comments || 0) === 0).length;
+          setUnansweredPostsCount(unanswered);
+        } catch (e) {
+          console.error('Failed to fetch posts for unanswered count:', e);
+        }
       } catch (err) {
         console.error('Failed to load mapping data for admin dashboard:', err);
       }
@@ -213,8 +236,20 @@ function DashboardAdminPage() {
   ];
 
   const resolvedScholarships = analytics?.topScholarships?.map((s: any) => {
-    const reconstructedId = s.name.toLowerCase().replace(/ /g, '-');
-    const mapped = scholarshipMap[reconstructedId] || scholarshipMap[s.name];
+    const reconstructedId = s.name.toLowerCase().replace(/ /g, '-').trim();
+    const searchKey = s.name.toLowerCase().trim();
+    let mapped = scholarshipMap[reconstructedId] || scholarshipMap[searchKey];
+    
+    // Partial matching fallback jika penamaan di logs sedikit terpotong
+    if (!mapped) {
+      const foundKey = Object.keys(scholarshipMap).find(key => 
+        key.includes(searchKey) || searchKey.includes(key)
+      );
+      if (foundKey) {
+        mapped = scholarshipMap[foundKey];
+      }
+    }
+    
     return {
       displayName: mapped ? mapped.name : s.name,
       url: mapped ? mapped.url : null,
@@ -223,9 +258,21 @@ function DashboardAdminPage() {
   }) || [];
 
   const resolvedCourses = analytics?.topCourses?.map((c: any) => {
-    const mapped = courseMap[c.name];
+    const searchKey = c.name.toLowerCase().trim();
+    let mapped = courseMap[searchKey];
+    
+    // Partial matching fallback jika penamaan kelas di log terpotong (misal AM vs AMN)
+    if (!mapped) {
+      const foundKey = Object.keys(courseMap).find(key => 
+        key.includes(searchKey) || searchKey.includes(key)
+      );
+      if (foundKey) {
+        mapped = courseMap[foundKey];
+      }
+    }
+    
     return {
-      displayName: c.name,
+      displayName: mapped ? mapped.name : c.name,
       url: mapped ? `/bisa-learning/${mapped.id}` : null,
       count: c.count
     };
@@ -468,7 +515,7 @@ function DashboardAdminPage() {
               {resolvedScholarships.length === 0 ? (
                 <p className="text-center text-gray-400 py-10 text-xs">Belum ada data beasiswa diakses.</p>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-4 max-h-[350px] overflow-y-auto pr-1.5 custom-scrollbar">
                   {resolvedScholarships.map((scholarship: any, idx: number) => {
                     const content = (
                       <div className="flex-1 min-w-0">
@@ -506,7 +553,7 @@ function DashboardAdminPage() {
               {resolvedCourses.length === 0 ? (
                 <p className="text-center text-gray-400 py-10 text-xs">Belum ada materi kelas yang diakses.</p>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-4 max-h-[350px] overflow-y-auto pr-1.5 custom-scrollbar">
                   {resolvedCourses.map((course: any, idx: number) => {
                     const content = (
                       <div className="flex-1 min-w-0">
@@ -550,6 +597,16 @@ function DashboardAdminPage() {
                   <span className="text-xs text-gray-500 font-semibold flex items-center gap-1.5"><FiMessageSquare className="text-pink-500" /> Komentar Balasan</span>
                   <span className="text-sm font-bold text-gray-800">{analytics?.dreamshubStats?.replies || 0} Reply</span>
                 </div>
+                <div className="flex justify-between items-center pb-2.5 border-b border-gray-50">
+                  <span className="text-xs text-gray-500 font-semibold flex items-center gap-1.5"><FiAlertTriangle className="text-amber-500" /> Diskusi Belum Dibalas</span>
+                  <a
+                    href="/admin/dreamshub"
+                    className="text-xs bg-amber-50 text-amber-700 border border-amber-200 px-2.5 py-0.5 rounded-full font-bold hover:bg-amber-100 transition-colors flex items-center gap-1"
+                  >
+                    {unansweredPostsCount !== null ? `${unansweredPostsCount} Post` : 'Loading...'}
+                    <FiArrowRight className="w-3 h-3" />
+                  </a>
+                </div>
                 <div className="flex justify-between items-center">
                   <span className="text-xs text-gray-500 font-semibold flex items-center gap-1.5"><FiThumbsUp className="text-pink-500" /> Menyukai Postingan</span>
                   <span className="text-sm font-bold text-gray-800">{analytics?.dreamshubStats?.likes || 0} Likes</span>
@@ -558,6 +615,47 @@ function DashboardAdminPage() {
               <div className="mt-4 p-3 bg-pink-50/50 rounded-xl border border-pink-100/50 text-[10px] text-gray-500 leading-relaxed">
                 Melacak keterlibatan langsung di forum DreamsHub sebagai KPI pendukung tingkat adopsi komunitas.
               </div>
+            </div>
+          </div>
+
+          {/* Top Accessed Pages Table */}
+          <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-xs mb-10">
+            <h4 className="text-xs font-black text-gray-800 mb-4 uppercase tracking-wider">10 Halaman Paling Sering Diakses</h4>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs font-semibold text-gray-600">
+                <thead>
+                  <tr className="border-b border-gray-100 bg-gray-50/50">
+                    <th className="p-3 w-16 text-center">No</th>
+                    <th className="p-3">URL Halaman</th>
+                    <th className="p-3 text-right">Jumlah Kunjungan (Periode Ini)</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {!analytics?.topPages || analytics?.topPages?.length === 0 ? (
+                    <tr>
+                      <td colSpan={3} className="p-4 text-center text-gray-400 font-medium">Belum ada data kunjungan halaman.</td>
+                    </tr>
+                  ) : (
+                    analytics?.topPages?.map((page: any, idx: number) => (
+                      <tr key={page.url} className="hover:bg-gray-50/20">
+                        <td className="p-3 text-center text-gray-400 font-bold">{idx + 1}</td>
+                        <td className="p-3 font-mono text-[#1B7691] font-bold">
+                          <a
+                            href={page.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="hover:underline inline-flex items-center gap-1.5"
+                          >
+                            {page.url}
+                            <FiExternalLink className="w-3 h-3 text-gray-400" />
+                          </a>
+                        </td>
+                        <td className="p-3 text-right font-black text-gray-800">{page.count} Kali Kunjungan</td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
             </div>
           </div>
 
