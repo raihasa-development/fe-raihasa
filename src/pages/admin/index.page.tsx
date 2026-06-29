@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import {
   FiBookOpen, FiUsers, FiAward, FiCpu, FiArrowRight, FiDollarSign, FiUserCheck,
   FiActivity, FiCreditCard, FiSettings, FiFileText, FiTrendingUp, FiMousePointer,
-  FiCalendar, FiCheckCircle, FiClock, FiAlertTriangle, FiCheckSquare, FiThumbsUp, FiMessageSquare
+  FiCalendar, FiCheckCircle, FiClock, FiAlertTriangle, FiCheckSquare, FiThumbsUp, FiMessageSquare, FiExternalLink
 } from 'react-icons/fi';
 import {
   ResponsiveContainer,
@@ -118,6 +118,8 @@ function DashboardAdminPage() {
 
   const [analytics, setAnalytics] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [scholarshipMap, setScholarshipMap] = useState<Record<string, { name: string; url: string }>>({});
+  const [courseMap, setCourseMap] = useState<Record<string, { id: string; name: string }>>({});
 
   const fetchAnalytics = useCallback(async (start: string, end: string) => {
     try {
@@ -133,6 +135,47 @@ function DashboardAdminPage() {
 
   useEffect(() => {
     fetchAnalytics(startDate, endDate);
+
+    const loadMappingData = async () => {
+      try {
+        // Fetch scholarships
+        const { data: schRes } = await api.get('/scholarship?limit=1000');
+        const schList = schRes?.data || [];
+        const sMap: Record<string, { name: string; url: string }> = {};
+        schList.forEach((s: any) => {
+          sMap[s.id] = {
+            name: s.nama,
+            url: `/list-scholarship/${s.id}`
+          };
+          const slug = s.nama.toLowerCase().replace(/ /g, '-');
+          sMap[slug] = {
+            name: s.nama,
+            url: `/scholarship-info/${s.id}`
+          };
+        });
+        setScholarshipMap(sMap);
+
+        // Fetch courses
+        const { data: lmsRes } = await api.get('/lms/modul');
+        const lmsList = lmsRes?.data || [];
+        const cMap: Record<string, { id: string; name: string }> = {};
+        lmsList.forEach((c: any) => {
+          cMap[c.nama] = {
+            id: c.id,
+            name: c.nama
+          };
+          cMap[c.id] = {
+            id: c.id,
+            name: c.nama
+          };
+        });
+        setCourseMap(cMap);
+      } catch (err) {
+        console.error('Failed to load mapping data for admin dashboard:', err);
+      }
+    };
+
+    loadMappingData();
   }, []);
 
   const handleApplyFilter = () => {
@@ -168,6 +211,25 @@ function DashboardAdminPage() {
     { name: 'Google OAuth', value: analytics?.registrationMethods?.google || 0, color: '#EF4444' },
     { name: 'Manual Email', value: analytics?.registrationMethods?.manual || 0, color: '#6B7280' }
   ];
+
+  const resolvedScholarships = analytics?.topScholarships?.map((s: any) => {
+    const reconstructedId = s.name.toLowerCase().replace(/ /g, '-');
+    const mapped = scholarshipMap[reconstructedId] || scholarshipMap[s.name];
+    return {
+      displayName: mapped ? mapped.name : s.name,
+      url: mapped ? mapped.url : null,
+      count: s.count
+    };
+  }) || [];
+
+  const resolvedCourses = analytics?.topCourses?.map((c: any) => {
+    const mapped = courseMap[c.name];
+    return {
+      displayName: c.name,
+      url: mapped ? `/bisa-learning/${mapped.id}` : null,
+      count: c.count
+    };
+  }) || [];
 
   // Helper formatting currency
   const formatIDR = (val: number) => {
@@ -403,19 +465,37 @@ function DashboardAdminPage() {
             {/* Detail Beasiswa - Top Viewed Scholarships */}
             <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-xs">
               <h4 className="text-xs font-black text-gray-800 mb-6 uppercase tracking-wider">Beasiswa Paling Sering Dilihat</h4>
-              {analytics?.topScholarships?.length === 0 ? (
+              {resolvedScholarships.length === 0 ? (
                 <p className="text-center text-gray-400 py-10 text-xs">Belum ada data beasiswa diakses.</p>
               ) : (
                 <div className="space-y-4">
-                  {analytics?.topScholarships?.map((scholarship: any, idx: number) => (
-                    <div key={scholarship.name} className="flex items-center gap-3">
-                      <span className="w-6 h-6 rounded-lg bg-orange-50 text-[#FB991A] flex items-center justify-center text-xs font-bold">{idx + 1}</span>
+                  {resolvedScholarships.map((scholarship: any, idx: number) => {
+                    const content = (
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs font-bold text-gray-800 truncate">{scholarship.name}</p>
+                        <p className="text-xs font-bold text-gray-800 truncate group-hover:text-[#FB991A] transition-colors">{scholarship.displayName}</p>
                         <p className="text-[10px] text-gray-400 font-semibold">{scholarship.count} Kali Dilihat</p>
                       </div>
-                    </div>
-                  ))}
+                    );
+
+                    return (
+                      <div key={scholarship.displayName} className="flex items-center gap-3">
+                        <span className="w-6 h-6 rounded-lg bg-orange-50 text-[#FB991A] flex items-center justify-center text-xs font-bold shrink-0">{idx + 1}</span>
+                        {scholarship.url ? (
+                          <a
+                            href={scholarship.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex-1 min-w-0 flex items-center gap-2 group hover:opacity-90"
+                          >
+                            {content}
+                            <FiExternalLink className="text-gray-400 opacity-0 group-hover:opacity-100 transition-all w-3.5 h-3.5 shrink-0" />
+                          </a>
+                        ) : (
+                          content
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -423,19 +503,37 @@ function DashboardAdminPage() {
             {/* Bisa Learning - Top Course Adoption */}
             <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-xs">
               <h4 className="text-xs font-black text-gray-800 mb-6 uppercase tracking-wider">Top Kelas Bisa-Learning</h4>
-              {analytics?.topCourses?.length === 0 ? (
+              {resolvedCourses.length === 0 ? (
                 <p className="text-center text-gray-400 py-10 text-xs">Belum ada materi kelas yang diakses.</p>
               ) : (
                 <div className="space-y-4">
-                  {analytics?.topCourses?.map((course: any, idx: number) => (
-                    <div key={course.name} className="flex items-center gap-3">
-                      <span className="w-6 h-6 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-xs font-bold">{idx + 1}</span>
+                  {resolvedCourses.map((course: any, idx: number) => {
+                    const content = (
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs font-bold text-gray-800 truncate">{course.name}</p>
+                        <p className="text-xs font-bold text-gray-800 truncate group-hover:text-indigo-600 transition-colors">{course.displayName}</p>
                         <p className="text-[10px] text-gray-400 font-semibold">{course.count} Kali Diakses</p>
                       </div>
-                    </div>
-                  ))}
+                    );
+
+                    return (
+                      <div key={course.displayName} className="flex items-center gap-3">
+                        <span className="w-6 h-6 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-xs font-bold shrink-0">{idx + 1}</span>
+                        {course.url ? (
+                          <a
+                            href={course.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex-1 min-w-0 flex items-center gap-2 group hover:opacity-90"
+                          >
+                            {content}
+                            <FiExternalLink className="text-gray-400 opacity-0 group-hover:opacity-100 transition-all w-3.5 h-3.5 shrink-0" />
+                          </a>
+                        ) : (
+                          content
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
