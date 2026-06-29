@@ -8,6 +8,7 @@ export interface User {
   google_id?: string | null;
   jurusan: string | null;
   name: string;
+  whatsapp?: string | null;
   // user_id: string;
   role: 'USER' | 'ADMIN';
 }

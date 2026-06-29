@@ -19,6 +19,7 @@ import { Analytics } from '@vercel/analytics/react';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
 import MetaPixel from '@/components/MetaPixel';
 import Toast from '@/components/Toast';
+import WhatsappPromptModal from '@/components/Popups/WhatsappPromptModal';
 import api from '@/lib/api';
 import SEO from '@/seo.config';
 import useActivityTracker from '@/hooks/useActivityTracker';
@@ -60,6 +61,7 @@ export default function App({ Component, pageProps }: AppProps) {
         <MetaPixel />
         <Analytics />
         <Toast />
+        <WhatsappPromptModal />
         <DefaultSeo {...SEO} />
         <HeroUIProvider>
           <Component {...pageProps} />
