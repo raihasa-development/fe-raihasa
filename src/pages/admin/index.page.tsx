@@ -618,6 +618,103 @@ function DashboardAdminPage() {
             </div>
           </div>
 
+          {/* Analisis Retensi & CRM */}
+          <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-xs mb-8">
+            <h4 className="text-xs font-black text-gray-800 mb-6 uppercase tracking-wider">Analisis Retensi & CRM (Keterlibatan User)</h4>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Card 1: Stickiness */}
+              <div className="bg-slate-50/50 p-5 rounded-2xl border border-slate-100 flex flex-col justify-between">
+                <div>
+                  <span className="text-[10px] uppercase tracking-wider text-slate-500 font-bold block mb-1">Stickiness Rate (DAU/MAU)</span>
+                  <p className="text-3xl font-black text-slate-900 mt-2">
+                    {analytics?.retentionAnalytics?.stickiness !== undefined ? `${analytics.retentionAnalytics.stickiness}%` : '0%'}
+                  </p>
+                </div>
+                <p className="text-[10px] text-gray-450 font-semibold leading-relaxed mt-4">
+                  Rasio keaktifan harian (DAU) dibandingkan bulanan (MAU). Menunjukkan tingkat loyalitas pengguna terhadap platform.
+                </p>
+              </div>
+
+              {/* Card 2: Avg Session Duration */}
+              <div className="bg-emerald-50/30 p-5 rounded-2xl border border-emerald-100/50 flex flex-col justify-between">
+                <div>
+                  <span className="text-[10px] uppercase tracking-wider text-emerald-700 font-bold block mb-1">Waktu Akses Rerata per Hari</span>
+                  <p className="text-3xl font-black text-emerald-800 mt-2">
+                    {analytics?.retentionAnalytics?.averageSessionDuration !== undefined ? `${analytics.retentionAnalytics.averageSessionDuration} Menit` : '0 Menit'}
+                  </p>
+                </div>
+                <p className="text-[10px] text-gray-450 font-semibold leading-relaxed mt-4">
+                  Rata-rata durasi total yang dihabiskan oleh seorang pengguna aktif saat membuka aplikasi dalam satu hari.
+                </p>
+              </div>
+
+              {/* Card 3: Cohort Retention Rates */}
+              <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs flex flex-col justify-between lg:col-span-1">
+                <div>
+                  <span className="text-[10px] uppercase tracking-wider text-gray-500 font-bold block mb-3">Tingkat Retensi Kohort (60 Hari Terakhir)</span>
+                  <div className="space-y-2.5">
+                    {/* Day 0 */}
+                    <div>
+                      <div className="flex justify-between text-[10px] font-bold text-gray-600 mb-0.5">
+                        <span>Day 0 (Daftar Akun)</span>
+                        <span>100%</span>
+                      </div>
+                      <div className="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden">
+                        <div className="bg-gray-400 h-full rounded-full" style={{ width: '100%' }}></div>
+                      </div>
+                    </div>
+
+                    {/* Day 1 */}
+                    <div>
+                      <div className="flex justify-between text-[10px] font-bold text-gray-600 mb-0.5">
+                        <span>Day 1 (Kembali Aktif)</span>
+                        <span>{analytics?.retentionAnalytics?.retention?.day1 || 0}%</span>
+                      </div>
+                      <div className="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden">
+                        <div 
+                          className="bg-indigo-500 h-full rounded-full transition-all duration-500" 
+                          style={{ width: `${analytics?.retentionAnalytics?.retention?.day1 || 0}%` }}
+                        ></div>
+                      </div>
+                    </div>
+
+                    {/* Day 7 */}
+                    <div>
+                      <div className="flex justify-between text-[10px] font-bold text-gray-600 mb-0.5">
+                        <span>Day 7 (Kembali Aktif)</span>
+                        <span>{analytics?.retentionAnalytics?.retention?.day7 || 0}%</span>
+                      </div>
+                      <div className="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden">
+                        <div 
+                          className="bg-indigo-500 h-full rounded-full transition-all duration-500" 
+                          style={{ width: `${analytics?.retentionAnalytics?.retention?.day7 || 0}%` }}
+                        ></div>
+                      </div>
+                    </div>
+
+                    {/* Day 30 */}
+                    <div>
+                      <div className="flex justify-between text-[10px] font-bold text-gray-600 mb-0.5">
+                        <span>Day 30 (Kembali Aktif)</span>
+                        <span>{analytics?.retentionAnalytics?.retention?.day30 || 0}%</span>
+                      </div>
+                      <div className="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden">
+                        <div 
+                          className="bg-indigo-500 h-full rounded-full transition-all duration-500" 
+                          style={{ width: `${analytics?.retentionAnalytics?.retention?.day30 || 0}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <p className="text-[9px] text-gray-400 font-semibold mt-3 text-right">
+                  Sampel ukuran: {analytics?.retentionAnalytics?.retention?.total || 0} user baru
+                </p>
+              </div>
+            </div>
+          </div>
+
           {/* Top Accessed Pages Table */}
           <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-xs mb-10">
             <h4 className="text-xs font-black text-gray-800 mb-4 uppercase tracking-wider">10 Halaman Paling Sering Diakses</h4>

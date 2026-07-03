@@ -40,6 +40,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       setActiveSection('services');
     } else if (
       pathName.includes('users') ||
+      pathName.includes('crm') ||
       pathName.includes('mentors') ||
       pathName.includes('payments') ||
       pathName.includes('manajemen-beasiswa') ||
@@ -72,6 +73,12 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           href: '/admin/users',
           icon: HiUserGroup,
           paths: ['/admin/users'],
+        },
+        {
+          title: 'CRM Analytics',
+          href: '/admin/crm',
+          icon: FaUsers,
+          paths: ['/admin/crm'],
         },
         {
           title: 'Kelola Mentor',
