@@ -156,19 +156,30 @@ export default function RegisterPage() {
         </div>
 
         {/* Right Side - Form Section */}
-        <div className="w-full lg:w-1/2 flex items-center justify-center p-6 md:p-12 bg-white relative">
-          <div className="lg:hidden absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[#FB991A] to-[#1B7691]"></div>
+        <div className="w-full lg:w-1/2 flex items-center justify-center p-6 md:p-12 bg-slate-50/50 lg:bg-slate-50/20 relative overflow-hidden">
+          {/* Mobile Background Decoration */}
+          <div className="lg:hidden absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[#FB991A] to-[#1B7691]"></div>
 
-          <div className="w-full max-w-md space-y-8">
+          {/* Decorative blurred circles in the background (mesh gradient effect for mobile) */}
+          <div className="lg:hidden absolute -top-12 -left-12 w-64 h-64 bg-[#FB991A]/10 rounded-full blur-3xl pointer-events-none"></div>
+          <div className="lg:hidden absolute bottom-12 -right-12 w-72 h-72 bg-[#1B7691]/8 rounded-full blur-3xl pointer-events-none"></div>
+
+          <div className="w-full max-w-md bg-white p-8 md:p-10 rounded-2xl border border-slate-100 shadow-xl shadow-slate-100/50 space-y-6 relative z-10">
             <div className="text-center lg:text-left">
               <div className="lg:hidden flex justify-center mb-6">
-                <NextImage src='/images/logo_white.svg' alt='logo' width={140} height={100} className="brightness-0 pointer-events-none select-none" />
+                <NextImage 
+                  src='/images/landing/Logo Primary Raih Asa Warna.svg' 
+                  alt='Raih Asa Logo' 
+                  width={150} 
+                  height={104} 
+                  className="object-contain pointer-events-none select-none" 
+                />
               </div>
-              <h2 className="text-3xl font-bold text-gray-900">Buat Akun Baru</h2>
-              <p className="mt-3 text-base text-gray-600">Mulai langkah pertamamu meraih beasiswa impian.</p>
+              <h2 className="text-3xl font-bold text-gray-900 tracking-tight">Buat Akun Baru</h2>
+              <p className="mt-2.5 text-base text-gray-600">Mulai langkah pertamamu meraih beasiswa impian.</p>
             </div>
 
-            <div className="bg-white">
+            <div>
               <FormProvider {...methods}>
                 <form
                   method="post"
@@ -180,6 +191,7 @@ export default function RegisterPage() {
                     label='Username'
                     placeholder='Cth: Jerome Makarim'
                     validation={{ required: 'Username harus diisi' }}
+                    className="!bg-slate-50/40 hover:!bg-slate-50/80 focus:!bg-white focus:!ring-[#FB991A] transition-all duration-200 !rounded-md"
                   />
                   <Input
                     id='email'
@@ -192,6 +204,7 @@ export default function RegisterPage() {
                         message: 'Email tidak sesuai format',
                       },
                     }}
+                    className="!bg-slate-50/40 hover:!bg-slate-50/80 focus:!bg-white focus:!ring-[#FB991A] transition-all duration-200 !rounded-md"
                   />
                   <Input
                     id='password'
@@ -206,6 +219,7 @@ export default function RegisterPage() {
                           'Min. 8 karakter, kombinasi huruf besar, kecil, & angka',
                       },
                     }}
+                    className="!bg-slate-50/40 hover:!bg-slate-50/80 focus:!bg-white focus:!ring-[#FB991A] transition-all duration-200 !rounded-md"
                   />
                   <Input
                     id='whatsapp'
@@ -219,6 +233,7 @@ export default function RegisterPage() {
                           'Nomor WhatsApp tidak valid (Gunakan format 08xxxxxxxxxx atau +62xxxxxxxxxx)',
                       },
                     }}
+                    className="!bg-slate-50/40 hover:!bg-slate-50/80 focus:!bg-white focus:!ring-[#FB991A] transition-all duration-200 !rounded-md"
                   />
 
                   <div className="pt-2">
@@ -226,7 +241,7 @@ export default function RegisterPage() {
                       isLoading={isPending}
                       type='submit'
                       variant='primary'
-                      className='w-full !py-3 !text-base !rounded-xl !bg-[#FB991A] hover:!bg-[#e08916] !font-semibold shadow-lg shadow-orange-500/10'
+                      className='w-full !py-3 !text-base !rounded-xl !bg-[#FB991A] hover:!bg-[#e08916] !font-semibold shadow-md shadow-orange-500/10 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]'
                     >
                       Daftar Sekarang
                     </Button>
@@ -249,7 +264,7 @@ export default function RegisterPage() {
                     </div>
                   )}
 
-                  <p className='text-center text-sm text-gray-500 mt-6'>
+                  <p className='text-center text-xs text-gray-500 mt-6'>
                     Dengan mendaftar, Anda menyetujui <a href="#" className="underline hover:text-gray-800">Syarat & Ketentuan</a> kami.
                   </p>
 
@@ -281,7 +296,7 @@ export default function RegisterPage() {
                     </div>
                   </div>
 
-                  <div className="text-center">
+                  <div className="text-center text-sm">
                     <ButtonLink
                       href='/login'
                       className='font-semibold text-[#FB991A] hover:text-[#d97706]'
