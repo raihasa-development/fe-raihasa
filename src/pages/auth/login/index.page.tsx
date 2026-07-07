@@ -192,20 +192,30 @@ function LoginPage() {
         </div>
 
         {/* Right Side - Form Section */}
-        <div className="w-full lg:w-1/2 flex items-center justify-center p-6 md:p-12 bg-white relative">
+        <div className="w-full lg:w-1/2 flex items-center justify-center p-6 md:p-12 bg-slate-50/50 lg:bg-slate-50/20 relative overflow-hidden">
           {/* Mobile Background Decoration */}
-          <div className="lg:hidden absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[#1B7691] to-[#FB991A]"></div>
+          <div className="lg:hidden absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[#1B7691] to-[#FB991A]"></div>
 
-          <div className="w-full max-w-md space-y-8">
+          {/* Decorative blurred circles in the background (mesh gradient effect for mobile) */}
+          <div className="lg:hidden absolute -top-12 -left-12 w-64 h-64 bg-[#1B7691]/8 rounded-full blur-3xl pointer-events-none"></div>
+          <div className="lg:hidden absolute bottom-12 -right-12 w-72 h-72 bg-[#FB991A]/10 rounded-full blur-3xl pointer-events-none"></div>
+
+          <div className="w-full max-w-md bg-white p-8 md:p-10 rounded-2xl border border-slate-100 shadow-xl shadow-slate-100/50 space-y-6 md:space-y-8 relative z-10">
             <div className="text-center lg:text-left">
               <div className="lg:hidden flex justify-center mb-6">
-                <NextImage src='/images/logo_white.svg' alt='logo' width={140} height={100} className="brightness-0 pointer-events-none select-none" />
+                <NextImage 
+                  src='/images/landing/Logo Primary Raih Asa Warna.svg' 
+                  alt='Raih Asa Logo' 
+                  width={150} 
+                  height={104} 
+                  className="object-contain pointer-events-none select-none" 
+                />
               </div>
-              <h2 className="text-3xl font-bold text-gray-900">Masuk Akun</h2>
-              <p className="mt-3 text-base text-gray-600">Silakan masukkan detail akun Anda</p>
+              <h2 className="text-3xl font-bold text-gray-900 tracking-tight">Masuk Akun</h2>
+              <p className="mt-2.5 text-base text-gray-600">Silakan masukkan detail akun Anda</p>
             </div>
 
-            <div className="bg-white">
+            <div>
               <FormProvider {...methods}>
                 <form method='post' className='space-y-6' onSubmit={handleSubmit(onSubmit)}>
                   <div className="space-y-5">
@@ -214,6 +224,7 @@ function LoginPage() {
                       label='Email'
                       placeholder='nama@email.com'
                       validation={{ required: 'Email tidak boleh kosong' }}
+                      className="!bg-slate-50/40 hover:!bg-slate-50/80 focus:!bg-white focus:!ring-[#1B7691] transition-all duration-200 !rounded-md"
                     />
 
                     <div className="space-y-1">
@@ -223,6 +234,7 @@ function LoginPage() {
                         type='password'
                         placeholder='••••••••'
                         validation={{ required: 'Password tidak boleh kosong' }}
+                        className="!bg-slate-50/40 hover:!bg-slate-50/80 focus:!bg-white focus:!ring-[#1B7691] transition-all duration-200 !rounded-md"
                       />
                       <div className='flex justify-end'>
                         <ButtonLink
@@ -240,7 +252,7 @@ function LoginPage() {
                     isLoading={isPending}
                     type='submit'
                     variant='primary'
-                    className='w-full !py-3 !text-base !rounded-xl !bg-[#1B7691] hover:!bg-[#166076] !font-semibold shadow-lg shadow-blue-900/10'
+                    className='w-full !py-3 !text-base !rounded-xl !bg-[#1B7691] hover:!bg-[#166076] !font-semibold shadow-md shadow-[#1b7691]/20 hover:shadow-lg hover:shadow-[#1b7691]/30 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]'
                   >
                     Masuk
                   </Button>
@@ -282,7 +294,7 @@ function LoginPage() {
                     />
                   </div>
 
-                  <p className='text-center text-gray-600'>
+                  <p className='text-center text-gray-600 text-sm'>
                     Belum memiliki akun?{' '}
                     <ButtonLink
                       href='/register'
