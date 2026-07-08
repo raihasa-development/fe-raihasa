@@ -119,6 +119,8 @@ function DashboardAdminPage() {
   const [analytics, setAnalytics] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [scholarshipMap, setScholarshipMap] = useState<Record<string, { name: string; url: string }>>({});
+  const [affiliateTab, setAffiliateTab] = useState<'summary' | 'details'>('summary');
+  const [selectedPromoCode, setSelectedPromoCode] = useState<string>('ALL');
   const [courseMap, setCourseMap] = useState<Record<string, { id: string; name: string }>>({});
   const [unansweredPostsCount, setUnansweredPostsCount] = useState<number | null>(null);
 
@@ -779,6 +781,267 @@ function DashboardAdminPage() {
                 </tbody>
               </table>
             </div>
+          </div>
+
+          {/* Statistik Paket Membership */}
+          <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-xs mb-10">
+            <div className="flex flex-col mb-4">
+              <h4 className="text-xs font-black text-gray-800 uppercase tracking-wider">Ringkasan Paket Membership</h4>
+              <p className="text-[10px] text-gray-400 font-medium mt-0.5">
+                Statistik pendaftaran dan total omzet paket membership baru yang terdaftar dalam periode filter tanggal ini.
+              </p>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs font-semibold text-gray-600">
+                <thead>
+                  <tr className="border-b border-gray-100 bg-gray-50/50">
+                    <th className="p-3">Nama Paket</th>
+                    <th className="p-3 text-center">Total Registrasi</th>
+                    <th className="p-3 text-center">Aktif</th>
+                    <th className="p-3 text-center">Pending</th>
+                    <th className="p-3 text-center">Expired</th>
+                    <th className="p-3 text-center">Cancelled</th>
+                    <th className="p-3 text-right">Total Omzet</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50 text-gray-600">
+                  {!analytics?.membershipStats || analytics?.membershipStats?.length === 0 ? (
+                    <tr>
+                      <td colSpan={7} className="p-4 text-center text-gray-400 font-medium">
+                        Belum ada data pendaftaran membership pada periode ini.
+                      </td>
+                    </tr>
+                  ) : (
+                    analytics?.membershipStats?.map((stat: any) => (
+                      <tr key={stat.planId} className="hover:bg-gray-50/20 font-medium">
+                        <td className="p-3 font-bold text-gray-800">{stat.name}</td>
+                        <td className="p-3 text-center font-bold text-gray-950">{stat.total}</td>
+                        <td className="p-3 text-center">
+                          <span className="bg-green-50 text-green-700 border border-green-150 px-2.5 py-0.5 rounded-full text-[10px] font-bold">
+                            {stat.active}
+                          </span>
+                        </td>
+                        <td className="p-3 text-center">
+                          <span className="bg-yellow-50 text-yellow-700 border border-yellow-150 px-2.5 py-0.5 rounded-full text-[10px] font-bold">
+                            {stat.pending}
+                          </span>
+                        </td>
+                        <td className="p-3 text-center">
+                          <span className="bg-gray-100 text-gray-600 border border-gray-200 px-2.5 py-0.5 rounded-full text-[10px] font-bold">
+                            {stat.expired}
+                          </span>
+                        </td>
+                        <td className="p-3 text-center">
+                          <span className="bg-red-50 text-red-600 border border-red-150 px-2.5 py-0.5 rounded-full text-[10px] font-bold">
+                            {stat.cancelled}
+                          </span>
+                        </td>
+                        <td className="p-3 text-right font-black text-emerald-600">
+                          {formatIDR(stat.revenue)}
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Laporan Afiliasi & Komisi Mentor */}
+          <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-xs mb-10">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
+              <div>
+                <h4 className="text-xs font-black text-gray-800 uppercase tracking-wider">Laporan Afiliasi & Komisi Mentor</h4>
+                <p className="text-[10px] text-gray-400 font-medium mt-0.5">
+                  Rincian penggunaan kode promo dan komisi mentor untuk transparansi laporan.
+                </p>
+              </div>
+
+              {/* Filters */}
+              <div className="flex flex-wrap items-center gap-3 self-start lg:self-auto">
+                <select
+                  value={selectedPromoCode}
+                  onChange={(e) => setSelectedPromoCode(e.target.value)}
+                  className="px-3 py-1.5 border border-gray-200 bg-white rounded-xl text-xs font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#1B7691]/20 outline-none"
+                >
+                  <option value="ALL">Semua Kode Afiliasi</option>
+                  {analytics?.affiliateSummary?.map((summary: any) => (
+                    <option key={summary.code} value={summary.code}>
+                      {summary.code} ({summary.mentorName})
+                    </option>
+                  ))}
+                </select>
+
+                <div className="flex bg-gray-100 p-1 rounded-xl">
+                  <button
+                    onClick={() => setAffiliateTab('summary')}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                      affiliateTab === 'summary'
+                        ? 'bg-white text-gray-800 shadow-xs'
+                        : 'text-gray-500 hover:text-gray-800'
+                    }`}
+                  >
+                    Ringkasan Komisi
+                  </button>
+                  <button
+                    onClick={() => setAffiliateTab('details')}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                      affiliateTab === 'details'
+                        ? 'bg-white text-gray-800 shadow-xs'
+                        : 'text-gray-500 hover:text-gray-800'
+                    }`}
+                  >
+                    Detail Transaksi
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Mentor Performance Card */}
+            {selectedPromoCode !== 'ALL' && (
+              <div className="mb-6 p-6 bg-slate-50 border border-slate-150 rounded-2xl">
+                <div className="flex justify-between items-start pb-4 mb-4 border-b border-slate-200">
+                  <div>
+                    <h5 className="text-xs font-black text-gray-800 uppercase tracking-wider">
+                      Laporan Transparansi Kinerja Mentor
+                    </h5>
+                    <p className="text-[10px] text-gray-400 font-bold mt-1">
+                      Periode: {new Date(startDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })} s.d {new Date(endDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
+                    </p>
+                  </div>
+                </div>
+
+                {(() => {
+                  const activePromoSummary = analytics?.affiliateSummary?.find(
+                    (s: any) => s.code === selectedPromoCode
+                  );
+                  if (!activePromoSummary) return null;
+
+                  return (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      <div className="bg-white p-4 rounded-xl border border-gray-150 shadow-2xs">
+                        <p className="text-[9px] text-gray-455 font-bold uppercase tracking-wider">Mentor & Kode Promo</p>
+                        <p className="text-sm font-black text-gray-800 mt-1">{activePromoSummary.mentorName}</p>
+                        <p className="text-xs text-gray-500 font-mono font-bold mt-0.5 text-[#1B7691]">{activePromoSummary.code}</p>
+                      </div>
+                      <div className="bg-white p-4 rounded-xl border border-gray-150 shadow-2xs">
+                        <p className="text-[9px] text-gray-455 font-bold uppercase tracking-wider">Registrasi & Komisi</p>
+                        <p className="text-sm font-black text-gray-800 mt-1">{activePromoSummary.count} Pengguna</p>
+                        <p className="text-xs text-gray-500 font-bold mt-0.5">Komisi: {activePromoSummary.commissionPct}% per transaksi</p>
+                      </div>
+                      <div className="bg-white p-4 rounded-xl border border-gray-150 shadow-2xs">
+                        <p className="text-[9px] text-gray-455 font-bold uppercase tracking-wider">Total Pendapatan Komisi</p>
+                        <p className="text-base font-black text-emerald-600 mt-1">{formatIDR(activePromoSummary.totalCommission)}</p>
+                        <p className="text-[10px] text-gray-400 font-medium">Total diskon dinikmati siswa: {formatIDR(activePromoSummary.totalDiscount)}</p>
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
+            )}
+
+            {(() => {
+              const summaries = selectedPromoCode === 'ALL'
+                ? analytics?.affiliateSummary
+                : analytics?.affiliateSummary?.filter((s: any) => s.code === selectedPromoCode);
+
+              const details = selectedPromoCode === 'ALL'
+                ? analytics?.affiliateDetails
+                : analytics?.affiliateDetails?.filter((d: any) => d.code === selectedPromoCode);
+
+              return affiliateTab === 'summary' ? (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs font-semibold text-gray-600">
+                    <thead>
+                      <tr className="border-b border-gray-100 bg-gray-50/50">
+                        <th className="p-3">Kode Promo</th>
+                        <th className="p-3">Mentor / Afiliator</th>
+                        <th className="p-3">Email</th>
+                        <th className="p-3 text-center">Jumlah Penggunaan</th>
+                        <th className="p-3 text-right">Total Diskon</th>
+                        <th className="p-3 text-center">Persen Komisi</th>
+                        <th className="p-3 text-right">Total Komisi</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-50 text-gray-600">
+                      {!summaries || summaries.length === 0 ? (
+                        <tr>
+                          <td colSpan={7} className="p-4 text-center text-gray-400 font-medium">
+                            Belum ada penggunaan kode promo mentor pada periode ini.
+                          </td>
+                        </tr>
+                      ) : (
+                        summaries.map((summary: any) => (
+                          <tr key={`${summary.code}_${summary.mentorName}`} className="hover:bg-gray-50/20 font-medium">
+                            <td className="p-3 font-mono font-bold text-[#1B7691]">{summary.code}</td>
+                            <td className="p-3 text-gray-800 font-bold">{summary.mentorName}</td>
+                            <td className="p-3 text-gray-450">{summary.mentorEmail}</td>
+                            <td className="p-3 text-center font-bold text-gray-900">{summary.count}</td>
+                            <td className="p-3 text-right text-gray-500">{formatIDR(summary.totalDiscount)}</td>
+                            <td className="p-3 text-center">
+                              <span className="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded text-[10px] font-bold">
+                                {summary.commissionPct}%
+                              </span>
+                            </td>
+                            <td className="p-3 text-right font-black text-emerald-600">
+                              {formatIDR(summary.totalCommission)}
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs font-semibold text-gray-600">
+                    <thead>
+                      <tr className="border-b border-gray-100 bg-gray-50/50">
+                        <th className="p-3">Tanggal</th>
+                        <th className="p-3">Siswa (Mentee)</th>
+                        <th className="p-3">Paket Langganan</th>
+                        <th className="p-3">Kode Promo</th>
+                        <th className="p-3">Mentor</th>
+                        <th className="p-3 text-right">Nilai Transaksi</th>
+                        <th className="p-3 text-right">Diskon</th>
+                        <th className="p-3 text-right">Komisi Mentor</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-50 text-gray-600">
+                      {!details || details.length === 0 ? (
+                        <tr>
+                          <td colSpan={8} className="p-4 text-center text-gray-400 font-medium">
+                            Belum ada transaksi afiliasi pada periode ini.
+                          </td>
+                        </tr>
+                      ) : (
+                        details.map((detail: any) => (
+                          <tr key={detail.id} className="hover:bg-gray-50/20 font-medium">
+                            <td className="p-3 text-gray-450 font-medium">
+                              {new Date(detail.redeemedAt).toLocaleDateString('id-ID', {
+                                day: 'numeric',
+                                month: 'short',
+                                year: 'numeric',
+                              })}
+                            </td>
+                            <td className="p-3">
+                              <p className="font-bold text-gray-800">{detail.studentName}</p>
+                              <p className="text-[10px] text-gray-400 font-medium">{detail.studentEmail}</p>
+                            </td>
+                            <td className="p-3 text-gray-855 font-bold">{detail.planName}</td>
+                            <td className="p-3 font-mono font-bold text-[#1B7691]">{detail.code}</td>
+                            <td className="p-3 text-gray-700">{detail.mentorName}</td>
+                            <td className="p-3 text-right text-gray-900 font-bold">{formatIDR(detail.paidAmount)}</td>
+                            <td className="p-3 text-right text-gray-500">{formatIDR(detail.discountApplied)}</td>
+                            <td className="p-3 text-right font-black text-emerald-600">{formatIDR(detail.commissionEarned)}</td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              );
+            })()}
           </div>
 
           {/* Recent Midtrans Transactions Table */}
