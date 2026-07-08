@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { FiCheckCircle, FiXCircle, FiSearch, FiGift, FiClock, FiSlash, FiMail, FiSend, FiUsers, FiAlertCircle, FiActivity } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
 import toast from 'react-hot-toast';
+import { useRouter } from 'next/router';
 
 import withAuth from '@/components/hoc/withAuth';
 import AdminDashboard from '@/layouts/AdminDashboard';
@@ -45,6 +46,8 @@ type User = {
 export default withAuth(AdminUsersPage, 'admin');
 
 function AdminUsersPage() {
+  const router = useRouter();
+  const [hasAutoOpened, setHasAutoOpened] = useState(false);
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -138,6 +141,23 @@ function AdminUsersPage() {
     setPage(1);
     setSelectedUserIds([]);
   }, [verifiedFilter, membershipFilter]);
+
+  // Auto-open activity log modal when redirected from CRM Analytics page with email query param
+  useEffect(() => {
+    if (!router.isReady || hasAutoOpened) return;
+    const { activityEmail } = router.query;
+    if (activityEmail && typeof activityEmail === 'string') {
+      if (search !== activityEmail) {
+        setSearch(activityEmail);
+      }
+      
+      const matchedUser = users.find(u => u.email.toLowerCase() === activityEmail.toLowerCase());
+      if (matchedUser) {
+        openActivityModal(matchedUser);
+        setHasAutoOpened(true);
+      }
+    }
+  }, [router.isReady, router.query, users, search, hasAutoOpened]);
 
   const handleFollowUpVerification = async () => {
     const selectedUsers = users.filter(u => selectedUserIds.includes(u.id));

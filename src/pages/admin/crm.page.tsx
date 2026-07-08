@@ -81,7 +81,7 @@ function CRMAnalyticsPage() {
       <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-gray-200 mb-8">
         <div>
           <Typography variant="h4" className="font-extrabold text-gray-900 leading-tight">
-            Raih Asa CRM & Gamifikasi Analytics 👑
+            Raih Asa CRM & Gamifikasi Analytics
           </Typography>
           <Typography className="text-gray-500 text-xs font-semibold mt-1">
             Analisis segmentasi perilaku (RFM), keaktifan (XP), dan prospek konversi (Hot Leads) user secara mendalam.
@@ -98,14 +98,14 @@ function CRMAnalyticsPage() {
       {showGuide && (
         <div className="bg-white p-6 rounded-2xl border border-gray-150 shadow-xs mb-8 space-y-6 animate-fadeIn">
           <h3 className="text-sm font-black text-gray-800 border-b pb-3 uppercase tracking-wider">
-            📖 Legenda & Rumus Kalkulasi Metrik CRM
+            Legenda & Rumus Kalkulasi Metrik CRM
           </h3>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs text-gray-650 leading-relaxed">
             {/* RFM Column */}
             <div className="space-y-3">
               <h4 className="font-bold text-[#FB991A] flex items-center gap-1 uppercase tracking-wide">
-                🎯 Segmentasi Bisnis RFM
+                Segmentasi Bisnis RFM
               </h4>
               <p className="text-[11px] text-gray-400 font-semibold leading-normal">
                 Mengelompokkan pengguna berdasarkan tiga aspek utama: Recency (waktu aktif terakhir), Frequency (jumlah aktivitas), dan Monetary (nilai transaksi).
@@ -121,7 +121,7 @@ function CRMAnalyticsPage() {
             {/* XP Column */}
             <div className="space-y-3 border-t md:border-t-0 md:border-l md:border-r border-gray-100 pt-4 md:pt-0 md:px-6">
               <h4 className="font-bold text-yellow-600 flex items-center gap-1 uppercase tracking-wide">
-                ⚡ Gamifikasi XP & Leveling
+                Gamifikasi XP & Leveling
               </h4>
               <p className="text-[11px] text-gray-400 font-semibold leading-normal">
                 XP (Experience Points) diakumulasikan dari riwayat aksi aktivitas pengguna dengan bobot bobot nilai sebagai berikut:
@@ -141,7 +141,7 @@ function CRMAnalyticsPage() {
             {/* Hot Leads Column */}
             <div className="space-y-3 border-t md:border-t-0 pt-4 md:pt-0">
               <h4 className="font-bold text-red-500 flex items-center gap-1 uppercase tracking-wide">
-                🔥 Hot Leads Detector
+                Hot Leads Detector
               </h4>
               <p className="text-[11px] text-gray-400 font-semibold leading-normal">
                 Mendeteksi pengguna non-premium (gratisan) teraktif dengan kecenderungan membeli tinggi berdasarkan sinyal aktivitas mereka:
@@ -159,29 +159,73 @@ function CRMAnalyticsPage() {
         </div>
       )}
 
-            {isLoading ? (
-              <div className="flex flex-col items-center justify-center py-20">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1B7691] mb-4"></div>
-                <Typography className="text-gray-500 font-bold text-sm">Menghitung metrik CRM level dewa...</Typography>
-              </div>
-            ) : error ? (
-              <div className="text-center py-20 text-red-500 font-bold text-sm bg-red-50 rounded-2xl p-6 border border-red-150">
-                {error}
-              </div>
-            ) : !data ? (
-              <div className="text-center py-20 text-gray-400 font-bold text-sm">
-                Belum ada data aktivitas terkumpul untuk dianalisis.
-              </div>
-            ) : (
-              <div className="space-y-10">
-                
-                {/* Section 1: RFM & Interest Charts */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                  {/* RFM Pie Chart */}
-                  <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-xs flex flex-col justify-between">
+      {isLoading ? (
+        <div className="flex flex-col items-center justify-center py-24 bg-white rounded-2xl border border-gray-100 shadow-xs">
+          <div className="animate-spin rounded-full h-12 w-12 border-4 border-[#1B7691] border-t-transparent mb-4"></div>
+          <Typography className="text-gray-400 text-xs font-bold uppercase tracking-widest">Menghitung metrik CRM level dewa...</Typography>
+        </div>
+      ) : error ? (
+        <div className="text-center py-20 text-red-500 font-bold text-sm bg-red-50 rounded-2xl p-6 border border-red-150">
+          {error}
+        </div>
+      ) : !data ? (
+        <div className="text-center py-20 text-gray-400 font-bold text-sm bg-white rounded-2xl border border-gray-100 shadow-xs">
+          Belum ada data aktivitas terkumpul untuk dianalisis.
+        </div>
+      ) : (
+        <div className="space-y-10 font-sans">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-xs flex items-center gap-4">
+                    <div className="w-12 h-12 bg-blue-50 text-[#1B7691] rounded-xl flex items-center justify-center shrink-0">
+                      <FiBookOpen className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">Total User</p>
+                      <p className="text-xl font-extrabold text-gray-900">{data?.summary?.totalUsersCount || 0}</p>
+                      <p className="text-[10px] text-gray-400 font-medium">Pengguna terdaftar</p>
+                    </div>
+                  </div>
+
+                  <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-xs flex items-center gap-4">
+                    <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center shrink-0">
+                      <FiActivity className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">User Aktif (XP &gt; 0)</p>
+                      <p className="text-xl font-extrabold text-gray-900">{data?.summary?.activeUsersCount || 0}</p>
+                      <p className="text-[10px] text-gray-400 font-medium">Aktif melakukan interaksi</p>
+                    </div>
+                  </div>
+
+                  <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-xs flex items-center gap-4">
+                    <div className="w-12 h-12 bg-red-50 text-red-500 rounded-xl flex items-center justify-center shrink-0">
+                      <FiTarget className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">Hot Leads (Prospek)</p>
+                      <p className="text-xl font-extrabold text-gray-900">{data?.summary?.totalHotLeadsCount || 0}</p>
+                      <p className="text-[10px] text-gray-400 font-medium">Sinyal ketertarikan beli tinggi</p>
+                    </div>
+                  </div>
+
+                  <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-xs flex items-center gap-4">
+                    <div className="w-12 h-12 bg-amber-50 text-[#FB991A] rounded-xl flex items-center justify-center shrink-0">
+                      <FiAward className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">Rerata Keterlibatan</p>
+                      <p className="text-xl font-extrabold text-gray-900">{data?.summary?.averageXP || 0} XP</p>
+                      <p className="text-[10px] text-gray-400 font-medium">Rata-rata level keaktifan user</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Section 1: RFM Segmentation & Recommendations */}
+                <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-xs flex flex-col lg:flex-row gap-8">
+                  <div className="flex-1 flex flex-col justify-between">
                     <div>
                       <h4 className="text-xs font-black text-gray-800 mb-2 uppercase tracking-wider flex items-center gap-1.5">
-                        <FiTarget className="text-[#FB991A]" /> Segmentasi Bisnis RFM
+                        <FiTarget className="text-[#FB991A]" /> Segmentasi Status Keaktifan (RFM)
                       </h4>
                       <p className="text-[10px] text-gray-400 font-semibold mb-4 leading-relaxed">
                         Pengelompokan otomatis berdasarkan hari aktif terakhir (Recency), frekuensi interaksi (Frequency), dan total transaksi (Monetary).
@@ -198,8 +242,8 @@ function CRMAnalyticsPage() {
                               data={rfmChartData}
                               cx="50%"
                               cy="50%"
-                              innerRadius={60}
-                              outerRadius={80}
+                              innerRadius={65}
+                              outerRadius={85}
                               paddingAngle={4}
                               dataKey="value"
                             >
@@ -210,13 +254,102 @@ function CRMAnalyticsPage() {
                             <ChartTooltip 
                               contentStyle={{ backgroundColor: 'white', borderRadius: '12px', border: '1px solid #E5E7EB', fontSize: '11px', fontWeight: 'bold' }} 
                             />
-                            <Legend verticalAlign="bottom" height={36} iconType="circle" wrapperStyle={{ fontSize: '10px', fontWeight: 'bold' }} />
                           </PieChart>
                         </ResponsiveContainer>
                       )}
+                      <div className="absolute text-center">
+                        <p className="text-[9px] font-bold text-gray-400 uppercase">Total User</p>
+                        <p className="text-lg font-black text-gray-800">{data?.summary?.totalUsersCount || 0}</p>
+                      </div>
                     </div>
                   </div>
 
+                  {/* Actions & Explanations */}
+                  <div className="flex-1 flex flex-col justify-center space-y-4 border-t lg:border-t-0 lg:border-l border-gray-100 pt-6 lg:pt-0 lg:pl-8">
+                    <h5 className="text-[10px] font-black text-gray-400 uppercase tracking-wider">
+                      Definisi Segmen & Tindakan Rekomendasi
+                    </h5>
+                    <div className="space-y-4 max-h-[320px] overflow-y-auto pr-1.5 custom-scrollbar">
+                      {/* Champions */}
+                      <div className="flex items-start gap-3">
+                        <span className="w-3 h-3 rounded-full bg-[#FB991A] mt-1 shrink-0" />
+                        <div className="text-xs">
+                          <div className="flex items-center gap-2 font-bold text-gray-800">
+                            <span>Champions (Premium Aktif)</span>
+                            <span className="text-[10px] bg-amber-50 text-amber-700 px-1.5 py-0.2 rounded font-black">{data?.rfmSegments?.champions || 0} User</span>
+                          </div>
+                          <p className="text-[10px] text-gray-500 font-semibold leading-relaxed mt-0.5">
+                            User premium yang aktif dalam 7 hari terakhir.
+                            <span className="text-[#1B7691] font-black block mt-0.5">Rekomendasi: Berikan insentif/token bonus forum, minta testimoni kesuksesan, atau tawarkan program afiliasi.</span>
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* At-Risk */}
+                      <div className="flex items-start gap-3">
+                        <span className="w-3 h-3 rounded-full bg-[#EF4444] mt-1 shrink-0" />
+                        <div className="text-xs">
+                          <div className="flex items-center gap-2 font-bold text-gray-800">
+                            <span>At-Risk (Premium Pasif)</span>
+                            <span className="text-[10px] bg-red-50 text-red-750 px-1.5 py-0.2 rounded font-black">{data?.rfmSegments?.atRisk || 0} User</span>
+                          </div>
+                          <p className="text-[10px] text-gray-500 font-semibold leading-relaxed mt-0.5">
+                            User premium yang sudah tidak aktif &gt; 14 hari.
+                            <span className="text-[#1B7691] font-black block mt-0.5">Rekomendasi: Kirim pesan re-engagement via WhatsApp secara personal untuk menanyakan kendala atau tawarkan bantuan belajar.</span>
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Newbies */}
+                      <div className="flex items-start gap-3">
+                        <span className="w-3 h-3 rounded-full bg-[#6366F1] mt-1 shrink-0" />
+                        <div className="text-xs">
+                          <div className="flex items-center gap-2 font-bold text-gray-800">
+                            <span>Newbies (User Baru)</span>
+                            <span className="text-[10px] bg-indigo-50 text-indigo-700 px-1.5 py-0.2 rounded font-black">{data?.rfmSegments?.newbies || 0} User</span>
+                          </div>
+                          <p className="text-[10px] text-gray-500 font-semibold leading-relaxed mt-0.5">
+                            Baru mendaftar &le; 7 hari lalu dan belum membeli paket premium.
+                            <span className="text-[#1B7691] font-black block mt-0.5">Rekomendasi: Kirim email panduan penggunaan kelas Bisa Learning gratis atau ajak mencoba fitur rekomendasi Scholra.</span>
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Pasif */}
+                      <div className="flex items-start gap-3">
+                        <span className="w-3 h-3 rounded-full bg-[#9CA3AF] mt-1 shrink-0" />
+                        <div className="text-xs">
+                          <div className="flex items-center gap-2 font-bold text-gray-800">
+                            <span>Pasif (User Dormant)</span>
+                            <span className="text-[10px] bg-gray-100 text-gray-700 px-1.5 py-0.2 rounded font-black">{data?.rfmSegments?.pasif || 0} User</span>
+                          </div>
+                          <p className="text-[10px] text-gray-500 font-semibold leading-relaxed mt-0.5">
+                            User gratisan terdaftar lama yang pasif &gt; 7 hari.
+                            <span className="text-[#1B7691] font-black block mt-0.5">Rekomendasi: Jalankan win-back campaign berupa penawaran diskon paket booster / mentoring terbatas via WhatsApp.</span>
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Lainnya */}
+                      <div className="flex items-start gap-3">
+                        <span className="w-3 h-3 rounded-full bg-[#10B981] mt-1 shrink-0" />
+                        <div className="text-xs">
+                          <div className="flex items-center gap-2 font-bold text-gray-800">
+                            <span>Lainnya (Umum Aktif)</span>
+                            <span className="text-[10px] bg-emerald-50 text-emerald-700 px-1.5 py-0.2 rounded font-black">{data?.rfmSegments?.others || 0} User</span>
+                          </div>
+                          <p className="text-[10px] text-gray-500 font-semibold leading-relaxed mt-0.5">
+                            User gratisan yang aktif di forum atau kelas gratis.
+                            <span className="text-[#1B7691] font-black block mt-0.5">Rekomendasi: Ajak upgrade ke premium dengan menawarkan kupon diskon eksklusif dan tonjolkan benefit mentorship.</span>
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Section 2: Interest & Peak Hours Charts */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                   {/* Interest Clustering Chart */}
                   <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-xs flex flex-col justify-between">
                     <div>
@@ -224,7 +357,7 @@ function CRMAnalyticsPage() {
                         <FiActivity className="text-indigo-500" /> Kluster Minat Pengguna (Interests)
                       </h4>
                       <p className="text-[10px] text-gray-400 font-semibold mb-4 leading-relaxed">
-                        Fokus ketertarikan utama pengguna di platform berdasarkan pola klik dan interaksi modul mereka.
+                        Fokus ketertarikan utama pengguna di platform berdasarkan pola klik halaman dan akses modul.
                       </p>
                     </div>
 
@@ -248,60 +381,73 @@ function CRMAnalyticsPage() {
                         </ResponsiveContainer>
                       )}
                     </div>
-                  </div>
-                </div>
 
-                {/* Section 2: Peak Hours & Broadcast Advice */}
-                <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-xs space-y-6">
-                  <div>
-                    <h4 className="text-xs font-black text-gray-800 mb-2 uppercase tracking-wider flex items-center gap-1.5">
-                      <FiClock className="text-[#1B7691]" /> Analisis Jam Puncak & Saran Broadcast
-                    </h4>
-                    <p className="text-[10px] text-gray-400 font-semibold leading-relaxed">
-                      Heatmap aktivitas seluruh pengguna diakumulasikan per jam untuk memetakan kurva waktu keaktifan tertinggi sepanjang hari.
-                    </p>
-                  </div>
-
-                  {/* Hourly Activity Area Chart */}
-                  <div className="h-60 w-full relative flex items-center justify-center">
-                    {hourlyChartData.length === 0 ? (
-                      <p className="text-xs text-gray-400 font-semibold">Belum ada data aktivitas per jam.</p>
-                    ) : (
-                      <ResponsiveContainer width="100%" height="100%">
-                        <AreaChart data={hourlyChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                          <defs>
-                            <linearGradient id="colorActivity" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor="#1B7691" stopOpacity={0.3}/>
-                              <stop offset="95%" stopColor="#1B7691" stopOpacity={0}/>
-                            </linearGradient>
-                          </defs>
-                          <XAxis dataKey="hour" tick={{ fontSize: 9, fontWeight: 'bold', fill: '#6B7280' }} axisLine={false} tickLine={false} />
-                          <YAxis tick={{ fontSize: 9, fontWeight: 'bold', fill: '#6B7280' }} axisLine={false} tickLine={false} />
-                          <ChartTooltip 
-                            contentStyle={{ backgroundColor: 'white', borderRadius: '12px', border: '1px solid #E5E7EB', fontSize: '11px', fontWeight: 'bold' }} 
-                          />
-                          <Area type="monotone" dataKey="Aktivitas" stroke="#1B7691" strokeWidth={2} fillOpacity={1} fill="url(#colorActivity)" />
-                        </AreaChart>
-                      </ResponsiveContainer>
-                    )}
+                    <div className="mt-4 space-y-2.5 border-t border-gray-50 pt-3">
+                      {interestData.map((item: any, idx: number) => (
+                        <div key={item.name} className="flex justify-between items-center text-xs font-semibold">
+                          <span className="text-gray-600 flex items-center gap-1.5">
+                            <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: idx === 0 ? '#1B7691' : idx === 1 ? '#6366F1' : '#EC4899' }} />
+                            {item.name}
+                          </span>
+                          <span className="font-bold text-gray-900">{item.count} User ({item.percentage}%)</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
 
-                  <div className="p-4 bg-blue-50/50 border border-blue-150 rounded-2xl text-[11px] font-bold text-gray-700 leading-relaxed">
-                    {data.peakHoursAdvice}
+                  {/* Peak Hours & Broadcast Advice */}
+                  <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-xs flex flex-col justify-between">
+                    <div>
+                      <h4 className="text-xs font-black text-gray-800 mb-2 uppercase tracking-wider flex items-center gap-1.5">
+                        <FiClock className="text-[#1B7691]" /> Waktu Puncak Aktivitas & Broadcast Advice
+                      </h4>
+                      <p className="text-[10px] text-gray-400 font-semibold mb-4 leading-relaxed">
+                        Heatmap aktivitas seluruh pengguna diakumulasikan per jam untuk memetakan kurva waktu keaktifan tertinggi sepanjang hari.
+                      </p>
+                    </div>
+
+                    <div className="h-60 w-full relative flex items-center justify-center">
+                      {hourlyChartData.length === 0 ? (
+                        <p className="text-xs text-gray-400 font-semibold">Belum ada data aktivitas per jam.</p>
+                      ) : (
+                        <ResponsiveContainer width="100%" height="100%">
+                          <AreaChart data={hourlyChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                            <defs>
+                              <linearGradient id="colorActivity" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="5%" stopColor="#1B7691" stopOpacity={0.3}/>
+                                <stop offset="95%" stopColor="#1B7691" stopOpacity={0}/>
+                              </linearGradient>
+                            </defs>
+                            <XAxis dataKey="hour" tick={{ fontSize: 9, fontWeight: 'bold', fill: '#6B7280' }} axisLine={false} tickLine={false} />
+                            <YAxis tick={{ fontSize: 9, fontWeight: 'bold', fill: '#6B7280' }} axisLine={false} tickLine={false} />
+                            <ChartTooltip 
+                              contentStyle={{ backgroundColor: 'white', borderRadius: '12px', border: '1px solid #E5E7EB', fontSize: '11px', fontWeight: 'bold' }} 
+                            />
+                            <Area type="monotone" dataKey="Aktivitas" stroke="#1B7691" strokeWidth={2} fillOpacity={1} fill="url(#colorActivity)" />
+                          </AreaChart>
+                        </ResponsiveContainer>
+                      )}
+                    </div>
+
+                    <div className="p-3 bg-blue-50/50 border border-blue-150 rounded-xl text-[10px] font-bold text-gray-700 leading-relaxed mt-4">
+                      {data.peakHoursAdvice}
+                    </div>
                   </div>
                 </div>
 
                 {/* Section 3: Hot Leads Detector (Sales Pipeline) */}
                 <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-xs">
-                  <h4 className="text-xs font-black text-gray-800 mb-2 uppercase tracking-wider flex items-center gap-1.5">
-                    <FiTarget className="text-red-500" /> Hot Leads Detector (Prospek Konversi Booster)
-                  </h4>
-                  <p className="text-[10px] text-gray-400 font-semibold mb-6 leading-relaxed">
-                    User non-premium teraktif yang menunjukkan sinyal ketertarikan tinggi terhadap layanan berbayar (CV/Essay/Interview Boost) berdasarkan pemicu halaman harga/pembayaran.
-                  </p>
+                  <div className="flex flex-col mb-4">
+                    <h4 className="text-xs font-black text-gray-800 uppercase tracking-wider flex items-center gap-1.5">
+                      <FiTarget className="text-red-500" /> Hot Leads Detector (Prospek Konversi Booster)
+                    </h4>
+                    <p className="text-[10px] text-gray-400 font-medium mt-0.5">
+                      User non-premium teraktif yang menunjukkan sinyal ketertarikan tinggi terhadap layanan berbayar (CV/Essay/Interview Boost) berdasarkan pemicu halaman harga/pembayaran.
+                    </p>
+                  </div>
 
                   <div className="overflow-x-auto">
-                    <table className="w-full text-left text-xs font-semibold text-gray-655">
+                    <table className="w-full text-left text-xs font-semibold text-gray-600">
                       <thead>
                         <tr className="border-b border-gray-100 bg-gray-50/50">
                           <th className="p-3 w-12 text-center">Rank</th>
@@ -324,7 +470,7 @@ function CRMAnalyticsPage() {
                               : null;
 
                             return (
-                              <tr key={lead.id} className="hover:bg-gray-50/20">
+                              <tr key={lead.id} className="hover:bg-gray-50/20 font-medium">
                                 <td className="p-3 text-center text-red-500 font-black">{idx + 1}</td>
                                 <td className="p-3">
                                   <p className="font-bold text-gray-800">{lead.name}</p>
@@ -332,12 +478,12 @@ function CRMAnalyticsPage() {
                                 </td>
                                 <td className="p-3 font-mono text-gray-600 font-bold">{lead.whatsapp || '-'}</td>
                                 <td className="p-3 text-center">
-                                  <span className="px-2.5 py-0.5 rounded-full bg-red-50 text-red-700 border border-red-100 text-[10px] font-black">
+                                  <span className="px-2.5 py-0.5 rounded-full bg-red-50 text-red-750 border border-red-100 text-[10px] font-black">
                                     {lead.score} Poin
                                   </span>
                                 </td>
                                 <td className="p-3 text-gray-450 text-[10px] font-bold">{formatDate(lead.lastActive)}</td>
-                                <td className="p-3 text-center">
+                                <td className="p-3 text-center flex items-center justify-center gap-2">
                                   {waLink ? (
                                     <a
                                       href={waLink}
@@ -348,8 +494,14 @@ function CRMAnalyticsPage() {
                                       <FiMessageCircle className="w-3.5 h-3.5" /> Chat WA
                                     </a>
                                   ) : (
-                                    <span className="text-[10px] text-gray-400 font-bold">No WA Kosong</span>
+                                    <span className="text-[10px] text-gray-400 font-bold shrink-0">No WA Kosong</span>
                                   )}
+                                  <a
+                                    href={`/admin/users?activityEmail=${encodeURIComponent(lead.email)}`}
+                                    className="inline-flex items-center gap-1 bg-blue-50 hover:bg-blue-100 text-[#1B7691] border border-blue-200 px-3 py-1.5 rounded-xl text-[10px] font-black transition-colors shrink-0"
+                                  >
+                                    <FiActivity className="w-3.5 h-3.5" /> Detail Log
+                                  </a>
                                 </td>
                               </tr>
                             );
@@ -362,15 +514,17 @@ function CRMAnalyticsPage() {
 
                 {/* Section 4: Gamification Leaderboard */}
                 <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-xs">
-                  <h4 className="text-xs font-black text-gray-800 mb-2 uppercase tracking-wider flex items-center gap-1.5">
-                    <FiAward className="text-yellow-500" /> Leaderboard Keaktifan Pengguna (Gamifikasi XP & Peringkat)
-                  </h4>
-                  <p className="text-[10px] text-gray-400 font-semibold mb-6 leading-relaxed">
-                    Pengguna teraktif yang dihitung secara dinamis berdasarkan total perolehan XP mereka dari log aktivitas.
-                  </p>
+                  <div className="flex flex-col mb-4">
+                    <h4 className="text-xs font-black text-gray-800 uppercase tracking-wider flex items-center gap-1.5">
+                      <FiAward className="text-yellow-500" /> Leaderboard Keaktifan Pengguna (Gamifikasi XP & Peringkat)
+                    </h4>
+                    <p className="text-[10px] text-gray-400 font-medium mt-0.5">
+                      Pengguna teraktif yang dihitung secara dinamis berdasarkan total perolehan XP mereka dari log aktivitas.
+                    </p>
+                  </div>
 
                   <div className="overflow-x-auto">
-                    <table className="w-full text-left text-xs font-semibold text-gray-655">
+                    <table className="w-full text-left text-xs font-semibold text-gray-600">
                       <thead>
                         <tr className="border-b border-gray-100 bg-gray-50/50">
                           <th className="p-3 w-12 text-center">Peringkat</th>
@@ -379,30 +533,30 @@ function CRMAnalyticsPage() {
                           <th className="p-3 text-right">Akumulasi XP</th>
                           <th className="p-3 text-center">Total Aktivitas</th>
                           <th className="p-3">Aktivitas Terakhir</th>
+                          <th className="p-3 text-center">Action</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-gray-50">
+                      <tbody className="divide-y divide-gray-50 text-gray-600 font-medium">
                         {data.leaderboard.length === 0 ? (
                           <tr>
-                            <td colSpan={6} className="p-6 text-center text-gray-400 font-medium">Belum ada aktivitas user yang terekam.</td>
+                            <td colSpan={7} className="p-6 text-center text-gray-400 font-medium">Belum ada aktivitas user yang terekam.</td>
                           </tr>
                         ) : (
                           data.leaderboard.map((user: any, idx: number) => {
-                            // Gelar style mapping
                             const isLegend = user.level === 5;
                             const isExpert = user.level === 4;
                             const isChallenger = user.level === 3;
                             
                             const badgeClass = isLegend 
-                              ? 'bg-amber-100 text-amber-800 border-amber-200' 
+                              ? 'bg-amber-50 text-amber-800 border-amber-200' 
                               : isExpert 
-                              ? 'bg-blue-100 text-blue-800 border-blue-200' 
+                              ? 'bg-blue-50 text-blue-800 border-blue-200' 
                               : isChallenger 
                               ? 'bg-yellow-50 text-yellow-700 border-yellow-100'
                               : 'bg-gray-100 text-gray-700 border-gray-200';
 
                             return (
-                              <tr key={user.id} className="hover:bg-gray-50/20">
+                              <tr key={user.id} className="hover:bg-gray-50/20 font-medium">
                                 <td className="p-3 text-center">
                                   <span className={`inline-block w-6 h-6 rounded-full flex items-center justify-center font-bold text-[11px] ${
                                     idx === 0 ? 'bg-yellow-100 text-yellow-800 font-black' : 
@@ -424,6 +578,14 @@ function CRMAnalyticsPage() {
                                 <td className="p-3 text-right font-black text-gray-800">{user.xp.toLocaleString('id-ID')} XP</td>
                                 <td className="p-3 text-center text-gray-600 font-bold">{user.totalActions} Aksi</td>
                                 <td className="p-3 text-gray-450 text-[10px] font-bold">{formatDate(user.lastActive)}</td>
+                                <td className="p-3 text-center">
+                                  <a
+                                    href={`/admin/users?activityEmail=${encodeURIComponent(user.email)}`}
+                                    className="inline-flex items-center gap-1 bg-blue-50 hover:bg-blue-100 text-[#1B7691] border border-blue-200 px-3 py-1.5 rounded-xl text-[10px] font-black transition-colors"
+                                  >
+                                    <FiActivity className="w-3.5 h-3.5" /> Detail Log
+                                  </a>
+                                </td>
                               </tr>
                             );
                           })
